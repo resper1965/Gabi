@@ -1,0 +1,34 @@
+name: GabiJur
+description: Plataforma de agentes inteligentes para o setor jurídico, baseada em IA, multiidioma e pronta para produção.
+website: https://github.com/resper1965/Gabi
+docs: https://github.com/resper1965/Gabi#readme
+logo: logo.png
+screenshot: screenshot.png
+categories:
+  - ai
+  - legal
+  - fullstack
+  - docker
+  - nodejs
+  - python
+  - postgres
+  - redis
+  - nextjs
+  - typescript
+  - multilingual
+env:
+  - name: POSTGRES_CONNECTION_STRING
+    description: String de conexão do banco de dados PostgreSQL
+    required: true
+  - name: REDIS_HOST
+    description: Host do Redis
+    required: true
+  - name: REDIS_PORT
+    description: Porta do Redis
+    required: true
+  - name: JWT_SECRET_KEY
+    description: Chave secreta para JWT
+    required: true
+  - name: NEXT_PUBLIC_API_URL
+    description: URL do backend para o frontend
+    required: true 
