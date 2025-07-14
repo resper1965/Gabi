@@ -1,0 +1,21 @@
+{
+  "appName": "GabiJur",
+  "welcome": "Welcome to GabiJur!",
+  "sidebar": {
+    "agents": "Agents",
+    "chat": "Chat",
+    "documentation": "Documentation",
+    "mcpServers": "MCP Servers",
+    "clients": "Clients",
+    "profile": "Profile",
+    "security": "Security",
+    "logout": "Logout",
+    "myAccount": "My Account"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In"
+  }
+} 
