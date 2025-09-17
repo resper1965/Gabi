@@ -1,0 +1,12 @@
+[submodule "services/agno"]
+	path = services/agno
+	url = https://github.com/agno-agi/agno.git
+[submodule "services/agent-ui"]
+	path = services/agent-ui
+	url = https://github.com/agno-agi/agent-ui.git
+[submodule "services/ag-ui-protocol"]
+	path = services/ag-ui-protocol
+	url = https://github.com/ag-ui-protocol/ag-ui.git
+[submodule "services/agentic-rag"]
+	path = services/agentic-rag
+	url = https://github.com/SBDI/agentic-rag.git
