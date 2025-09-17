@@ -1,0 +1,29 @@
+http:
+  middlewares:
+    default-sec:
+      chain:
+        middlewares:
+          - sec-headers
+          - compress
+          - rate-limit
+    sec-headers:
+      headers:
+        referrerPolicy: "no-referrer"
+        contentTypeNosniff: true
+        frameDeny: true
+        permissionsPolicy: "accelerometer=(), camera=(), geolocation=(), microphone=()"
+        browserXssFilter: true
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+    compress:
+      compress: {}
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 200
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
