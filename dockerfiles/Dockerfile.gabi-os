@@ -9,10 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 WORKDIR /app
 
 # Copiar código fonte do gabi-os
-COPY ./services/gabi-os/ .
+COPY services/gabi-os/ .
 
 # Instalar dependências
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 7777
-CMD ["python", "main.py"]
+CMD ["python", "agentos.py"]

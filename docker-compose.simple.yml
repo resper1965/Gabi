@@ -1,0 +1,87 @@
+version: "3.9"
+
+networks:
+  gabi-simple:
+    driver: bridge
+
+volumes:
+  db_data:
+
+services:
+  # Banco de dados
+  db:
+    image: ankane/pgvector:latest
+    container_name: gabi-db-simple
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gabi
+      POSTGRES_PASSWORD: gabi_dev_secure_2024
+      POSTGRES_DB: gabi_dev
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - gabi-simple
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gabi -d gabi_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: gabi-redis-simple
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass gabi_redis_2024
+    ports:
+      - "6379:6379"
+    networks:
+      - gabi-simple
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "gabi_redis_2024", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Traefik com portas diferentes
+  traefik:
+    image: traefik:v2.11
+    container_name: gabi-traefik-simple
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:8082"
+      - "--entrypoints.websecure.address=:8444"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--log.level=INFO"
+    ports:
+      - "8082:8082"   # HTTP
+      - "8444:8444"   # HTTPS
+      - "8083:8080"   # Dashboard (API interna)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - gabi-simple
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Aplicação de teste
+  test-app:
+    image: nginx:alpine
+    container_name: gabi-test-app
+    restart: unless-stopped
+    networks:
+      - gabi-simple
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.test.rule=Host(`localhost`)"
+      - "traefik.http.routers.test.entrypoints=web"
+      - "traefik.http.services.test.loadbalancer.server.port=80"

@@ -1,0 +1,139 @@
+version: "3.9"
+
+networks:
+  gabi-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  redis_data:
+
+services:
+  # Banco de dados PostgreSQL + pgvector
+  db:
+    image: ankane/pgvector:latest
+    container_name: gabi-db-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gabi
+      POSTGRES_PASSWORD: gabi_prod_2024
+      POSTGRES_DB: gabi_prod
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gabi -d gabi_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache e sessões
+  redis:
+    image: redis:7-alpine
+    container_name: gabi-redis-prod
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass gabi_redis_prod_2024
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "gabi_redis_prod_2024", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Gabi OS - AgentOS Runtime
+  gabi-os:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.gabi-os
+    container_name: gabi-os-prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_prod_2024@db:5432/gabi_prod
+      REDIS_URL: redis://:gabi_redis_prod_2024@redis:6379/0
+      OS_SECURITY_KEY: gabi_prod_security_key_2024
+      OPENAI_API_KEY: sk-dev-openai-key-placeholder
+      ANTHROPIC_API_KEY: sk-dev-anthropic-key-placeholder
+      AGNO_LOG_LEVEL: INFO
+      AGNO_ENABLE_TELEMETRY: "false"
+      DEFAULT_MODEL: gpt-4o
+      ENABLE_USER_MEMORIES: "true"
+      ENABLE_SESSION_SUMMARIES: "true"
+      MAX_HISTORY_RUNS: "5"
+      PORT: 7777
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "7777:7777"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7777/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Gabi Ingest - Worker de processamento
+  gabi-ingest:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.gabi-ingest
+    container_name: gabi-ingest-prod
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_prod_2024@db:5432/gabi_prod
+      REDIS_URL: redis://:gabi_redis_prod_2024@redis:6379/0
+      OPENAI_API_KEY: sk-dev-openai-key-placeholder
+      ANTHROPIC_API_KEY: sk-dev-anthropic-key-placeholder
+      PORT: 8000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Gabi Chat - Interface Next.js
+  gabi-chat:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.gabi-chat
+    container_name: gabi-chat-prod
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_AGENTOS_URL: http://gabi-os:7777
+      NEXT_PUBLIC_INGEST_URL: http://gabi-ingest:8000
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      gabi-os:
+        condition: service_healthy
+      gabi-ingest:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

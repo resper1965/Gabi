@@ -1,0 +1,190 @@
+version: "3.9"
+
+networks:
+  gabi-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  db_data:
+  traefik_data:
+  logs_data:
+
+services:
+  # Banco de dados com otimizações
+  db:
+    image: ankane/pgvector:latest
+    container_name: gabi-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gabi
+      POSTGRES_PASSWORD: gabi_dev_secure_2024
+      POSTGRES_DB: gabi_dev
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gabi -d gabi_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Traefik para desenvolvimento
+  traefik:
+    image: traefik:v2.11
+    container_name: gabi-traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:8080"
+      - "--entrypoints.websecure.address=:8443"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--log.level=INFO"
+      - "--accesslog=true"
+    ports:
+      - "8080:8080"   # HTTP
+      - "8443:8443"   # HTTPS
+      - "8081:8080"   # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_data:/data
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.5
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis para cache e sessões
+  redis:
+    image: redis:7-alpine
+    container_name: gabi-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass gabi_redis_2024
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.15
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # Prometheus para monitoramento
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: gabi-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.20
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Grafana para dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: gabi-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=gabi_grafana_2024
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3001:3000"
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.25
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - prometheus
+
+  # Log aggregator
+  loki:
+    image: grafana/loki:latest
+    container_name: gabi-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - ./data/loki:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.30
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Log collector
+  promtail:
+    image: grafana/promtail:latest
+    container_name: gabi-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      gabi-dev:
+        ipv4_address: 172.20.0.35
+    depends_on:
+      - loki
