@@ -1,0 +1,13 @@
+{
+  "error": {
+    "not_found": "Recurso no encontrado.",
+    "unauthorized": "Acceso no autorizado.",
+    "validation": "Error de validación.",
+    "server": "Error interno del servidor."
+  },
+  "success": {
+    "created": "Recurso creado con éxito.",
+    "updated": "Recurso actualizado con éxito.",
+    "deleted": "Recurso eliminado con éxito."
+  }
+} 

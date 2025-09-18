@@ -1,0 +1,37 @@
+services:
+  api:
+    build: ./backend
+    ports:
+      - "18000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+  frontend:
+    build: ./frontend
+    ports:
+      - "13000:3000"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - api
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: gabijur
+    ports:
+      - "15432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis_data:/data
+volumes:
+  db_data:
+  redis_data:
