@@ -49,18 +49,18 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background/80 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md bg-background-secondary border-border">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
             <span className="text-3xl font-montserrat font-medium text-foreground">
               Gabi<span className="text-brand">.</span>
             </span>
           </div>
-          <CardTitle className="text-2xl font-montserrat font-medium">
+          <CardTitle className="text-2xl font-montserrat font-medium text-foreground">
             Entrar
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-secondary-foreground">
             Acesse sua conta para continuar
           </CardDescription>
         </CardHeader>
@@ -73,7 +73,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-foreground">Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -83,12 +83,12 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
                 placeholder="seu@email.com"
                 required
                 disabled={isLoading}
-                className="bg-secondary border-border text-foreground"
+                className="bg-background-secondary border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className="text-foreground">Senha</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -99,7 +99,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
                   placeholder="Sua senha"
                   required
                   disabled={isLoading}
-                  className="bg-secondary border-border text-foreground pr-10"
+                  className="bg-background-secondary border-border text-foreground placeholder:text-muted-foreground pr-10"
                 />
                 <Button
                   type="button"
@@ -120,7 +120,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
             
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/80 text-primary-foreground font-montserrat font-medium"
+              className="w-full bg-primary hover:bg-primaryAccent text-white font-montserrat font-medium"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -136,11 +136,11 @@ export default function LoginForm({ onLoginSuccess, onSwitchToRegister }: LoginF
           
           {onSwitchToRegister && (
             <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-secondary-foreground">
                 Não tem uma conta?{' '}
                 <Button
                   variant="link"
-                  className="p-0 h-auto text-primary hover:text-primary/80"
+                  className="p-0 h-auto text-primary hover:text-primaryAccent"
                   onClick={onSwitchToRegister}
                   disabled={isLoading}
                 >

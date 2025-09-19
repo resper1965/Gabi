@@ -1,0 +1,51 @@
+# gabi-chat: Next.js (produção) - VERSÃO COM NPM
+FROM node:20-alpine AS deps
+WORKDIR /app
+
+# Instalar dependências do sistema
+RUN apk add --no-cache libc6-compat
+
+# Copiar arquivos de dependências
+COPY services/gabi-chat/package.json ./
+
+# Instalar dependências
+RUN npm install --only=production
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Instalar dependências do sistema
+RUN apk add --no-cache libc6-compat
+
+# Copiar código fonte
+COPY services/gabi-chat/ .
+
+# Instalar todas as dependências
+RUN npm install
+
+# Build da aplicação
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Instalar dependências do sistema
+RUN apk add --no-cache libc6-compat
+
+# Configurar ambiente de produção
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Copiar arquivos necessários
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+
+# Criar pasta public se não existir
+RUN mkdir -p ./public
+
+# Expor porta
+EXPOSE 3000
+
+# Comando de inicialização
+CMD ["npm", "start"]

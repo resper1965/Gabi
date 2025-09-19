@@ -11,20 +11,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta de cores ness
-        primary: '#EEF1F6',
-        primaryAccent: '#0B0C0E',
+        // Paleta de cores ness - CORRIGIDA PARA CONTRASTE
+        primary: '#00ADE8',
+        primaryAccent: '#0099CC',
         brand: '#00ADE8',
         background: {
           DEFAULT: '#0B0C0E',
           secondary: '#111317'
         },
-        secondary: '#151820',
+        foreground: '#EEF1F6', // Texto principal - ALTO CONTRASTE
+        secondary: {
+          DEFAULT: '#151820',
+          foreground: '#B8BCC8' // Texto secundário - CONTRASTE ADEQUADO
+        },
         border: '#1B2030',
         accent: '#00ADE8',
-        muted: '#A1A1AA',
-        destructive: '#E53935',
-        positive: '#22C55E'
+        muted: {
+          DEFAULT: '#8B919F',
+          foreground: '#6B7280' // Texto muted - CONTRASTE LEGÍVEL
+        },
+        destructive: '#EF4444',
+        positive: '#10B981'
       },
       fontFamily: {
         geist: 'var(--font-geist-sans)',

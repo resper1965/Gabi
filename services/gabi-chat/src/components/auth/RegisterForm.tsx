@@ -67,18 +67,18 @@ export default function RegisterForm({ invitationToken, onRegisterSuccess, onSwi
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background/80 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md bg-background-secondary border-border">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
             <span className="text-3xl font-montserrat font-medium text-foreground">
               Gabi<span className="text-brand">.</span>
             </span>
           </div>
-          <CardTitle className="text-2xl font-montserrat font-medium">
+          <CardTitle className="text-2xl font-montserrat font-medium text-foreground">
             {invitationToken ? 'Aceitar Convite' : 'Criar Conta'}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-secondary-foreground">
             {invitationToken 
               ? 'Complete seu cadastro para acessar a organização'
               : 'Crie sua conta para começar'

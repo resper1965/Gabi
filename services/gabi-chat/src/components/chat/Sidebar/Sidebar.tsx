@@ -24,9 +24,9 @@ const SidebarHeader = () => {
   const { organization, user, hasPermission, logout } = useAuth();
   
   return (
-    <div className="mb-8 pl-2">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-2xl font-montserrat font-medium text-white">Gabi<span className="text-brand">.</span></span>
+    <div className="mb-6 pl-2">
+      <div className="flex items-center gap-2 mb-6">
+        <span className="text-2xl font-montserrat font-medium text-foreground">Gabi<span className="text-brand">.</span></span>
       </div>
       {organization && (
         <div className="mb-4">
@@ -41,7 +41,7 @@ const SidebarHeader = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full justify-start text-xs font-montserrat"
+              className="w-full justify-start text-xs font-montserrat bg-background-secondary border-border text-foreground hover:bg-background hover:text-foreground"
             >
               <Settings className="h-3 w-3 mr-2" />
               Administração
@@ -52,11 +52,11 @@ const SidebarHeader = () => {
       
       {/* User Info & Logout */}
       {user && (
-        <div className="mb-4 p-2 bg-secondary/50 rounded-lg">
-          <div className="text-xs text-muted-foreground mb-1">
+        <div className="mb-4 p-3 bg-background-secondary/50 rounded-lg border border-border">
+          <div className="text-xs text-foreground mb-1 font-medium">
             {user.full_name}
           </div>
-          <div className="text-xs text-muted-foreground mb-2">
+          <div className="text-xs text-secondary-foreground mb-3">
             {user.role === 'platform_admin' ? 'Platform Admin' : 
              user.role === 'org_admin' ? 'Org Admin' : 'User'}
           </div>
@@ -64,7 +64,7 @@ const SidebarHeader = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => logout()}
-            className="w-full justify-start text-xs text-muted-foreground hover:text-foreground"
+            className="w-full justify-start text-xs text-secondary-foreground hover:text-foreground hover:bg-background"
           >
             <LogOut className="h-3 w-3 mr-2" />
             Sair
@@ -92,13 +92,13 @@ const NewChatButton = ({
     }}
     disabled={disabled}
     size="lg"
-    className={`h-9 w-full rounded-xl text-xs font-montserrat font-medium text-background cursor-pointer z-10 relative ${
+    className={`h-10 w-full rounded-xl text-sm font-montserrat font-medium cursor-pointer z-10 relative transition-all duration-200 ${
       hasUnsavedMessages 
-        ? 'bg-orange-500 hover:bg-orange-600' 
-        : 'bg-primary hover:bg-primary/80'
+        ? 'bg-orange-500 hover:bg-orange-600 text-white' 
+        : 'bg-primary hover:bg-primaryAccent text-white'
     }`}
   >
-    <Icon type="plus-icon" size="xs" className="text-background" />
+    <Icon type="plus-icon" size="xs" className="text-white mr-2" />
     <span>
       {hasUnsavedMessages ? 'Novo Chat*' : 'Novo Chat'}
     </span>
@@ -109,7 +109,7 @@ const NewChatButton = ({
 )
 
 const ModelDisplay = ({ model }: { model: string }) => (
-  <div className="flex h-9 w-full items-center gap-3 rounded-xl border border-primary/15 bg-accent p-3 text-xs font-montserrat font-medium text-white">
+  <div className="flex h-10 w-full items-center gap-3 rounded-xl border border-border bg-background-secondary p-3 text-sm font-montserrat font-medium text-foreground">
     {(() => {
       const icon = getProviderIcon(model)
       return icon ? <Icon type={icon} className="shrink-0" size="xs" /> : null
@@ -196,31 +196,31 @@ const Endpoint = () => {
   }
 
   return (
-    <div className="flex flex-col items-start gap-2">
-      <div className="text-xs font-montserrat font-medium text-primary">GabiOS</div>
+    <div className="flex flex-col items-start gap-3">
+      <div className="text-sm font-montserrat font-medium text-foreground">GabiOS</div>
       {isEditing ? (
-        <div className="flex w-full items-center gap-1">
+        <div className="flex w-full items-center gap-2">
           <input
             type="text"
             value={endpointValue}
             onChange={(e) => setEndpointValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex h-9 w-full items-center text-ellipsis rounded-xl border border-primary/15 bg-accent p-3 text-xs font-montserrat font-medium text-white placeholder:text-muted"
+            className="flex h-10 w-full items-center text-ellipsis rounded-xl border border-border bg-background-secondary p-3 text-sm font-montserrat font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             autoFocus
           />
           <Button
             variant="ghost"
             size="icon"
             onClick={handleSave}
-            className="hover:cursor-pointer hover:bg-transparent"
+            className="hover:cursor-pointer hover:bg-background-secondary text-foreground"
           >
             <Icon type="save" size="xs" />
           </Button>
         </div>
       ) : (
-        <div className="flex w-full items-center gap-1">
+        <div className="flex w-full items-center gap-2">
           <motion.div
-            className="relative flex h-9 w-full cursor-pointer items-center justify-between rounded-xl border border-primary/15 bg-accent p-3"
+            className="relative flex h-10 w-full cursor-pointer items-center justify-between rounded-xl border border-border bg-background-secondary p-3 hover:bg-background transition-colors"
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onClick={() => setIsEditing(true)}
@@ -236,7 +236,7 @@ const Endpoint = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <p className="flex items-center gap-2 whitespace-nowrap text-xs font-montserrat font-medium text-white">
+                  <p className="flex items-center gap-2 whitespace-nowrap text-sm font-montserrat font-medium text-foreground">
                     <Icon type="edit" size="xxs" /> Editar GabiOS
                   </p>
                 </motion.div>
@@ -249,7 +249,7 @@ const Endpoint = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <p className="text-xs font-montserrat font-medium text-white">
+                  <p className="text-sm font-montserrat font-medium text-foreground">
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
                         ENDPOINT_PLACEHOLDER
@@ -266,7 +266,7 @@ const Endpoint = () => {
             variant="ghost"
             size="icon"
             onClick={handleRefresh}
-            className="hover:cursor-pointer hover:bg-transparent"
+            className="hover:cursor-pointer hover:bg-background-secondary text-foreground"
           >
             <motion.div
               key={isRotating ? 'rotating' : 'idle'}
@@ -330,14 +330,14 @@ const Sidebar = () => {
 
   return (
     <motion.aside
-      className="relative flex h-screen shrink-0 grow-0 flex-col overflow-hidden px-4 py-3 font-dmmono"
-      initial={{ width: '16rem' }}
-      animate={{ width: isCollapsed ? '2.5rem' : '16rem' }}
+      className="relative flex h-screen shrink-0 grow-0 flex-col overflow-hidden px-6 py-4 font-dmmono bg-background border-r border-border"
+      initial={{ width: '20rem' }}
+      animate={{ width: isCollapsed ? '3rem' : '20rem' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
       <motion.button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute right-2 top-2 z-10 p-1"
+        className="absolute right-3 top-3 z-10 p-2 hover:bg-background-secondary rounded-lg transition-colors"
         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         type="button"
         whileTap={{ scale: 0.95 }}
@@ -345,11 +345,11 @@ const Sidebar = () => {
         <Icon
           type="sheet"
           size="xs"
-          className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
+          className={`transform text-foreground ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
         />
       </motion.button>
       <motion.div
-        className="w-60 flex-1 flex flex-col"
+        className="w-full flex-1 flex flex-col"
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: isCollapsed ? 0 : 1, x: isCollapsed ? -20 : 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -359,13 +359,13 @@ const Sidebar = () => {
       >
         <div className="space-y-6 flex-1">
           <SidebarHeader />
-          <div className="relative z-20">
+          <div className="relative z-20 space-y-3">
             <NewChatButton
               disabled={false}
               onClick={handleNewChat}
               hasUnsavedMessages={messages.length > 0}
             />
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="text-xs text-secondary-foreground mt-2 px-2">
               Mensagens: {messages.length}
               {messages.length > 0 && (
                 <span className="text-orange-400 ml-1">(não salvas)</span>
@@ -378,20 +378,20 @@ const Sidebar = () => {
               {isEndpointActive && (
                 <>
                   <motion.div
-                    className="flex w-full flex-col items-start gap-2"
+                    className="flex w-full flex-col items-start gap-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
                   >
-                    <div className="text-xs font-montserrat font-medium uppercase text-primary">
+                    <div className="text-sm font-montserrat font-medium uppercase text-foreground">
                       Modo
                     </div>
                     {isEndpointLoading ? (
-                      <div className="flex w-full flex-col gap-2">
+                      <div className="flex w-full flex-col gap-3">
                         {Array.from({ length: 3 }).map((_, index) => (
                           <Skeleton
                             key={index}
-                            className="h-9 w-full rounded-xl"
+                            className="h-10 w-full rounded-xl bg-background-secondary"
                           />
                         ))}
                       </div>
@@ -413,12 +413,12 @@ const Sidebar = () => {
         </div>
         {/* Footer com ness. */}
         <motion.div
-          className="mt-auto pt-4"
+          className="mt-auto pt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: isCollapsed ? 0 : 1 }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
-          <div className="text-xs font-montserrat font-medium text-primary/60 text-center">
+          <div className="text-sm font-montserrat font-medium text-secondary-foreground text-center">
             ness<span className="text-brand">.</span>
           </div>
         </motion.div>

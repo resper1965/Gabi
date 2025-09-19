@@ -1,0 +1,206 @@
+version: "3.9"
+
+# Gabi - Chat Multi-Agentes com Control Panel
+# Versão com painel de controle funcional
+
+networks:
+  gabi-network:
+    driver: bridge
+    name: gabi-network
+
+volumes:
+  gabi_postgres_data:
+  gabi_redis_data:
+
+services:
+  # Banco de dados PostgreSQL + pgvector
+  gabi-db:
+    image: ankane/pgvector:latest
+    container_name: gabi-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gabi
+      POSTGRES_PASSWORD: gabi_dev_secure_2024
+      POSTGRES_DB: gabi_dev
+    volumes:
+      - gabi_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gabi -d gabi_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis para cache e sessões
+  gabi-redis:
+    image: redis:7-alpine
+    container_name: gabi-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass gabi_redis_2024
+    volumes:
+      - gabi_redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Traefik - Proxy reverso
+  gabi-traefik:
+    image: traefik:v2.11
+    container_name: gabi-traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--log.level=INFO"
+    ports:
+      - "8080:80"     # HTTP
+      - "8081:8080"   # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - gabi-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # gabi-os - AgentOS Runtime
+  gabi-os:
+    build:
+      context: ../../
+      dockerfile: dockerfiles/Dockerfile.gabi-os
+    container_name: gabi-os
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_dev_secure_2024@db:5432/gabi_dev
+      REDIS_URL: redis://:gabi_redis_2024@redis:6379/0
+      PORT: 7777
+    ports:
+      - "7777:7777"
+    networks:
+      - gabi-network
+    depends_on:
+      - gabi-db
+      - gabi-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7777/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-os.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.gabi-os.entrypoints=web"
+      - "traefik.http.services.gabi-os.loadbalancer.server.port=7777"
+
+  # gabi-ingest - Worker de processamento
+  gabi-ingest:
+    build:
+      context: ../../
+      dockerfile: dockerfiles/Dockerfile.gabi-ingest
+    container_name: gabi-ingest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_dev_secure_2024@db:5432/gabi_dev
+      REDIS_URL: redis://:gabi_redis_2024@redis:6379/0
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    networks:
+      - gabi-network
+    depends_on:
+      - gabi-db
+      - gabi-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-ingest.rule=Host(`localhost`) && PathPrefix(`/ingest`)"
+      - "traefik.http.routers.gabi-ingest.entrypoints=web"
+      - "traefik.http.services.gabi-ingest.loadbalancer.server.port=8000"
+
+  # gabi-panel - Control Panel Dashboard
+  gabi-panel:
+    build:
+      context: ../../
+      dockerfile: dockerfiles/Dockerfile.gabi-panel
+    container_name: gabi-panel
+    restart: unless-stopped
+    environment:
+      PORT: 9000
+    ports:
+      - "9000:9000"
+    networks:
+      - gabi-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-panel.rule=Host(`localhost`) && PathPrefix(`/panel`)"
+      - "traefik.http.routers.gabi-panel.entrypoints=web"
+      - "traefik.http.services.gabi-panel.loadbalancer.server.port=9000"
+
+  # gabi-chat - Interface Next.js (CORRIGIDA)
+  gabi-chat:
+    build:
+      context: ../../
+      dockerfile: dockerfiles/Dockerfile.gabi-chat-npm
+    container_name: gabi-chat
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_AGENTOS_URL: http://gabi-os:7777
+      NEXT_PUBLIC_INGEST_URL: http://gabi-ingest:8000
+      DATABASE_URL: postgresql://gabi:gabi_dev_secure_2024@db:5432/gabi_dev
+      REDIS_URL: redis://:gabi_redis_2024@redis:6379/0
+    ports:
+      - "3000:3000"
+    networks:
+      - gabi-network
+    depends_on:
+      - gabi-db
+      - gabi-redis
+      - gabi-os
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-chat.rule=Host(`localhost`)"
+      - "traefik.http.routers.gabi-chat.entrypoints=web"
+      - "traefik.http.services.gabi-chat.loadbalancer.server.port=3000"
+
+  # Aplicação de teste
+  gabi-test:
+    image: nginx:alpine
+    container_name: gabi-test
+    restart: unless-stopped
+    networks:
+      - gabi-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-test.rule=Host(`localhost`) && PathPrefix(`/test`)"
+      - "traefik.http.routers.gabi-test.entrypoints=web"
+      - "traefik.http.services.gabi-test.loadbalancer.server.port=80"
