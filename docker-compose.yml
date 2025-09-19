@@ -1,0 +1,118 @@
+version: "3.9"
+
+networks:
+  web:
+    external: true
+  internal:
+    driver: bridge
+
+volumes:
+  traefik_letsencrypt:
+  db_data:
+
+secrets:
+  POSTGRES_PASSWORD:
+    file: ./secrets/POSTGRES_PASSWORD
+  OS_SECURITY_KEY:
+    file: ./secrets/OS_SECURITY_KEY
+  OPENAI_API_KEY:
+    file: ./secrets/OPENAI_API_KEY
+
+services:
+  traefik:
+    image: traefik:2.11
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.filename=/etc/traefik/traefik_dynamic.yml"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http3=true"
+      - "--certificatesresolvers.le.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
+      - "--api.dashboard=false"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - traefik_letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik_dynamic.yml:/etc/traefik/traefik_dynamic.yml:ro
+    networks: [web]
+
+  db:
+    image: ankane/pgvector:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD
+      POSTGRES_DB: ${POSTGRES_DB}
+    secrets:
+      - POSTGRES_PASSWORD
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks: [internal]
+
+  gabi-os:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.gabi-os
+    image: gabi/os:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      OS_SECURITY_KEY_FILE: /run/secrets/OS_SECURITY_KEY
+      OPENAI_API_KEY_FILE: /run/secrets/OPENAI_API_KEY
+    secrets:
+      - OS_SECURITY_KEY
+      - OPENAI_API_KEY
+      - POSTGRES_PASSWORD
+    depends_on: [db]
+    expose:
+      - "7777"
+    networks: [internal, web]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-os.rule=Host(`os.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.gabi-os.entrypoints=websecure"
+      - "traefik.http.routers.gabi-os.tls.certresolver=le"
+      - "traefik.http.services.gabi-os.loadbalancer.server.port=7777"
+      - "traefik.http.routers.gabi-os.middlewares=default-sec@file"
+
+  gabi-chat:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.gabi-chat
+    image: gabi/chat:latest
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_AGENTOS_URL: "http://gabi-os:7777"
+    depends_on: [gabi-os]
+    expose:
+      - "3000"
+    networks: [internal, web]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gabi-chat.rule=Host(`chat.${DOMAIN_ROOT}`)"
+      - "traefik.http.routers.gabi-chat.entrypoints=websecure"
+      - "traefik.http.routers.gabi-chat.tls.certresolver=le"
+      - "traefik.http.services.gabi-chat.loadbalancer.server.port=3000"
+      - "traefik.http.routers.gabi-chat.middlewares=default-sec@file"
+
+
+  gabi-ingest:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Dockerfile.gabi-ingest
+    image: gabi/ingest:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      OPENAI_API_KEY_FILE: /run/secrets/OPENAI_API_KEY
+    secrets:
+      - OPENAI_API_KEY
+      - POSTGRES_PASSWORD
+    depends_on: [db]
+    networks: [internal]

@@ -1,0 +1,68 @@
+version: "3.9"
+
+networks:
+  gabi-local:
+    driver: bridge
+
+volumes:
+  db_data:
+
+services:
+  # Banco de dados para desenvolvimento local
+  db:
+    image: ankane/pgvector:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gabi
+      POSTGRES_PASSWORD: gabi_dev_password_2024
+      POSTGRES_DB: gabi_dev
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks: [gabi-local]
+
+  # gabi-os (AgentOS) - Desenvolvimento
+  gabi-os:
+    build:
+      context: ./services/gabi-os
+      dockerfile: ../../dockerfiles/Dockerfile.gabi-os
+    image: gabi/os:dev
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_dev_password_2024@db:5432/gabi_dev
+      OS_SECURITY_KEY: gabi_dev_security_key_2024
+      OPENAI_API_KEY: sk-dev-openai-key-placeholder
+    depends_on: [db]
+    ports:
+      - "7777:7777"
+    networks: [gabi-local]
+
+  # gabi-chat (Interface) - Desenvolvimento
+  gabi-chat:
+    build:
+      context: ./services/gabi-chat
+      dockerfile: ../../dockerfiles/Dockerfile.gabi-chat
+    image: gabi/chat:dev
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_AGENTOS_URL: "http://localhost:7777"
+    depends_on: [gabi-os]
+    ports:
+      - "3000:3000"
+    networks: [gabi-local]
+
+  # gabi-ingest (Worker) - Desenvolvimento
+  gabi-ingest:
+    build:
+      context: ./services/gabi-ingest
+      dockerfile: ../../dockerfiles/Dockerfile.gabi-ingest
+    image: gabi/ingest:dev
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://gabi:gabi_dev_password_2024@db:5432/gabi_dev
+      OPENAI_API_KEY: sk-dev-openai-key-placeholder
+    depends_on: [db]
+    ports:
+      - "8000:8000"
+    networks: [gabi-local]

@@ -1,0 +1,16 @@
+{
+  "name": "gabi-chat",
+  "version": "1.0.0",
+  "description": "Gabi Chat - Interface multi-agentes",
+  "main": "chat_app.js",
+  "scripts": {
+    "start": "node chat_app.js",
+    "dev": "node chat_app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
