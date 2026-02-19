@@ -1,0 +1,291 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ══════════════════════════════════════════
+   gabi. Design System — Sharp Premium Dark
+   Adapted from ness. Design Kit
+   ══════════════════════════════════════════ */
+
+@theme {
+  /* ── Brand Primary (Emerald/Teal) ── */
+  --color-gabi-primary: #10b981;
+  --color-gabi-hover: #059669;
+  --color-gabi-light: #34d399;
+  --color-gabi-dark: #047857;
+  --color-gabi-dim: rgba(16, 185, 129, 0.5);
+  --color-gabi-glow: rgba(16, 185, 129, 0.25);
+
+  /* ── Module Accents ── */
+  --color-mod-ghost: #10b981; /* emerald */
+  --color-mod-law: #f59e0b; /* amber */
+  --color-mod-ntalk: #06b6d4; /* cyan */
+  --color-mod-insightcare: #f43f5e; /* rose */
+
+  /* ── Surfaces ── */
+  --color-surface-base: #0a0f1a;
+  --color-surface-raised: #111827;
+  --color-surface-card: #1a2332;
+  --color-surface-overlay: rgba(10, 15, 26, 0.7);
+  --color-surface-glass: rgba(17, 24, 39, 0.6);
+
+  /* ── Status ── */
+  --color-status-active: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-critical: #ef4444;
+  --color-status-info: #06b6d4;
+
+  /* ── Typography ── */
+  --font-ui: "Montserrat", system-ui, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Radii ── */
+  --radius-tech: 8px;
+  --radius-soft: 12px;
+}
+
+/* ══════════════════════════════════════════
+   Brand Mark
+   gabi. — lowercase, dot in brand accent
+   ══════════════════════════════════════════ */
+
+.brand-mark {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: -0.02em;
+}
+.brand-mark .dot {
+  color: var(--color-gabi-primary);
+}
+
+/* ══════════════════════════════════════════
+   Global Reset & Base
+   ══════════════════════════════════════════ */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+html {
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-surface-base);
+  color: #e2e8f0;
+  position: relative;
+}
+
+/* ══════════════════════════════════════════
+   Utility Classes
+   ══════════════════════════════════════════ */
+
+/* Accent text */
+.neon-text {
+  color: var(--color-gabi-primary);
+}
+
+/* Glow ring */
+.neon-glow {
+  box-shadow:
+    0 0 12px var(--color-gabi-glow),
+    inset 0 0 6px rgba(16, 185, 129, 0.05);
+}
+
+/* Tech border — interactive */
+.tech-border {
+  border: 1px solid #1e293b;
+  transition:
+    border-color 200ms,
+    box-shadow 200ms;
+}
+.tech-border:hover {
+  border-color: var(--color-gabi-primary);
+}
+.tech-border:focus-within {
+  border-color: var(--color-gabi-primary);
+  box-shadow: 0 0 0 3px var(--color-gabi-glow);
+}
+
+/* Glass panel */
+.glass-panel {
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Background grid */
+.cyber-grid {
+  position: relative;
+}
+.cyber-grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(16, 185, 129, 0.04) 1px,
+    transparent 0
+  );
+  background-size: 32px 32px;
+  animation: grid-drift 25s linear infinite;
+  pointer-events: none;
+}
+
+/* Data table */
+.data-grid {
+  width: 100%;
+  font-family: var(--font-data);
+  font-size: 0.8rem;
+  border-collapse: collapse;
+}
+.data-grid thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-surface-raised);
+}
+.data-grid th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #1e293b;
+}
+.data-grid td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+}
+.data-grid tbody tr:hover {
+  background: rgba(16, 185, 129, 0.04);
+}
+
+/* Active navigation indicator */
+.nav-link-active {
+  position: relative;
+}
+.nav-link-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--color-gabi-primary);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px var(--color-gabi-glow);
+}
+
+/* ══════════════════════════════════════════
+   Animations
+   ══════════════════════════════════════════ */
+
+@keyframes grid-drift {
+  to {
+    background-position: 32px 32px;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 400ms ease-out both;
+}
+.animate-fade-in {
+  animation: fade-in 400ms ease-out both;
+}
+.animate-slide-in {
+  animation: slide-in 250ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ══════════════════════════════════════════
+   Focus & Interaction
+   ══════════════════════════════════════════ */
+
+:focus-visible {
+  outline: 2px solid var(--color-gabi-primary);
+  outline-offset: 2px;
+}
+
+button,
+a,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* ══════════════════════════════════════════
+   Light Theme Override
+   ══════════════════════════════════════════ */
+
+[data-theme="light"] {
+  --color-surface-base: #f8fafc;
+  --color-surface-raised: #ffffff;
+  --color-surface-card: #ffffff;
+  --color-surface-overlay: rgba(248, 250, 252, 0.8);
+  --color-surface-glass: rgba(255, 255, 255, 0.7);
+  color: #1e293b;
+}
