@@ -3,6 +3,7 @@
 import { useAuth } from "./auth-provider"
 import { usePathname } from "next/navigation"
 import { Sidebar } from "./sidebar"
+import { ErrorBoundary } from "./error-boundary"
 import { Loader2 } from "lucide-react"
 
 const PUBLIC_PATHS = ["/login"]
@@ -39,11 +40,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  // Authenticated layout: sidebar + content
+  // Authenticated layout: sidebar + content + error boundary
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   )
 }

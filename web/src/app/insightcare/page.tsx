@@ -5,8 +5,10 @@ import { ChatPanel, type Message } from "@/components/chat-panel"
 import { UploadButton } from "@/components/upload-button"
 import { gabi } from "@/lib/api"
 import { ShieldCheck } from "lucide-react"
+import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-insightcare)"
+const CTX_WINDOW = 10
 
 export default function InsightCarePage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -26,11 +28,12 @@ export default function InsightCarePage() {
     setIsLoading(true)
 
     try {
+      const history = messages.slice(-CTX_WINDOW).map((m) => ({ role: m.role, content: m.content }))
       const res = await gabi.insightcare.chat({
         tenant_id: "default",
         agent,
         question: text,
-        chat_history: messages.map((m) => ({ role: m.role, content: m.content })),
+        chat_history: history,
         summary: summary || undefined,
       }) as { response: string | Record<string, unknown>; sources_used: number; summary?: string }
 
@@ -55,16 +58,10 @@ export default function InsightCarePage() {
   const handleUpload = async (file: File) => {
     await gabi.care.upload("default", "policy", file)
     const isXlsx = file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls")
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: isXlsx
-          ? `📊 Planilha **${file.name}** importada como dados de sinistralidade.`
-          : `📄 Documento **${file.name}** indexado na base de seguros.`,
-      },
-    ])
+    toast.success(isXlsx
+      ? `📊 ${file.name} importado como sinistralidade`
+      : `📄 ${file.name} indexado na base de seguros`
+    )
   }
 
   return (
@@ -80,12 +77,7 @@ export default function InsightCarePage() {
               <p className="text-xs text-zinc-500">Sua Analista de Seguros</p>
             </div>
           </div>
-          <UploadButton
-            onUpload={handleUpload}
-            accept=".pdf,.docx,.txt,.xlsx,.xls"
-            moduleAccent={ACCENT}
-            label="Upload"
-          />
+          <UploadButton onUpload={handleUpload} accept=".pdf,.docx,.txt,.xlsx,.xls" moduleAccent={ACCENT} label="Upload" />
         </div>
         <div className="flex gap-2">
           {agents.map((a) => (
@@ -93,9 +85,7 @@ export default function InsightCarePage() {
               key={a.key}
               onClick={() => setAgent(a.key)}
               className={`px-3 py-1.5 rounded-[var(--radius-tech)] text-xs font-medium transition-all duration-200 cursor-pointer ${
-                agent === a.key
-                  ? "text-white"
-                  : "bg-white/5 text-slate-400 hover:text-white"
+                agent === a.key ? "text-white" : "bg-white/5 text-slate-400 hover:text-white"
               }`}
               style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}30` } : undefined}
               title={a.desc}
@@ -105,13 +95,7 @@ export default function InsightCarePage() {
           ))}
         </div>
       </header>
-      <ChatPanel
-        messages={messages}
-        onSend={handleSend}
-        isLoading={isLoading}
-        placeholder={`Pergunte à gabi. sobre ${agents.find((a) => a.key === agent)?.desc.toLowerCase()}...`}
-        moduleAccent={ACCENT}
-      />
+      <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder={`Pergunte à gabi. sobre ${agents.find((a) => a.key === agent)?.desc.toLowerCase()}...`} moduleAccent={ACCENT} />
     </div>
   )
 }

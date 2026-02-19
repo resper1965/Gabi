@@ -4,14 +4,15 @@ import { useState } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { gabi } from "@/lib/api"
 import { Database, Settings, RefreshCw } from "lucide-react"
+import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-ntalk)"
+const CTX_WINDOW = 10
 
 export default function NTalkPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [summary, setSummary] = useState<string | null>(null)
-  const [showConfig, setShowConfig] = useState(false)
 
   const handleSend = async (text: string) => {
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text }
@@ -19,15 +20,16 @@ export default function NTalkPage() {
     setIsLoading(true)
 
     try {
+      const history = messages.slice(-CTX_WINDOW).map((m) => ({ role: m.role, content: m.content }))
       const res = await gabi.ntalk.ask({
         tenant_id: "default",
         question: text,
-        chat_history: messages.map((m) => ({ role: m.role, content: m.content })),
+        chat_history: history,
         summary: summary || undefined,
       }) as { analysis: string; sql?: string; results?: { row_count: number }; summary?: string }
 
       let content = res.analysis || "Sem resposta"
-      if (res.sql) content = `**SQL:**\n\`\`\`sql\n${res.sql}\n\`\`\`\n\n${content}`
+      if (res.sql) content = `**SQL Gerado:**\n\`\`\`sql\n${res.sql}\n\`\`\`\n\n${content}`
       if (res.results) content += `\n\n_${res.results.row_count} linhas retornadas_`
 
       setMessages((prev) => [...prev, {
@@ -47,13 +49,10 @@ export default function NTalkPage() {
     setIsLoading(true)
     try {
       const res = await gabi.data.syncSchema("default") as { tables_synced: number; terms_created: number }
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now().toString(), role: "assistant", content: `🔄 Schema sincronizado: **${res.tables_synced}** tabelas, **${res.terms_created}** termos criados no dicionário.` },
-      ])
+      toast.success(`🔄 Schema sincronizado: ${res.tables_synced} tabelas, ${res.terms_created} termos`)
     } catch (e: unknown) {
       const errorMsg = e instanceof Error ? e.message : "Erro"
-      setMessages((prev) => [...prev, { id: Date.now().toString(), role: "assistant", content: `⚠️ Sync falhou: ${errorMsg}` }])
+      toast.error(`Sync falhou: ${errorMsg}`)
     } finally {
       setIsLoading(false)
     }
@@ -83,7 +82,6 @@ export default function NTalkPage() {
             <span>Sync Schema</span>
           </button>
           <button
-            onClick={() => setShowConfig(!showConfig)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200 bg-white/5 text-slate-400 hover:text-white"
             title="Configurar conexão"
           >
@@ -91,13 +89,7 @@ export default function NTalkPage() {
           </button>
         </div>
       </header>
-      <ChatPanel
-        messages={messages}
-        onSend={handleSend}
-        isLoading={isLoading}
-        placeholder="Pergunte sobre sua carteira imobiliária..."
-        moduleAccent={ACCENT}
-      />
+      <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder="Pergunte sobre seus dados..." moduleAccent={ACCENT} />
     </div>
   )
 }

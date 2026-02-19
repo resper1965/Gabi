@@ -5,8 +5,10 @@ import { ChatPanel, type Message } from "@/components/chat-panel"
 import { UploadButton } from "@/components/upload-button"
 import { gabi } from "@/lib/api"
 import { PenTool } from "lucide-react"
+import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-ghost)"
+const CTX_WINDOW = 10
 
 export default function GhostPage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -18,18 +20,17 @@ export default function GhostPage() {
     setIsLoading(true)
 
     try {
+      const history = messages.slice(-CTX_WINDOW).map((m) => ({ role: m.role, content: m.content }))
       const res = await gabi.ghost.generate({
         profile_id: "default",
         prompt: text,
-        chat_history: messages.map((m) => ({ role: m.role, content: m.content })),
+        chat_history: history,
       }) as { text: string }
 
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
+      setMessages((prev) => [...prev, {
+        id: (Date.now() + 1).toString(), role: "assistant",
         content: res.text || "Sem resposta",
-      }
-      setMessages((prev) => [...prev, assistantMsg])
+      }])
     } catch (e: unknown) {
       const errorMsg = e instanceof Error ? e.message : "Erro desconhecido"
       setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: `⚠️ ${errorMsg}` }])
@@ -40,10 +41,7 @@ export default function GhostPage() {
 
   const handleUpload = async (file: File) => {
     await gabi.writer.upload("default", "content", file)
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), role: "assistant", content: `📄 Documento **${file.name}** indexado com sucesso.` },
-    ])
+    toast.success(`📄 ${file.name} indexado com sucesso`)
   }
 
   return (
@@ -59,27 +57,11 @@ export default function GhostPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <UploadButton
-            onUpload={handleUpload}
-            accept=".pdf,.docx,.txt,.md"
-            moduleAccent={ACCENT}
-            label="Estilo"
-          />
-          <UploadButton
-            onUpload={async (file) => { await gabi.writer.upload("default", "content", file) }}
-            accept=".pdf,.docx,.txt,.md"
-            moduleAccent={ACCENT}
-            label="Conteúdo"
-          />
+          <UploadButton onUpload={handleUpload} accept=".pdf,.docx,.txt,.md" moduleAccent={ACCENT} label="Estilo" />
+          <UploadButton onUpload={async (f) => { await gabi.writer.upload("default", "content", f); toast.success(`📄 ${f.name} indexado`) }} accept=".pdf,.docx,.txt,.md" moduleAccent={ACCENT} label="Conteúdo" />
         </div>
       </header>
-      <ChatPanel
-        messages={messages}
-        onSend={handleSend}
-        isLoading={isLoading}
-        placeholder="Peça para a gabi. escrever algo..."
-        moduleAccent={ACCENT}
-      />
+      <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder="Peça para a gabi. escrever algo..." moduleAccent={ACCENT} />
     </div>
   )
 }

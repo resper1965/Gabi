@@ -5,8 +5,10 @@ import { ChatPanel, type Message } from "@/components/chat-panel"
 import { UploadButton } from "@/components/upload-button"
 import { gabi } from "@/lib/api"
 import { Scale } from "lucide-react"
+import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-law)"
+const CTX_WINDOW = 10
 
 export default function LawPage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -26,10 +28,11 @@ export default function LawPage() {
     setIsLoading(true)
 
     try {
+      const history = messages.slice(-CTX_WINDOW).map((m) => ({ role: m.role, content: m.content }))
       const res = await gabi.law.agent({
         agent,
         query: text,
-        chat_history: messages.map((m) => ({ role: m.role, content: m.content })),
+        chat_history: history,
       }) as { result: Record<string, unknown>; sources_used: number }
 
       const content = typeof res.result === "string"
@@ -50,10 +53,7 @@ export default function LawPage() {
 
   const handleUpload = async (file: File) => {
     await gabi.legal.upload("law", file)
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), role: "assistant", content: `📄 Documento **${file.name}** indexado na base jurídica.` },
-    ])
+    toast.success(`📄 ${file.name} indexado na base jurídica`)
   }
 
   return (
@@ -69,12 +69,7 @@ export default function LawPage() {
               <p className="text-xs text-zinc-500">Sua Auditora Jurídica</p>
             </div>
           </div>
-          <UploadButton
-            onUpload={handleUpload}
-            accept=".pdf,.docx,.txt"
-            moduleAccent={ACCENT}
-            label="Upload Doc"
-          />
+          <UploadButton onUpload={handleUpload} accept=".pdf,.docx,.txt" moduleAccent={ACCENT} label="Upload Doc" />
         </div>
         <div className="flex gap-2">
           {agents.map((a) => (
@@ -82,9 +77,7 @@ export default function LawPage() {
               key={a.key}
               onClick={() => setAgent(a.key)}
               className={`px-3 py-1.5 rounded-[var(--radius-tech)] text-xs font-medium transition-all duration-200 cursor-pointer ${
-                agent === a.key
-                  ? "text-white"
-                  : "bg-white/5 text-slate-400 hover:text-white"
+                agent === a.key ? "text-white" : "bg-white/5 text-slate-400 hover:text-white"
               }`}
               style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}30` } : undefined}
               title={a.desc}
@@ -94,13 +87,7 @@ export default function LawPage() {
           ))}
         </div>
       </header>
-      <ChatPanel
-        messages={messages}
-        onSend={handleSend}
-        isLoading={isLoading}
-        placeholder={`Pergunte à gabi. ${agents.find((a) => a.key === agent)?.label}...`}
-        moduleAccent={ACCENT}
-      />
+      <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder={`Pergunte à gabi. ${agents.find((a) => a.key === agent)?.label}...`} moduleAccent={ACCENT} />
     </div>
   )
 }

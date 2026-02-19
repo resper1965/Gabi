@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, type FormEvent } from "react"
 import { Send, Loader2 } from "lucide-react"
+import ReactMarkdown from "react-markdown"
 
 export interface Message {
   id: string
@@ -81,9 +82,51 @@ export function ChatPanel({
               }`}
               style={msg.role === "assistant" ? { borderLeft: `2px solid ${moduleAccent}` } : undefined}
             >
-              <div className="whitespace-pre-wrap" style={{ fontFamily: "var(--font-ui)" }}>
-                {msg.content}
-              </div>
+              {msg.role === "assistant" ? (
+                <div className="prose-chat" style={{ fontFamily: "var(--font-ui)" }}>
+                  <ReactMarkdown
+                    components={{
+                      code: ({ className, children, ...props }) => {
+                        const isBlock = className?.includes("language-")
+                        if (isBlock) {
+                          return (
+                            <pre className="bg-black/30 rounded-[var(--radius-tech)] p-3 overflow-x-auto my-2 text-xs">
+                              <code className={className} style={{ fontFamily: "var(--font-data)" }} {...props}>
+                                {children}
+                              </code>
+                            </pre>
+                          )
+                        }
+                        return (
+                          <code
+                            className="bg-white/10 px-1.5 py-0.5 rounded text-[0.85em]"
+                            style={{ fontFamily: "var(--font-data)" }}
+                            {...props}
+                          >
+                            {children}
+                          </code>
+                        )
+                      },
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                      em: ({ children }) => <em className="text-slate-400">{children}</em>,
+                      ul: ({ children }) => <ul className="list-disc list-inside mb-2 pl-1 space-y-0.5">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal list-inside mb-2 pl-1 space-y-0.5">{children}</ol>,
+                      a: ({ href, children }) => (
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: moduleAccent }}>
+                          {children}
+                        </a>
+                      ),
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <div className="whitespace-pre-wrap" style={{ fontFamily: "var(--font-ui)" }}>
+                  {msg.content}
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -93,7 +136,10 @@ export function ChatPanel({
               className="bg-[var(--color-surface-card)] rounded-[var(--radius-soft)] px-4 py-3"
               style={{ borderLeft: `2px solid ${moduleAccent}` }}
             >
-              <Loader2 className="w-4 h-4 animate-spin" style={{ color: moduleAccent }} />
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" style={{ color: moduleAccent }} />
+                <span className="text-xs text-slate-500">gabi. está pensando...</span>
+              </div>
             </div>
           </div>
         )}
