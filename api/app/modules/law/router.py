@@ -12,6 +12,7 @@ from app.database import get_db
 from app.core.auth import CurrentUser, get_current_user
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
+from app.core.rate_limit import check_rate_limit
 from app.models.law import LegalDocument, LegalChunk, RegulatoryAlert
 
 router = APIRouter()

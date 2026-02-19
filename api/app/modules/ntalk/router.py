@@ -15,6 +15,7 @@ from app.core.auth import CurrentUser, get_current_user
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
 from app.core.memory import summarize, should_summarize
+from app.core.rate_limit import check_rate_limit
 from app.models.ntalk import BusinessDictionary, GoldenQuery, TenantConnection, AuditLog
 from app.config import get_settings
 
