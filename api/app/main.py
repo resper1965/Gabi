@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Gabi Hub API",
     description="Unified AI Backend — nGhost + Law & Comply + nTalkSQL + InsightCare",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -36,6 +36,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── Health Check ──
+from app.core.health import router as health_router
+app.include_router(health_router, tags=["Health"])
 
 # ── Module Routers ──
 from app.modules.ghost.router import router as ghost_router
@@ -48,7 +52,6 @@ app.include_router(law_router, prefix="/api/law", tags=["Law & Comply"])
 app.include_router(ntalk_router, prefix="/api/ntalk", tags=["nTalkSQL"])
 app.include_router(insightcare_router, prefix="/api/insightcare", tags=["InsightCare"])
 
-
-@app.get("/health")
-async def health():
-    return {"status": "ok", "service": "gabi-hub", "modules": ["ghost", "law", "ntalk", "insightcare"]}
+# ── Admin Router ──
+from app.modules.admin.router import router as admin_router
+app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])

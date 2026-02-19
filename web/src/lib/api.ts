@@ -98,12 +98,24 @@ export const gabiCare = {
     uploadFile("/api/insightcare/upload", file, { tenant_id: tenantId, doc_type: docType, ...(clientId ? { client_id: clientId } : {}) }),
 }
 
+// ── Admin ──
+
+export const gabiAdmin = {
+  users: () => request("/api/admin/users"),
+  stats: () => request("/api/admin/stats"),
+  updateRole: (userId: string, role: string) =>
+    request(`/api/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
+  updateStatus: (userId: string, isActive: boolean) =>
+    request(`/api/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ is_active: isActive }) }),
+}
+
 // Unified export
 export const gabi = {
   writer: gabiWriter,
   legal: gabiLegal,
   data: gabiData,
   care: gabiCare,
+  admin: gabiAdmin,
   ghost: gabiWriter,
   law: gabiLegal,
   ntalk: gabiData,
