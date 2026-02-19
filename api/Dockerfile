@@ -6,6 +6,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential gcc libpq-dev && rm -rf /var/lib/apt/lists/*
 
+# Install CPU-only PyTorch first (400MB vs 2GB CUDA)
+RUN pip install --no-cache-dir --prefix=/install \
+    torch --index-url https://download.pytorch.org/whl/cpu
+
 COPY pyproject.toml .
 RUN pip install --no-cache-dir --prefix=/install .
 
