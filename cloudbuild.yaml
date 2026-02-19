@@ -69,9 +69,9 @@ steps:
       - "--max-instances=3"
       - "--port=8080"
       - "--allow-unauthenticated"
-      - "--set-env-vars=GABI_GCP_PROJECT_ID=${PROJECT_ID},GABI_VERTEX_AI_LOCATION=${_REGION}"
-      - "--set-secrets=GABI_DATABASE_URL=GABI_DATABASE_URL:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=GABI_FIREBASE_ADMIN_SA:latest"
-      - '--set-env-vars=GABI_CORS_ORIGINS=["https://gabi.ness.com.br","https://gabi-web-${PROJECT_NUMBER}.run.app"]'
+      - "--add-cloudsql-instances=${PROJECT_ID}:${_REGION}:gabi-db"
+      - "--set-env-vars=GABI_GCP_PROJECT_ID=${PROJECT_ID},GABI_VERTEX_AI_LOCATION=${_REGION},GABI_CORS_ORIGINS=*"
+      - "--set-secrets=GABI_DATABASE_URL=GABI_DATABASE_URL:latest"
     waitFor: ["push-api"]
 
   # ── Deploy Web to Cloud Run ──
@@ -95,7 +95,7 @@ steps:
 substitutions:
   _REGION: us-central1
   _REPO: gabi
-  _API_URL: https://gabi-api-CHANGEME.run.app
+  _API_URL: https://gabi-api-935866797303.us-central1.run.app
   _FIREBASE_API_KEY: ""
   _FIREBASE_AUTH_DOMAIN: ""
   _FIREBASE_PROJECT_ID: ""
