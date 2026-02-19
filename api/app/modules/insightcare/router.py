@@ -16,6 +16,7 @@ from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
 from app.core.memory import summarize, should_summarize
 from app.core.rate_limit import check_rate_limit
+from app.core.dynamic_rag import should_retrieve, format_rag_context
 from app.models.insightcare import (
     InsuranceClient, Policy, ClaimsData,
     InsuranceDocument, InsuranceChunk,
@@ -154,43 +155,50 @@ async def chat(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """InsightCare chat — RAG with agent-specific prompts."""
+    """InsightCare chat — Dynamic RAG with agent-specific prompts."""
+    check_rate_limit(user.uid)
+
     system_prompt = AGENTS.get(req.agent)
     if not system_prompt:
         return {"error": f"Agente '{req.agent}' não encontrado."}
 
-    # RAG: search document chunks (tenant-segregated)
-    query_embedding = embed(req.question)
+    # Dynamic RAG: let AI decide if knowledge base search is needed
+    intent = await should_retrieve(req.question, req.chat_history)
+    did_retrieve = intent["needs_rag"]
+    chunks = []
 
-    # Build filter: tenant + optional client
-    params = {"emb": str(query_embedding), "tid": req.tenant_id}
-    client_filter = ""
-    if req.client_id:
-        client_filter = "AND (d.client_id = :cid OR d.client_id IS NULL)"
-        params["cid"] = req.client_id
+    if did_retrieve:
+        query_embedding = embed(intent["refined_query"])
+        params = {"emb": str(query_embedding), "tid": req.tenant_id}
+        client_filter = ""
+        if req.client_id:
+            client_filter = "AND (d.client_id = :cid OR d.client_id IS NULL)"
+            params["cid"] = req.client_id
 
-    rag_results = await db.execute(
-        text(f"""
-            SELECT c.content, c.section_ref, d.title, d.doc_type
-            FROM ic_chunks c
-            JOIN ic_documents d ON c.document_id = d.id
-            WHERE d.tenant_id = :tid AND d.is_active = true
-              AND c.embedding IS NOT NULL {client_filter}
-            ORDER BY c.embedding <=> :emb::vector
-            LIMIT 8
-        """),
-        params,
-    )
-    chunks = [dict(row._mapping) for row in rag_results]
+        rag_results = await db.execute(
+            text(f"""
+                SELECT c.content, c.section_ref, d.title, d.doc_type
+                FROM ic_chunks c
+                JOIN ic_documents d ON c.document_id = d.id
+                WHERE d.tenant_id = :tid AND d.is_active = true
+                  AND c.embedding IS NOT NULL {client_filter}
+                ORDER BY c.embedding <=> :emb::vector
+                LIMIT 8
+            """),
+            params,
+        )
+        chunks = [dict(row._mapping) for row in rag_results]
 
-    # For claims_analyst, also fetch numeric data
+    rag_context = format_rag_context(chunks)
+
+    # For claims_analyst, always fetch numeric data (not affected by dynamic RAG)
     claims_context = ""
     if req.agent == "claims_analyst" and req.client_id:
         claims_res = await db.execute(
             select(ClaimsData)
             .where(ClaimsData.tenant_id == req.tenant_id, ClaimsData.client_id == req.client_id)
             .order_by(ClaimsData.period.desc())
-            .limit(24)  # Last 24 periods
+            .limit(24)
         )
         claims = claims_res.scalars().all()
         if claims:
@@ -201,14 +209,7 @@ async def chat(
                 for c in claims
             )
 
-    # Build context
-    rag_context = "\n".join(
-        f"[{c['doc_type'].upper()}] {c.get('section_ref', '')} — {c['content'][:600]}"
-        for c in chunks
-    ) if chunks else "Nenhum documento encontrado na base."
-
     prompt = f"""
-[BASE DE CONHECIMENTO]
 {rag_context}
 {claims_context}
 

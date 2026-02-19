@@ -100,34 +100,40 @@ async def invoke_agent(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Invoke a specialized legal agent."""
+    """Invoke a specialized legal agent with dynamic RAG + multi-agent debate."""
+    check_rate_limit(user.uid)
+
     system_prompt = AGENTS.get(req.agent)
     if not system_prompt:
         return {"error": f"Agente '{req.agent}' não encontrado. Use: auditor, researcher, drafter, watcher"}
 
-    # RAG: search legal knowledge base
-    query_embedding = embed(req.query)
-    rag_results = await db.execute(
-        text("""
-            SELECT c.content, c.hierarchy, d.title, d.doc_type
-            FROM law_chunks c
-            JOIN law_documents d ON c.document_id = d.id
-            WHERE d.is_active = true AND c.embedding IS NOT NULL
-            ORDER BY c.embedding <=> :emb::vector
-            LIMIT 8
-        """),
-        {"emb": str(query_embedding)},
+    # Dynamic RAG: let the AI decide if knowledge base search is needed
+    chunks, did_retrieve = await retrieve_if_needed(
+        question=req.query,
+        chat_history=req.chat_history,
+        db=db,
+        chunks_table="law_chunks",
+        docs_table="law_documents",
+        doc_type_col="doc_type",
+        limit=8,
     )
-    chunks = [dict(row._mapping) for row in rag_results]
+    rag_context = format_rag_context(chunks)
 
-    # Build context
-    rag_context = "\n".join(
-        f"[{c['doc_type'].upper()}] {c.get('hierarchy', '')} — {c['content'][:600]}"
-        for c in chunks
-    ) if chunks else "Nenhum documento encontrado na base."
+    # Multi-agent debate for auditor: run auditor + researcher in parallel
+    if req.agent == "auditor":
+        result = await debate(
+            agents=[
+                AgentConfig(name="auditor", system_prompt=AGENTS["auditor"], module="law", output_json=True),
+                AgentConfig(name="researcher", system_prompt=AGENTS["researcher"], module="law", output_json=True),
+            ],
+            query=req.document_text or req.query,
+            rag_context=rag_context,
+            chat_history=req.chat_history,
+        )
+        return {"agent": "auditor+researcher", "result": result, "sources_used": len(chunks), "dynamic_rag": did_retrieve}
 
+    # Single-agent for other types
     prompt = f"""
-[BASE_DE_CONHECIMENTO_RAG]
 {rag_context}
 
 [CONSULTA/CONTRATO]
@@ -136,14 +142,13 @@ async def invoke_agent(
 Execute a análise conforme suas instruções.
 """
 
-    # Use Gemini Pro for law (precision + long context)
-    if req.agent in ("auditor", "researcher"):
+    if req.agent in ("researcher",):
         result = await generate_json(module="law", prompt=prompt, system_instruction=system_prompt)
     else:
         result = {"text": await generate(module="law", prompt=prompt,
                                           system_instruction=system_prompt, chat_history=req.chat_history)}
 
-    return {"agent": req.agent, "result": result, "sources_used": len(chunks)}
+    return {"agent": req.agent, "result": result, "sources_used": len(chunks), "dynamic_rag": did_retrieve}
 
 
 @router.get("/documents")
