@@ -73,9 +73,8 @@ steps:
           --memory=1Gi --cpu=1 \
           --min-instances=0 --max-instances=3 \
           --port=8080 \
-          --allow-unauthenticated \
           --add-cloudsql-instances=${PROJECT_ID}:${_REGION}:gabi-db \
-          --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi.ness.com.br\",\"http://localhost:3000\"]##PYTHONPATH=/app" \
+          --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi.ness.com.br\",\"http://localhost:3000\"]##GABI_ADMIN_EMAILS=[\"resper@ness.com.br\",\"resper@bekaa.eu\"]##GABI_AUTO_APPROVE_DOMAINS=[\"ness.com.br\",\"bekaa.eu\"]##PYTHONPATH=/app" \
           --set-secrets="GABI_DATABASE_URL=GABI_DATABASE_URL:latest"
     waitFor: ["push-api"]
 
@@ -94,7 +93,6 @@ steps:
       - "--min-instances=0"
       - "--max-instances=3"
       - "--port=3000"
-      - "--allow-unauthenticated"
     waitFor: ["push-web"]
 
 substitutions:

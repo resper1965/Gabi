@@ -60,7 +60,10 @@ export default function LoginPage() {
           >
             Gabi<span style={{ color: "#00ade8" }}>.</span>
           </h1>
-          <p className="text-slate-500 text-sm mt-2">Inteligencia Artificial powered</p>
+          <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+            Inteligencia Artificial<br />
+            powered by <span className="text-slate-400">ness.</span>
+          </p>
         </div>
 
         {/* Google Sign-In */}

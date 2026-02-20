@@ -52,7 +52,6 @@ gcloud run deploy gabi-api \
   --memory=1Gi --cpu=1 \
   --min-instances=0 --max-instances=3 \
   --port=8080 \
-  --allow-unauthenticated \
   --set-env-vars="GABI_GCP_PROJECT_ID=${PROJECT_ID},GABI_VERTEX_AI_LOCATION=${REGION}" \
   --set-secrets="GABI_DATABASE_URL=GABI_DATABASE_URL:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=GABI_FIREBASE_ADMIN_SA:latest" \
   --project="${PROJECT_ID}"
@@ -70,7 +69,6 @@ gcloud run deploy gabi-web \
   --memory=512Mi --cpu=1 \
   --min-instances=0 --max-instances=3 \
   --port=3000 \
-  --allow-unauthenticated \
   --project="${PROJECT_ID}"
 
 WEB_URL=$(gcloud run services describe gabi-web --region="${REGION}" --project="${PROJECT_ID}" --format='value(status.url)')

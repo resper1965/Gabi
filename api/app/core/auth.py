@@ -105,7 +105,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
         if email.lower() in [e.lower() for e in settings.admin_emails]:
-            if user.role != "superadmin" or user.status != "approved":
+            if user.role != "superadmin" or user.status != "approved" or user.allowed_modules != ALL_MODULES:
                 user.role = "superadmin"
                 user.status = "approved"
                 user.allowed_modules = ALL_MODULES
