@@ -13,8 +13,7 @@ export type { FirebaseUser } from './auth'
 export { adminApp, adminAuth } from './auth'
 export { getApp, getAuth } from './auth'
 
-// DB — Prisma Client
-export { db } from './db'
+// DB — Not used (Gabi uses Python/SQLAlchemy for database access)
 
 // Utils
 export { cn, escapeHtml, sanitizeFilename, validateFile, validateContent, errorResponse, successResponse } from './utils'

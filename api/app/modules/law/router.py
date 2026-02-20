@@ -13,6 +13,8 @@ from app.core.auth import CurrentUser, get_current_user
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
 from app.core.rate_limit import check_rate_limit
+from app.core.dynamic_rag import retrieve_if_needed, format_rag_context
+from app.core.multi_agent import debate, AgentConfig
 from app.models.law import LegalDocument, LegalChunk, RegulatoryAlert
 
 router = APIRouter()

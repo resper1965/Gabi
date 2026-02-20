@@ -1,0 +1,29 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "web/Dockerfile"
+      - "-t"
+      - "us-central1-docker.pkg.dev/gabi-hub/gabi/gabi-web:latest"
+      - "--build-arg"
+      - "NEXT_PUBLIC_API_URL=https://api.gabi.ness.com.br"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyD33o0h2hlMp7izg7oMdB-PbEBrZW_e4o8"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=ngabi-480613.firebaseapp.com"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_PROJECT_ID=ngabi-480613"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=ngabi-480613.firebasestorage.app"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=661727503610"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_APP_ID=1:661727503610:web:3762934ab7daca293d1543"
+      - "."
+images:
+  - "us-central1-docker.pkg.dev/gabi-hub/gabi/gabi-web:latest"
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+timeout: 1200s

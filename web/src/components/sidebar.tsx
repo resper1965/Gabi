@@ -45,15 +45,17 @@ export function Sidebar() {
     >
       {/* Brand */}
       <div className="p-4 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
-          style={{ background: "linear-gradient(135deg, var(--color-gabi-primary), var(--color-gabi-dark))" }}
-        >
-          g
-        </div>
+        <img
+          src="/logo.png"
+          alt="Gabi Logo"
+          className="w-8 h-8 rounded-lg object-cover shrink-0"
+        />
         {!collapsed && (
-          <span className="brand-mark text-lg text-white">
-            gabi<span className="dot">.</span>
+          <span
+            className="text-lg text-white font-medium"
+            style={{ fontFamily: "Montserrat, sans-serif" }}
+          >
+            Gabi<span style={{ color: "#00ade8" }}>.</span>
           </span>
         )}
         <button

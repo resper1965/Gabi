@@ -5,8 +5,11 @@ import { AuthGate } from "@/components/auth-gate"
 import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
-  title: "gabi. — AI Platform",
-  description: "gabi.writer + gabi.legal + gabi.data + gabi.care",
+  title: "Gabi",
+  description: "Dra. Gabi — Sua assistente jurídica e de negócios",
+  icons: {
+    icon: "/favicon.png",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -49,16 +49,18 @@ export default function LoginPage() {
       <div className="w-full max-w-sm animate-fade-in-up">
         {/* Brand */}
         <div className="text-center mb-10">
-          <div
-            className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold"
-            style={{ background: "linear-gradient(135deg, var(--color-gabi-primary), var(--color-gabi-dark))" }}
+          <img
+            src="/logo.png"
+            alt="Gabi Logo"
+            className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg"
+          />
+          <h1
+            className="text-3xl text-white font-medium"
+            style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            g
-          </div>
-          <h1 className="brand-mark text-3xl text-white">
-            gabi<span className="dot">.</span>
+            Gabi<span style={{ color: "#00ade8" }}>.</span>
           </h1>
-          <p className="text-slate-500 text-sm mt-2">Plataforma de Inteligência Artificial</p>
+          <p className="text-slate-500 text-sm mt-2">Dra. Gabi — Sua assistente jurídica e de negócios</p>
         </div>
 
         {/* Google Sign-In */}

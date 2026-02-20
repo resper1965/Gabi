@@ -10,11 +10,14 @@ from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.config import get_settings
 from app.core.auth import CurrentUser, require_role
 from app.models.user import User
 from app.models.ghost import KnowledgeDocument
 from app.models.law import LegalDocument
 from app.models.insightcare import InsuranceDocument
+
+settings = get_settings()
 
 router = APIRouter()
 
@@ -129,7 +132,7 @@ async def block_user(
     if not target:
         raise HTTPException(404, "Usuário não encontrado")
 
-    if target.email == "resper@ness.com.br":
+    if target.email.lower() in [e.lower() for e in settings.admin_emails]:
         raise HTTPException(403, "Não é permitido bloquear o superadmin")
 
     target.status = "blocked"

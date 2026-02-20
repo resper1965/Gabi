@@ -33,18 +33,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
 
   const fetchProfile = useCallback(async (firebaseUser: User) => {
+    console.log("AuthProvider: Fetching profile for", firebaseUser.email)
     try {
       const token = await firebaseUser.getIdToken()
+      console.log("AuthProvider: Token acquired (length):", token.length)
       const res = await fetch(`${API_BASE}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       })
+      console.log("AuthProvider: API response status:", res.status)
       if (res.ok) {
         const data = await res.json()
+        console.log("AuthProvider: Profile fetched successfully, role:", data.role)
         setProfile(data)
+      } else {
+        const errorText = await res.text()
+        console.error("AuthProvider: API error response:", errorText)
       }
-    } catch {
-      // API not available — allow login to proceed, profile will be null
-      console.warn("Could not fetch user profile from API")
+    } catch (err) {
+      console.error("AuthProvider: Could not fetch user profile from API:", err)
     }
   }, [])
 

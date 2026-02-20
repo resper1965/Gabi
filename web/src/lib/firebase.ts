@@ -1,6 +1,6 @@
 "use client"
 
-import { initializeApp, getApps } from "firebase/app"
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app"
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -9,6 +9,7 @@ import {
   signOut,
   onAuthStateChanged,
   type User,
+  type Auth,
 } from "firebase/auth"
 
 const firebaseConfig = {
@@ -20,8 +21,33 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
-const auth = getAuth(app)
+let _app: FirebaseApp | null = null
+let _auth: Auth | null = null
+
+function getFirebaseApp(): FirebaseApp {
+  if (_app) return _app
+  _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
+  return _app
+}
+
+function getFirebaseAuth(): Auth {
+  if (_auth) return _auth
+  _auth = getAuth(getFirebaseApp())
+  return _auth
+}
+
+// Lazy proxy — only initializes when actually accessed at runtime (client-side)
+const auth = new Proxy({} as Auth, {
+  get(_, prop) {
+    const realAuth = getFirebaseAuth()
+    const value = (realAuth as unknown as Record<string | symbol, unknown>)[prop]
+    if (typeof value === "function") {
+      return value.bind(realAuth)
+    }
+    return value
+  },
+})
+
 const googleProvider = new GoogleAuthProvider()
 
 export { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider, signOut, onAuthStateChanged }

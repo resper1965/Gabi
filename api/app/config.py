@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     query_timeout_seconds: int = 30
 
     # Authorization
-    admin_email: str = "resper@ness.com.br"
-    auto_approve_domain: str = "ness.com.br"
+    admin_emails: list[str] = ["resper@ness.com.br", "resper@bekaa.eu"]
+    auto_approve_domains: list[str] = ["ness.com.br", "bekaa.eu"]
 
     model_config = {"env_file": ".env", "env_prefix": "GABI_"}
 

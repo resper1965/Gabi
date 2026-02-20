@@ -66,11 +66,11 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         # Determine role and status based on email domain
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        if email.lower() == settings.admin_email.lower():
+        if email.lower() in [e.lower() for e in settings.admin_emails]:
             role = "superadmin"
             user_status = "approved"
             modules = ALL_MODULES
-        elif domain == settings.auto_approve_domain.lower():
+        elif domain in [d.lower() for d in settings.auto_approve_domains]:
             role = "user"
             user_status = "approved"
             modules = ALL_MODULES
@@ -92,7 +92,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         await db.commit()
         await db.refresh(user)
     else:
-        # Update profile info if changed
+        # Update profile info from Google account
         changed = False
         if name and user.name != name:
             user.name = name
@@ -100,6 +100,22 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         if picture and user.picture != picture:
             user.picture = picture
             changed = True
+
+        # ALWAYS enforce role policy on existing users
+        domain = email.split("@")[-1].lower() if "@" in email else ""
+
+        if email.lower() in [e.lower() for e in settings.admin_emails]:
+            if user.role != "superadmin" or user.status != "approved":
+                user.role = "superadmin"
+                user.status = "approved"
+                user.allowed_modules = ALL_MODULES
+                changed = True
+        elif domain in [d.lower() for d in settings.auto_approve_domains]:
+            if user.status != "approved":
+                user.status = "approved"
+                user.allowed_modules = ALL_MODULES
+                changed = True
+
         if changed:
             await db.commit()
 
@@ -116,7 +132,9 @@ async def get_current_user(
     _init_firebase()
 
     auth_header = request.headers.get("Authorization", "")
+    print(f"DEBUG: Auth header presence: {bool(auth_header)}")
     if not auth_header.startswith("Bearer "):
+        print(f"DEBUG: Invalid header format: '{auth_header[:15]}...'")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token de autenticação não fornecido",
@@ -126,7 +144,8 @@ async def get_current_user(
 
     try:
         decoded = firebase_auth.verify_id_token(token)
-    except Exception:
+    except Exception as e:
+        print(f"❌ Token verification failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
