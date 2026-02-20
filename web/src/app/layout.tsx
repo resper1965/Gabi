@@ -6,7 +6,7 @@ import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
   title: "Gabi",
-  description: "Dra. Gabi — Sua assistente jurídica e de negócios",
+  description: "Inteligencia Artificial powered",
   icons: {
     icon: "/favicon.png",
   },

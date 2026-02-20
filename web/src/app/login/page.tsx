@@ -60,7 +60,7 @@ export default function LoginPage() {
           >
             Gabi<span style={{ color: "#00ade8" }}>.</span>
           </h1>
-          <p className="text-slate-500 text-sm mt-2">Dra. Gabi — Sua assistente jurídica e de negócios</p>
+          <p className="text-slate-500 text-sm mt-2">Inteligencia Artificial powered</p>
         </div>
 
         {/* Google Sign-In */}
