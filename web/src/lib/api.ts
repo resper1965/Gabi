@@ -105,8 +105,20 @@ export const gabiAdmin = {
   stats: () => request("/api/admin/stats"),
   updateRole: (userId: string, role: string) =>
     request(`/api/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
+  approveUser: (userId: string, allowedModules: string[]) =>
+    request(`/api/admin/users/${userId}/approve`, { method: "PATCH", body: JSON.stringify({ allowed_modules: allowedModules }) }),
+  blockUser: (userId: string) =>
+    request(`/api/admin/users/${userId}/block`, { method: "PATCH" }),
+  updateModules: (userId: string, allowedModules: string[]) =>
+    request(`/api/admin/users/${userId}/modules`, { method: "PATCH", body: JSON.stringify({ allowed_modules: allowedModules }) }),
   updateStatus: (userId: string, isActive: boolean) =>
     request(`/api/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ is_active: isActive }) }),
+}
+
+// ── Auth ──
+
+export const gabiAuth = {
+  me: () => request("/api/auth/me"),
 }
 
 // Unified export
@@ -116,6 +128,7 @@ export const gabi = {
   data: gabiData,
   care: gabiCare,
   admin: gabiAdmin,
+  auth: gabiAuth,
   ghost: gabiWriter,
   law: gabiLegal,
   ntalk: gabiData,

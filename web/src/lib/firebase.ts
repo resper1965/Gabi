@@ -1,7 +1,15 @@
 "use client"
 
 import { initializeApp, getApps } from "firebase/app"
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, type User } from "firebase/auth"
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+  type User,
+} from "firebase/auth"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,6 +22,7 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 const auth = getAuth(app)
+const googleProvider = new GoogleAuthProvider()
 
-export { auth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+export { auth, signInWithEmailAndPassword, signInWithPopup, googleProvider, signOut, onAuthStateChanged }
 export type { User }

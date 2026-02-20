@@ -55,3 +55,7 @@ app.include_router(insightcare_router, prefix="/api/insightcare", tags=["Insight
 # ── Admin Router ──
 from app.modules.admin.router import router as admin_router
 app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+
+# ── Auth Router ──
+from app.core.auth import router as auth_router
+app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])

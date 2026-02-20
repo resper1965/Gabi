@@ -17,19 +17,21 @@ import {
 import { useState } from "react"
 
 const modules = [
-  { key: "writer", label: "gabi.writer", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)", roles: ["ghost", "admin"] },
-  { key: "legal", label: "gabi.legal", icon: Scale, href: "/law", accent: "var(--color-mod-law)", roles: ["law", "admin"] },
-  { key: "data", label: "gabi.data", icon: Database, href: "/ntalk", accent: "var(--color-mod-ntalk)", roles: ["ntalk", "admin"] },
-  { key: "care", label: "gabi.care", icon: ShieldCheck, href: "/insightcare", accent: "var(--color-mod-insightcare)", roles: ["insightcare", "admin"] },
+  { key: "ghost", label: "gabi.writer", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)" },
+  { key: "law", label: "gabi.legal", icon: Scale, href: "/law", accent: "var(--color-mod-law)" },
+  { key: "ntalk", label: "gabi.data", icon: Database, href: "/ntalk", accent: "var(--color-mod-ntalk)" },
+  { key: "insightcare", label: "gabi.care", icon: ShieldCheck, href: "/insightcare", accent: "var(--color-mod-insightcare)" },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { user, role } = useAuth()
+  const { user, profile } = useAuth()
   const [collapsed, setCollapsed] = useState(false)
 
+  const isSuperadmin = profile?.role === "superadmin"
+  const allowedModules = profile?.allowed_modules || []
   const visibleModules = modules.filter(
-    (m) => m.roles.includes(role) || role === "admin"
+    (m) => isSuperadmin || allowedModules.includes(m.key)
   )
 
   const initials = user?.email?.slice(0, 2).toUpperCase() || "?"
@@ -107,7 +109,7 @@ export function Sidebar() {
         })}
 
         {/* Admin Link */}
-        {role === "admin" && (
+        {(profile?.role === "admin" || profile?.role === "superadmin") && (
           <>
             {!collapsed && (
               <div className="pt-4 pb-1 px-3">
@@ -148,7 +150,7 @@ export function Sidebar() {
           {!collapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white truncate">{user?.email || "—"}</p>
-              <p className="text-[0.6rem] text-slate-500 uppercase tracking-wider font-medium">{role}</p>
+              <p className="text-[0.6rem] text-slate-500 uppercase tracking-wider font-medium">{profile?.role || "user"}</p>
             </div>
           )}
           <button

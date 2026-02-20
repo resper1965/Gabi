@@ -2,54 +2,65 @@
 
 import { PenTool, Scale, Database, ShieldCheck, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
 
 const modules = [
   {
-    key: "writer",
+    key: "ghost",
     name: "gabi.writer",
     tagline: "Sua Ghost Writer",
     description: "Absorve estilo e escreve com fidelidade — Style Signature + RAG",
     icon: PenTool,
     href: "/ghost",
     accent: "var(--color-mod-ghost)",
-    roles: ["ghost", "admin"],
   },
   {
-    key: "legal",
+    key: "law",
     name: "gabi.legal",
     tagline: "Sua Auditora Jurídica",
     description: "4 agentes IA: Auditora, Pesquisadora, Redatora, Sentinela",
     icon: Scale,
     href: "/law",
     accent: "var(--color-mod-law)",
-    roles: ["law", "admin"],
   },
   {
-    key: "data",
+    key: "ntalk",
     name: "gabi.data",
     tagline: "Sua CFO de Dados",
     description: "Converse com seus dados financeiros — SQL em linguagem natural",
     icon: Database,
     href: "/ntalk",
     accent: "var(--color-mod-ntalk)",
-    roles: ["ntalk", "admin"],
   },
   {
-    key: "care",
+    key: "insightcare",
     name: "gabi.care",
     tagline: "Sua Analista de Seguros",
     description: "Sinistralidade, apólices e normas ANS/SUSEP — 3 agentes",
     icon: ShieldCheck,
     href: "/insightcare",
     accent: "var(--color-mod-insightcare)",
-    roles: ["insightcare", "admin"],
   },
 ]
 
 export default function DashboardPage() {
-  const { user, role } = useAuth()
-  const visible = modules.filter((m) => m.roles.includes(role) || role === "admin")
+  const { user, profile, loading } = useAuth()
+  const router = useRouter()
+
+  // Redirect pending users
+  useEffect(() => {
+    if (!loading && profile && profile.status !== "approved") {
+      router.replace("/pending")
+    }
+  }, [profile, loading, router])
+
+  const isSuperadmin = profile?.role === "superadmin"
+  const allowedModules = profile?.allowed_modules || []
+  const visible = modules.filter(
+    (m) => isSuperadmin || allowedModules.includes(m.key)
+  )
   const firstName = user?.displayName || user?.email?.split("@")[0] || "Usuário"
 
   return (
@@ -98,6 +109,18 @@ export default function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* Empty state */}
+      {visible.length === 0 && (
+        <div className="text-center py-16">
+          <p className="text-slate-500 text-sm">
+            Nenhum módulo está liberado para sua conta.
+          </p>
+          <p className="text-slate-600 text-xs mt-1">
+            Contate o administrador para solicitar acesso.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

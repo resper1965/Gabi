@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 
 from app.models.base import Base
 
@@ -17,7 +17,9 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     name = Column(String(255), nullable=True)
     picture = Column(String(500), nullable=True)
-    role = Column(String(50), nullable=False, default="user")  # ghost, law, ntalk, admin
+    role = Column(String(50), nullable=False, default="user")  # superadmin, admin, user
+    status = Column(String(20), nullable=False, default="pending")  # approved, pending, blocked
+    allowed_modules = Column(ARRAY(String), server_default="{}")  # ["ghost","law","ntalk","insightcare"]
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

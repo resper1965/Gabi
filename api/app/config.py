@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     max_query_rows: int = 1000
     query_timeout_seconds: int = 30
 
+    # Authorization
+    admin_email: str = "resper@ness.com.br"
+    auto_approve_domain: str = "ness.com.br"
+
     model_config = {"env_file": ".env", "env_prefix": "GABI_"}
 
 
