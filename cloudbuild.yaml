@@ -70,7 +70,7 @@ steps:
       - "--port=8080"
       - "--allow-unauthenticated"
       - "--add-cloudsql-instances=${PROJECT_ID}:${_REGION}:gabi-db"
-      - '--set-env-vars=GABI_GCP_PROJECT_ID=${PROJECT_ID},GABI_VERTEX_AI_LOCATION=${_REGION},GABI_CORS_ORIGINS=["*"]'
+      - '--set-env-vars=GABI_GCP_PROJECT_ID=${PROJECT_ID},GABI_VERTEX_AI_LOCATION=${_REGION},GABI_CORS_ORIGINS=["https://gabi.ness.com.br","http://localhost:3000"]'
       - "--set-secrets=GABI_DATABASE_URL=GABI_DATABASE_URL:latest"
     waitFor: ["push-api"]
 
@@ -95,10 +95,10 @@ steps:
 substitutions:
   _REGION: us-central1
   _REPO: gabi
-  _API_URL: https://gabi-api-935866797303.us-central1.run.app
-  _FIREBASE_API_KEY: ""
-  _FIREBASE_AUTH_DOMAIN: ""
-  _FIREBASE_PROJECT_ID: ""
+  _API_URL: https://api.gabi.ness.com.br
+  _FIREBASE_API_KEY: "AIzaSyD33o0h2hlMp7izg7oMdB-PbEBrZW_e4o8"
+  _FIREBASE_AUTH_DOMAIN: "ngabi-480613.firebaseapp.com"
+  _FIREBASE_PROJECT_ID: "ngabi-480613"
 
 options:
   logging: CLOUD_LOGGING_ONLY
