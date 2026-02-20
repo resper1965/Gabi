@@ -119,6 +119,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         if changed:
             await db.commit()
 
+    print(f"DEBUG: User {email} has role {user.role}, status {user.status}, modules {user.allowed_modules}")
     return user
 
 
