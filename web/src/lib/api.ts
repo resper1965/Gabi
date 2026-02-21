@@ -150,6 +150,12 @@ export const gabiAdmin = {
     request(`/api/admin/users/${userId}/modules`, { method: "PATCH", body: JSON.stringify({ allowed_modules: allowedModules }) }),
   updateStatus: (userId: string, isActive: boolean) =>
     request(`/api/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ is_active: isActive }) }),
+  // Regulatory Seed Packs
+  regulatoryPacks: () => request("/api/admin/regulatory/packs"),
+  seedRegulatory: (packs: string[], force = false) =>
+    request("/api/admin/regulatory/seed", { method: "POST", body: JSON.stringify({ packs, force }) }),
+  removeSeedPack: (packId: string) =>
+    request(`/api/admin/regulatory/seed/${packId}`, { method: "DELETE" }),
 }
 
 // ── Chat History ──
@@ -167,12 +173,19 @@ export const gabiAuth = {
   me: () => request("/api/auth/me"),
 }
 
-// Unified export
+// Unified export — supports both branded (writer/legal/data/care) and module (ghost/law/ntalk/insightcare) names
 export const gabi = {
+  // Branded names
   writer: gabiWriter,
   legal: gabiLegal,
   data: gabiData,
   care: gabiCare,
+  // Module names (aliases)
+  ghost: gabiWriter,
+  law: gabiLegal,
+  ntalk: gabiData,
+  insightcare: gabiCare,
+  // Shared
   admin: gabiAdmin,
   auth: gabiAuth,
   chat: gabiChat,

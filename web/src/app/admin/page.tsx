@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-provider"
 import { gabi } from "@/lib/api"
 import {
   Users, FileText, Database, Shield, RefreshCw, Loader2,
-  CheckCircle2, XCircle, Clock, ChevronDown,
+  CheckCircle2, XCircle, Clock, ChevronDown, BookOpen, Download, Trash2,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -27,6 +27,14 @@ interface Stats {
   pending_users: number
   documents: { ghost: number; law: number; insightcare: number; total: number }
   database_size_mb: number
+}
+
+interface SeedPack {
+  id: string
+  name: string
+  description: string
+  module: string
+  dir: string
 }
 
 const ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
@@ -56,16 +64,20 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [expandedUser, setExpandedUser] = useState<string | null>(null)
+  const [seedPacks, setSeedPacks] = useState<SeedPack[]>([])
+  const [seedLoading, setSeedLoading] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [u, s] = await Promise.all([
+      const [u, s, packs] = await Promise.all([
         gabi.admin.users() as Promise<UserInfo[]>,
         gabi.admin.stats() as Promise<Stats>,
+        gabi.admin.regulatoryPacks().catch(() => ({ packs: [] })) as Promise<{ packs: SeedPack[] }>,
       ])
       setUsers(u)
       setStats(s)
+      setSeedPacks(packs.packs || [])
     } catch {
       toast.error("Erro ao carregar dados")
     } finally {
@@ -210,6 +222,78 @@ export default function AdminPage() {
                 >
                   Bloquear
                 </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Regulatory Seed Packs */}
+      {profile?.role === "superadmin" && seedPacks.length > 0 && (
+        <div className="mb-6 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="w-4 h-4 text-violet-400" />
+            <h2 className="text-sm font-semibold">Bases Regulatórias</h2>
+            <span className="text-[0.6rem] text-slate-500 ml-1">Seed Packs</span>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {seedPacks.map((pack) => (
+              <div
+                key={pack.id}
+                className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 flex flex-col gap-2"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-white">{pack.id.toUpperCase()}</p>
+                    <p className="text-[0.6rem] text-slate-500 mt-0.5 leading-relaxed">{pack.description}</p>
+                  </div>
+                  <span
+                    className="text-[0.55rem] px-1.5 py-0.5 rounded font-medium shrink-0"
+                    style={{
+                      color: pack.module === "law" ? "var(--color-mod-law)" : "var(--color-mod-insightcare)",
+                      background: pack.module === "law" ? "var(--color-mod-law)15" : "var(--color-mod-insightcare)15",
+                    }}
+                  >
+                    {pack.module}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 mt-auto">
+                  <button
+                    onClick={async () => {
+                      setSeedLoading(pack.id)
+                      try {
+                        const res = await gabi.admin.seedRegulatory([pack.id]) as { results: Array<{ status: string; docs_created?: number; total_chunks?: number }> }
+                        const r = res.results?.[0]
+                        if (r?.status === "already_seeded") {
+                          toast.info(`${pack.id.toUpperCase()} já está instalado`)
+                        } else {
+                          toast.success(`${pack.id.toUpperCase()} instalado: ${r?.docs_created || 0} docs, ${r?.total_chunks || 0} chunks`)
+                        }
+                      } catch { toast.error(`Erro ao instalar ${pack.id}`) }
+                      finally { setSeedLoading(null) }
+                    }}
+                    disabled={seedLoading === pack.id}
+                    className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {seedLoading === pack.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                    Instalar
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setSeedLoading(`rm-${pack.id}`)
+                      try {
+                        const res = await gabi.admin.removeSeedPack(pack.id) as { docs_deactivated: number }
+                        toast.success(`${pack.id.toUpperCase()} removido (${res.docs_deactivated} docs)`)
+                      } catch { toast.error(`Erro ao remover ${pack.id}`) }
+                      finally { setSeedLoading(null) }
+                    }}
+                    disabled={seedLoading === `rm-${pack.id}`}
+                    className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-red-500/10 text-red-400/60 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {seedLoading === `rm-${pack.id}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                    Remover
+                  </button>
+                </div>
               </div>
             ))}
           </div>
