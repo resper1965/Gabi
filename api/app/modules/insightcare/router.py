@@ -182,7 +182,7 @@ async def chat(
                 SELECT c.content, c.section_ref, d.title, d.doc_type
                 FROM ic_chunks c
                 JOIN ic_documents d ON c.document_id = d.id
-                WHERE d.tenant_id = :tid AND d.is_active = true
+                WHERE (d.tenant_id = :tid OR d.is_shared = true) AND d.is_active = true
                   AND c.embedding IS NOT NULL {client_filter}
                 ORDER BY c.embedding <=> :emb::vector
                 LIMIT 8

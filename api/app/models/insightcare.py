@@ -75,6 +75,7 @@ class InsuranceDocument(Base):
     chunk_count = Column(Integer, default=0)
     summary = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True)
+    is_shared = Column(Boolean, default=False, index=True)
     created_at = Column(DateTime, server_default=func.now())
 
 

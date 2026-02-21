@@ -23,6 +23,7 @@ class LegalDocument(Base):
     summary = Column(Text, nullable=True)
     metadata_ = Column("metadata", Text, nullable=True)  # JSON
     is_active = Column(Boolean, default=True)
+    is_shared = Column(Boolean, default=False, index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 

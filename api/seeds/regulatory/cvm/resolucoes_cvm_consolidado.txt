@@ -1,0 +1,78 @@
+INSTRUÇÕES CVM — NORMAS DO MERCADO DE CAPITAIS
+Comissão de Valores Mobiliários
+
+=== RESOLUÇÃO CVM Nº 175, DE 23 DE DEZEMBRO DE 2022 ===
+Dispõe sobre a constituição, o funcionamento e a divulgação de informações dos fundos de investimento.
+
+CAPÍTULO I — DAS DISPOSIÇÕES GERAIS
+
+Art. 1º Esta Resolução dispõe sobre a constituição, o funcionamento e a divulgação de informações dos fundos de investimento, observado o disposto na Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil).
+
+Art. 2º O fundo de investimento é uma comunhão de recursos constituída sob a forma de condomínio de natureza especial, destinada à aplicação em ativos financeiros, bens e direitos de qualquer natureza.
+
+Art. 3º São participantes do fundo de investimento:
+I – o administrador;
+II – o gestor;
+III – o distribuidor;
+IV – o custodiante;
+V – o cotista.
+
+Art. 4º São deveres do administrador:
+I – diligência;
+II – lealdade aos interesses dos cotistas;
+III – transparência na divulgação de informações;
+IV – exercer suas atividades com boa fé.
+
+Art. 5º O regulamento do fundo deve conter, no mínimo:
+I – denominação e classificação do fundo;
+II – prazo de duração;
+III – política de investimento;
+IV – taxa de administração e performance;
+V – condições de aplicação e resgate;
+VI – política de distribuição de resultados.
+
+=== RESOLUÇÃO CVM Nº 80, DE 29 DE MARÇO DE 2022 ===
+Dispõe sobre o registro e a prestação de informações de emissores de valores mobiliários.
+
+Art. 1º Esta Resolução dispõe sobre o registro de emissores de valores mobiliários admitidos à negociação em mercados regulamentados.
+
+Art. 2º São obrigações do emissor registrado:
+I – manter atualizado o formulário de referência;
+II – divulgar fatos relevantes;
+III – publicar demonstrações financeiras;
+IV – realizar assembleia geral ordinária anualmente;
+V – observar as práticas de governança corporativa.
+
+Art. 3º Fato relevante é qualquer ato ou fato ocorrido ou relacionado aos negócios do emissor que possa influir de modo ponderável na cotação dos valores mobiliários ou na decisão dos investidores.
+
+Art. 4º O fato relevante deve ser divulgado:
+I – antes da abertura ou após o fechamento dos mercados;
+II – de forma ampla, imediata e simultânea;
+III – em linguagem acessível ao público investidor.
+
+=== RESOLUÇÃO CVM Nº 88, DE 27 DE JUNHO DE 2022 ===
+Dispõe sobre ofertas públicas de distribuição de valores mobiliários.
+
+Art. 1º Qualquer oferta pública de distribuição de valores mobiliários será realizada em regime de registro na CVM.
+
+Art. 2º São requisitos para o registro de oferta pública:
+I – registro do emissor na CVM;
+II – contratação de instituição líder;
+III – elaboração de prospecto;
+IV – demonstrações financeiras auditadas;
+V – parecer jurídico.
+
+=== INSTRUÇÃO CVM Nº 555 (parcialmente revogada pela Res. 175) ===
+Referência histórica sobre fundos de investimento.
+
+Art. 1º Esta Instrução dispõe sobre a constituição, a administração, o funcionamento e a divulgação de informações dos fundos de investimento.
+
+Nota: A ICVM 555 foi revogada pela Resolução CVM nº 175/2022, que entrou em vigor em 02/10/2023. Referências à ICVM 555 em contratos e regulamentos devem ser interpretadas conforme a nova resolução.
+
+=== GOVERNANÇA CORPORATIVA — CÓDIGO DAS MELHORES PRÁTICAS ===
+
+Princípios fundamentais do mercado de capitais brasileiro:
+1. Transparência (disclosure) — Disponibilizar informações relevantes de forma tempestiva e equitativa.
+2. Equidade (fairness) — Tratamento justo e igualitário de todos os acionistas e demais partes interessadas.
+3. Prestação de contas (accountability) — Os agentes devem prestar contas de sua atuação de modo claro.
+4. Responsabilidade corporativa — Zelar pela viabilidade econômico-financeira da organização.

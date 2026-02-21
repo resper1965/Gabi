@@ -276,3 +276,59 @@ async def usage_analytics(
         "module_totals": modules,
     }
 
+
+# ── Regulatory Seed Packs ──
+
+class SeedRequest(BaseModel):
+    packs: list[str]  # e.g. ["ans", "cvm", "lgpd"]
+    force: bool = False
+
+
+@router.get("/regulatory/packs")
+async def list_regulatory_packs(
+    user: CurrentUser = Depends(require_role("admin", "superadmin")),
+):
+    """List available regulatory seed packs."""
+    from app.core.seed_regulatory import list_packs
+    return {"packs": list_packs()}
+
+
+@router.post("/regulatory/seed")
+async def seed_regulatory(
+    body: SeedRequest,
+    user: CurrentUser = Depends(require_role("superadmin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Install selected regulatory seed packs into the shared knowledge base."""
+    from app.core.seed_regulatory import seed_multiple
+    results = await seed_multiple(db, body.packs, force=body.force)
+    return {"results": results}
+
+
+@router.delete("/regulatory/seed/{pack_id}")
+async def remove_seed_pack(
+    pack_id: str,
+    user: CurrentUser = Depends(require_role("superadmin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove a seeded regulatory pack (deactivate shared docs)."""
+    from app.core.seed_regulatory import AVAILABLE_PACKS, _get_models
+
+    if pack_id not in AVAILABLE_PACKS:
+        raise HTTPException(404, f"Pack '{pack_id}' not found")
+
+    module = AVAILABLE_PACKS[pack_id]["module"]
+    doc_model, _ = _get_models(module)
+
+    result = await db.execute(
+        select(doc_model).where(
+            doc_model.is_shared == True,
+            doc_model.title.like(f"[SEED:{pack_id.upper()}]%"),
+        )
+    )
+    docs = result.scalars().all()
+    for doc in docs:
+        doc.is_active = False
+
+    await db.commit()
+    return {"pack": pack_id, "docs_deactivated": len(docs)}

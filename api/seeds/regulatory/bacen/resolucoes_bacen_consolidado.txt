@@ -1,0 +1,63 @@
+NORMAS DO BANCO CENTRAL DO BRASIL — BACEN
+Regulação do Sistema Financeiro Nacional
+
+=== RESOLUÇÃO BCB Nº 4.893, DE 26 DE FEVEREIRO DE 2021 ===
+Dispõe sobre a política de segurança cibernética e sobre os requisitos para a contratação de serviços de processamento e armazenamento de dados e de computação em nuvem.
+
+Art. 1º As instituições autorizadas a funcionar pelo Banco Central do Brasil devem implementar e manter política de segurança cibernética.
+
+Art. 2º A política de segurança cibernética deve contemplar:
+I – os objetivos de segurança cibernética;
+II – os procedimentos e os controles adotados para reduzir a vulnerabilidade;
+III – os controles específicos para tratamento de informações confidenciais;
+IV – o registro e o controle dos efeitos de incidentes relevantes;
+V – as diretrizes para elaboração de cenários de incidentes;
+VI – os procedimentos e os controles para prevenção de vazamento de dados;
+VII – a classificação dos dados e das informações.
+
+Art. 3º A contratação de serviços de computação em nuvem deve:
+I – assegurar que os dados e informações estejam sujeitos à legislação brasileira;
+II – possibilitar o acesso da instituição e do BCB aos dados;
+III – garantir a segregação dos dados dos contratantes;
+IV – prever a portabilidade dos dados.
+
+=== RESOLUÇÃO BCB Nº 4.658, DE 26 DE ABRIL DE 2018 ===
+Open Banking / Open Finance
+
+Art. 1º Esta Resolução dispõe sobre a implementação do Sistema Financeiro Aberto (Open Finance), que possibilita o compartilhamento padronizado de dados e serviços por meio de abertura e integração de sistemas.
+
+Art. 2º São objetivos do Open Finance:
+I – incentivar a inovação;
+II – promover a concorrência;
+III – aumentar a eficiência do Sistema Financeiro Nacional;
+IV – promover a cidadania financeira.
+
+=== RESOLUÇÃO CMN Nº 4.966, DE 25 DE NOVEMBRO DE 2021 ===
+Dispõe sobre instrumentos financeiros e critérios contábeis.
+
+Art. 1º Os instrumentos financeiros devem ser classificados nas seguintes categorias:
+I – custo amortizado;
+II – valor justo por meio de outros resultados abrangentes;
+III – valor justo por meio do resultado.
+
+Art. 2º A mensuração da perda de crédito esperada deve considerar:
+I – informações disponíveis sem custo ou esforço excessivo;
+II – cenários ponderados por probabilidade;
+III – o valor temporal do dinheiro.
+
+=== PIX — REGULAMENTO ===
+
+Art. 1º O Pix é o arranjo de pagamentos instantâneos instituído pelo Banco Central do Brasil, que possibilita a transferência de recursos entre contas em até 10 segundos, 24 horas por dia, 7 dias por semana.
+
+Art. 2º São funcionalidades do Pix:
+I – transferência entre contas;
+II – pagamento de compras;
+III – pagamento de prestação de serviços;
+IV – recolhimento de tributos;
+V – Pix Saque e Pix Troco.
+
+Art. 3º Limites e segurança:
+I – limite noturno diferenciado (R$ 1.000 padrão, ajustável);
+II – mecanismo especial de devolução (MED) para fraudes;
+III – bloqueio cautelar de até 72 horas;
+IV – notificação de infração entre instituições.

@@ -118,9 +118,8 @@ async def invoke_agent(
         question=req.query,
         chat_history=req.chat_history,
         db=db,
-        chunks_table="law_chunks",
-        docs_table="law_documents",
-        doc_type_col="doc_type",
+        module="law",
+        user_id=user.uid,
         limit=8,
     )
     rag_context = format_rag_context(chunks)

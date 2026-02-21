@@ -68,10 +68,12 @@ async def retrieve_if_needed(
     db: AsyncSession,
     *,
     module: str = "law",
+    user_id: str | None = None,
     limit: int = 8,
 ) -> tuple[list[dict], bool]:
     """
     Dynamic RAG: check intent, then retrieve only if needed.
+    Includes both user-owned and shared (regulatory) documents.
     Returns (chunks, did_retrieve).
     """
     # Validate table names against allowlist (prevent SQL injection)
@@ -87,17 +89,25 @@ async def retrieve_if_needed(
     # Embed the refined query (often more search-friendly than raw question)
     query_embedding = embed(intent["refined_query"])
 
+    # Build ownership filter: user's own docs + shared regulatory docs
+    if user_id:
+        ownership_filter = "(d.user_id = :uid OR d.is_shared = true)"
+        params = {"emb": str(query_embedding), "lim": limit, "uid": user_id}
+    else:
+        ownership_filter = "d.is_shared = true"
+        params = {"emb": str(query_embedding), "lim": limit}
+
     # Table names are safe — validated against ALLOWED_TABLE_PAIRS above
     results = await db.execute(
         text(f"""
             SELECT c.content, d.title, d.{doc_type_col} as doc_type
             FROM {chunks_table} c
             JOIN {docs_table} d ON c.document_id = d.id
-            WHERE d.is_active = true AND c.embedding IS NOT NULL
+            WHERE {ownership_filter} AND d.is_active = true AND c.embedding IS NOT NULL
             ORDER BY c.embedding <=> :emb::vector
             LIMIT :lim
         """),
-        {"emb": str(query_embedding), "lim": limit},
+        params,
     )
 
     chunks = [dict(row._mapping) for row in results]

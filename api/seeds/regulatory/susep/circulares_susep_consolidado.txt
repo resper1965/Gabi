@@ -1,0 +1,58 @@
+CIRCULAR SUSEP Nº 648, DE 10 DE MARÇO DE 2022
+Dispõe sobre os requisitos de segurança cibernética e de tecnologia da informação — SUSEP
+
+Art. 1º Esta Circular estabelece requisitos de segurança cibernética e de tecnologia da informação a serem observados pelas sociedades seguradoras, entidades abertas de previdência complementar, sociedades de capitalização e resseguradores locais.
+
+Art. 2º As supervisionadas devem implementar política de segurança cibernética com o objetivo de assegurar a confidencialidade, a integridade e a disponibilidade dos dados e dos sistemas de informação.
+
+Art. 3º A política de segurança deve contemplar, no mínimo:
+I – os objetivos de segurança cibernética;
+II – os procedimentos e controles para redução de vulnerabilidades;
+III – controles para rastreabilidade da informação;
+IV – controles sobre tratamento de incidentes;
+V – classificação de dados e informações.
+
+Art. 4º As supervisionadas devem estabelecer plano de resposta a incidentes contemplando:
+I – identificação e análise de causa e impacto;
+II – comunicação à SUSEP de incidentes relevantes;
+III – avaliação de necessidade de comunicação aos titulares de dados (LGPD).
+
+=== CIRCULAR SUSEP Nº 637, DE 13 DE JULHO DE 2021 ===
+Dispõe sobre as regras e critérios para operação dos seguros de pessoas.
+
+Art. 1º Esta Circular dispõe sobre as regras e os critérios para estruturação, comercialização e administração de seguros de pessoas.
+
+Art. 2º Os seguros de pessoas compreendem:
+I - seguro de vida;
+II - seguro de acidentes pessoais;
+III - seguro de viagem;
+IV - seguro prestamista;
+V - seguro educacional;
+VI - seguro de diária por incapacidade temporária;
+VII - seguro de desemprego ou perda de renda.
+
+Art. 3º As condições gerais do seguro devem conter, no mínimo:
+I – objeto do seguro e riscos cobertos;
+II – riscos excluídos;
+III – âmbito geográfico;
+IV – períodos de carência;
+V – franquias e participações obrigatórias do segurado;
+VI – critérios de cálculo e de pagamento da indenização;
+VII – obrigações do segurado;
+VIII – procedimentos para comunicação e regulação de sinistros;
+IX – prazo de prescrição.
+
+=== RESOLUÇÃO CNSP Nº 432, DE 12 DE NOVEMBRO DE 2021 ===
+Dispõe sobre provisões técnicas e ativos de cobertura.
+
+Art. 1º Esta Resolução estabelece critérios e condições para a constituição e adequação das provisões técnicas e dos ativos garantidores.
+
+Art. 2º As provisões técnicas devem ser constituídas de acordo com:
+I – nota técnica atuarial;
+II – critérios mínimos definidos pela SUSEP;
+III – princípios atuariais geralmente aceitos.
+
+Art. 3º Os ativos garantidores devem ser:
+I – suficientes para cobertura integral das provisões técnicas;
+II – diversificados conforme limites prudenciais;
+III – líquidos e mensuráveis a valor de mercado.

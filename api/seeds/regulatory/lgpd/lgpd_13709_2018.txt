@@ -1,0 +1,85 @@
+LEI GERAL DE PROTEÇÃO DE DADOS PESSOAIS (LGPD)
+Lei nº 13.709, de 14 de agosto de 2018
+
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
+
+Art. 1º Esta Lei dispõe sobre o tratamento de dados pessoais, inclusive nos meios digitais, por pessoa natural ou por pessoa jurídica de direito público ou privado, com o objetivo de proteger os direitos fundamentais de liberdade e de privacidade e o livre desenvolvimento da personalidade da pessoa natural.
+
+Art. 2º A disciplina da proteção de dados pessoais tem como fundamentos:
+I – o respeito à privacidade;
+II – a autodeterminação informativa;
+III – a liberdade de expressão, de informação, de comunicação e de opinião;
+IV – a inviolabilidade da intimidade, da honra e da imagem;
+V – o desenvolvimento econômico e tecnológico e a inovação;
+VI – a livre iniciativa, a livre concorrência e a defesa do consumidor;
+VII – os direitos humanos, o livre desenvolvimento da personalidade, a dignidade e o exercício da cidadania pelas pessoas naturais.
+
+Art. 5º Para os fins desta Lei, considera-se:
+I – dado pessoal: informação relacionada a pessoa natural identificada ou identificável;
+II – dado pessoal sensível: dado pessoal sobre origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização de caráter religioso, filosófico ou político, dado referente à saúde ou à vida sexual, dado genético ou biométrico, quando vinculado a uma pessoa natural;
+III – dado anonimizado: dado relativo a titular que não possa ser identificado, considerando a utilização de meios técnicos razoáveis e disponíveis na ocasião de seu tratamento;
+IV – banco de dados: conjunto estruturado de dados pessoais;
+V – titular: pessoa natural a quem se referem os dados pessoais que são objeto de tratamento;
+VI – controlador: pessoa natural ou jurídica, de direito público ou privado, a quem competem as decisões referentes ao tratamento de dados pessoais;
+VII – operador: pessoa natural ou jurídica, de direito público ou privado, que realiza o tratamento de dados pessoais em nome do controlador;
+VIII – encarregado: pessoa indicada pelo controlador e operador para atuar como canal de comunicação entre o controlador, os titulares dos dados e a Autoridade Nacional de Proteção de Dados (ANPD);
+IX – agentes de tratamento: o controlador e o operador;
+X – tratamento: toda operação realizada com dados pessoais.
+
+Art. 6º As atividades de tratamento de dados pessoais deverão observar a boa-fé e os seguintes princípios:
+I – finalidade;
+II – adequação;
+III – necessidade;
+IV – livre acesso;
+V – qualidade dos dados;
+VI – transparência;
+VII – segurança;
+VIII – prevenção;
+IX – não discriminação;
+X – responsabilização e prestação de contas.
+
+Art. 7º O tratamento de dados pessoais somente poderá ser realizado nas seguintes hipóteses:
+I – mediante o fornecimento de consentimento pelo titular;
+II – para o cumprimento de obrigação legal ou regulatória pelo controlador;
+III – pela administração pública, para o tratamento e uso compartilhado de dados necessários à execução de políticas públicas;
+IV – para a realização de estudos por órgão de pesquisa;
+V – quando necessário para a execução de contrato ou de procedimentos preliminares relacionados a contrato do qual seja parte o titular;
+VI – para o exercício regular de direitos em processo judicial, administrativo ou arbitral;
+VII – para a proteção da vida ou da incolumidade física do titular ou de terceiro;
+VIII – para a tutela da saúde, exclusivamente, em procedimento realizado por profissionais de saúde, serviços de saúde ou autoridade sanitária;
+IX – quando necessário para atender aos interesses legítimos do controlador ou de terceiro;
+X – para a proteção do crédito.
+
+CAPÍTULO II — DO TRATAMENTO DE DADOS PESSOAIS SENSÍVEIS
+
+Art. 11. O tratamento de dados pessoais sensíveis somente poderá ocorrer nas seguintes hipóteses:
+I – quando o titular ou seu responsável legal consentir, de forma específica e destacada, para finalidades específicas;
+II – sem fornecimento de consentimento do titular, nas hipóteses em que for indispensável para:
+a) cumprimento de obrigação legal ou regulatória pelo controlador;
+b) tratamento compartilhado de dados necessários à execução, pela administração pública, de políticas públicas;
+c) realização de estudos por órgão de pesquisa;
+d) exercício regular de direitos;
+e) proteção da vida ou da incolumidade física do titular ou de terceiro;
+f) tutela da saúde;
+g) garantia da prevenção à fraude e à segurança do titular.
+
+CAPÍTULO VII — DA SEGURANÇA E DAS BOAS PRÁTICAS
+
+Art. 46. Os agentes de tratamento devem adotar medidas de segurança, técnicas e administrativas aptas a proteger os dados pessoais de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou qualquer forma de tratamento inadequado ou ilícito.
+
+Art. 48. O controlador deverá comunicar à autoridade nacional e ao titular a ocorrência de incidente de segurança que possa acarretar risco ou dano relevante aos titulares.
+
+Art. 50. Os controladores e operadores poderão formular regras de boas práticas e de governança que estabeleçam as condições de organização, o regime de funcionamento, os procedimentos, incluindo reclamações e petições de titulares, as normas de segurança, os padrões técnicos, as obrigações específicas para os diversos envolvidos no tratamento, as ações educativas, os mecanismos internos de supervisão e de mitigação de riscos e outros aspectos relacionados ao tratamento de dados pessoais.
+
+CAPÍTULO VIII — DA FISCALIZAÇÃO
+
+Art. 52. Os agentes de tratamento de dados, em razão das infrações cometidas às normas previstas nesta Lei, ficam sujeitos às seguintes sanções administrativas aplicáveis pela autoridade nacional:
+I – advertência;
+II – multa simples, de até 2% (dois por cento) do faturamento da pessoa jurídica de direito privado, grupo ou conglomerado no Brasil no seu último exercício, excluídos os tributos, limitada, no total, a R$ 50.000.000,00 (cinquenta milhões de reais) por infração;
+III – multa diária;
+IV – publicização da infração;
+V – bloqueio dos dados pessoais;
+VI – eliminação dos dados pessoais;
+VII – suspensão parcial do funcionamento do banco de dados;
+VIII – suspensão do exercício da atividade de tratamento dos dados pessoais;
+IX – proibição parcial ou total do exercício de atividades relacionadas a tratamento de dados.
