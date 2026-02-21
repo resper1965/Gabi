@@ -1,0 +1,23 @@
+{
+  "app.name": "Gabi Hub",
+  "chat.placeholder": "Digite sua mensagem...",
+  "chat.thinking": "gabi. está pensando...",
+  "chat.start": "Comece uma conversa com a",
+  "chat.copy": "Copiar",
+  "chat.sources": "Fontes consultadas",
+  "history.title": "Histórico",
+  "history.loading": "Carregando...",
+  "history.empty": "Nenhuma conversa salva",
+  "history.open": "Abrir",
+  "history.export": "Exportar .md",
+  "history.delete": "Remover",
+  "history.loaded": "Conversa carregada",
+  "history.exported": "Exportado como .md",
+  "history.deleted": "Conversa removida",
+  "upload.drop_title": "Arraste ou clique para upload",
+  "upload.drop_subtitle": "PDF, DOCX ou TXT",
+  "upload.processing": "Processando...",
+  "error.generic": "Erro desconhecido",
+  "error.rate_limit": "Limite de requisições excedido",
+  "error.network": "Erro de conexão"
+}

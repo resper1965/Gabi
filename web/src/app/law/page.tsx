@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
-import { UploadButton } from "@/components/upload-button"
+import { MassUploadZone } from "@/components/mass-upload-zone"
 import { gabi } from "@/lib/api"
-import { Scale } from "lucide-react"
+import { Scale, ChevronDown, ChevronUp } from "lucide-react"
 import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-law)"
@@ -14,6 +14,8 @@ export default function LawPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [agent, setAgent] = useState("auditor")
+  const [docType, setDocType] = useState("law")
+  const [showUpload, setShowUpload] = useState(false)
 
   const agents = [
     { key: "auditor", label: "Auditora", desc: "Cruza contratos com regulações" },
@@ -33,7 +35,7 @@ export default function LawPage() {
         agent,
         query: text,
         chat_history: history,
-      }) as { result: Record<string, unknown>; sources_used: number }
+      }) as { result: Record<string, unknown>; sources_used: number; sources?: Array<{ title: string; type: string }> }
 
       const content = typeof res.result === "string"
         ? res.result
@@ -42,6 +44,7 @@ export default function LawPage() {
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(), role: "assistant",
         content: `${content}\n\n_Fontes utilizadas: ${res.sources_used}_`,
+        metadata: res.sources ? { sources: res.sources } : undefined,
       }])
     } catch (e: unknown) {
       const errorMsg = e instanceof Error ? e.message : "Erro"
@@ -51,10 +54,10 @@ export default function LawPage() {
     }
   }
 
-  const handleUpload = async (file: File) => {
-    await gabi.legal.upload("law", file)
-    toast.success(`📄 ${file.name} indexado na base jurídica`)
-  }
+  const handleUpload = useCallback(async (file: File) => {
+    const res = await gabi.legal.upload(docType, file)
+    return res as { chunk_count?: number }
+  }, [docType])
 
   return (
     <div className="h-full flex flex-col">
@@ -69,8 +72,37 @@ export default function LawPage() {
               <p className="text-xs text-zinc-500">Sua Auditora Jurídica</p>
             </div>
           </div>
-          <UploadButton onUpload={handleUpload} accept=".pdf,.docx,.txt" moduleAccent={ACCENT} label="Upload Doc" />
+          <button
+            onClick={() => setShowUpload(!showUpload)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200"
+            style={{ background: `color-mix(in srgb, ${ACCENT} 15%, transparent)`, color: ACCENT, border: `1px solid color-mix(in srgb, ${ACCENT} 25%, transparent)` }}
+          >
+            📎 Base Jurídica
+            {showUpload ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
         </div>
+
+        {/* Collapsible upload zone */}
+        {showUpload && (
+          <div className="mb-3 animate-fade-in-up">
+            <MassUploadZone
+              onUpload={handleUpload}
+              docType={docType}
+              docTypeOptions={[
+                { key: "contract", label: "📑 Contratos" },
+                { key: "regulation", label: "⚖️ Regulações" },
+                { key: "precedent", label: "📋 Precedentes" },
+                { key: "law", label: "📜 Legislação" },
+              ]}
+              onDocTypeChange={setDocType}
+              moduleAccent={ACCENT}
+              accept=".pdf,.docx,.txt"
+              acceptLabel="PDF, DOCX, TXT — múltiplos arquivos"
+              onComplete={() => toast.success("Base jurídica atualizada")}
+            />
+          </div>
+        )}
+
         <div className="flex gap-2">
           {agents.map((a) => (
             <button

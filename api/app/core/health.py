@@ -66,3 +66,4 @@ async def readiness_check():
         "service": "gabi-api",
         "checks": checks,
     }
+

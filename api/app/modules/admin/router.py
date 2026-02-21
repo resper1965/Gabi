@@ -219,3 +219,60 @@ async def system_stats(
         },
         "database_size_mb": db_size_mb,
     }
+
+
+@router.get("/analytics")
+async def usage_analytics(
+    user: CurrentUser = Depends(require_role("admin", "superadmin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Usage analytics: queries/day, module breakdown, top users."""
+    # Queries per day (last 7 days)
+    daily = await db.execute(text("""
+        SELECT date_trunc('day', created_at)::date AS day,
+               module, COUNT(*) AS cnt
+        FROM analytics_events
+        WHERE created_at > now() - interval '7 days'
+        GROUP BY day, module
+        ORDER BY day
+    """))
+    queries_by_day = [
+        {"day": str(row[0]), "module": row[1], "count": row[2]}
+        for row in daily
+    ]
+
+    # Top users (last 7 days)
+    top_users = await db.execute(text("""
+        SELECT user_id, COUNT(*) AS cnt
+        FROM analytics_events
+        WHERE created_at > now() - interval '7 days'
+        GROUP BY user_id
+        ORDER BY cnt DESC
+        LIMIT 10
+    """))
+    top = [{"user_id": row[0], "count": row[1]} for row in top_users]
+
+    # Module totals
+    module_totals = await db.execute(text("""
+        SELECT module, COUNT(*) AS cnt
+        FROM analytics_events
+        WHERE created_at > now() - interval '7 days'
+        GROUP BY module
+    """))
+    modules = {row[0]: row[1] for row in module_totals}
+
+    # Total events
+    total = await db.execute(text("""
+        SELECT COUNT(*) FROM analytics_events
+        WHERE created_at > now() - interval '7 days'
+    """))
+    total_count = total.scalar() or 0
+
+    return {
+        "period": "7d",
+        "total_events": total_count,
+        "queries_by_day": queries_by_day,
+        "top_users": top,
+        "module_totals": modules,
+    }
+

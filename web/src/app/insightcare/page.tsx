@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
-import { UploadButton } from "@/components/upload-button"
+import { MassUploadZone } from "@/components/mass-upload-zone"
 import { gabi } from "@/lib/api"
-import { ShieldCheck } from "lucide-react"
+import { ShieldCheck, ChevronDown, ChevronUp } from "lucide-react"
 import { toast } from "sonner"
 
 const ACCENT = "var(--color-mod-insightcare)"
@@ -15,6 +15,8 @@ export default function InsightCarePage() {
   const [isLoading, setIsLoading] = useState(false)
   const [agent, setAgent] = useState("policy_analyst")
   const [summary, setSummary] = useState<string | null>(null)
+  const [docType, setDocType] = useState("policy")
+  const [showUpload, setShowUpload] = useState(false)
 
   const agents = [
     { key: "policy_analyst", label: "Apólices", desc: "Analisa e compara coberturas" },
@@ -55,14 +57,10 @@ export default function InsightCarePage() {
     }
   }
 
-  const handleUpload = async (file: File) => {
-    await gabi.care.upload("default", "policy", file)
-    const isXlsx = file.name.toLowerCase().endsWith(".xlsx") || file.name.toLowerCase().endsWith(".xls")
-    toast.success(isXlsx
-      ? `📊 ${file.name} importado como sinistralidade`
-      : `📄 ${file.name} indexado na base de seguros`
-    )
-  }
+  const handleUpload = useCallback(async (file: File) => {
+    const res = await gabi.care.upload("default", docType, file)
+    return res as { chunk_count?: number }
+  }, [docType])
 
   return (
     <div className="h-full flex flex-col">
@@ -77,8 +75,37 @@ export default function InsightCarePage() {
               <p className="text-xs text-zinc-500">Sua Analista de Seguros</p>
             </div>
           </div>
-          <UploadButton onUpload={handleUpload} accept=".pdf,.docx,.txt,.xlsx,.xls" moduleAccent={ACCENT} label="Upload" />
+          <button
+            onClick={() => setShowUpload(!showUpload)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200"
+            style={{ background: `color-mix(in srgb, ${ACCENT} 15%, transparent)`, color: ACCENT, border: `1px solid color-mix(in srgb, ${ACCENT} 25%, transparent)` }}
+          >
+            📎 Base de Seguros
+            {showUpload ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
         </div>
+
+        {/* Collapsible upload zone */}
+        {showUpload && (
+          <div className="mb-3 animate-fade-in-up">
+            <MassUploadZone
+              onUpload={handleUpload}
+              docType={docType}
+              docTypeOptions={[
+                { key: "policy", label: "📋 Apólices" },
+                { key: "report", label: "📊 Sinistros (XLSX)" },
+                { key: "regulation", label: "⚖️ Normas ANS" },
+                { key: "contract", label: "📑 Contratos" },
+              ]}
+              onDocTypeChange={setDocType}
+              moduleAccent={ACCENT}
+              accept=".pdf,.docx,.txt,.xlsx,.xls"
+              acceptLabel="PDF, DOCX, TXT, XLSX — múltiplos arquivos"
+              onComplete={() => toast.success("Base de seguros atualizada")}
+            />
+          </div>
+        )}
+
         <div className="flex gap-2">
           {agents.map((a) => (
             <button

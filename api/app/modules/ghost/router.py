@@ -39,6 +39,8 @@ Você é INVISÍVEL. O leitor não deve perceber que uma IA escreveu.
 1. Siga o manual de estilo FIELMENTE.
 2. Use APENAS os fatos da base de conteúdo abaixo.
 3. Se um dado factual não estiver na base: "[⚠️ Dado não encontrado — preencher]"
+4. NUNCA invente dados factuais (nomes, datas, números, citações, estatísticas).
+5. Prefira deixar lacunas marcadas do que fabricar informações.
 """
 
 
@@ -90,6 +92,67 @@ async def upload_document(
             await db.commit()
 
     return result
+
+# ── Document Management ──
+
+@router.get("/documents")
+async def list_documents(
+    profile_id: str | None = None,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all knowledge documents for the current user, optionally filtered by profile."""
+    query = (
+        select(KnowledgeDocument)
+        .where(KnowledgeDocument.user_id == user.uid)
+        .order_by(KnowledgeDocument.created_at.desc())
+    )
+    if profile_id:
+        query = query.where(KnowledgeDocument.profile_id == profile_id)
+
+    result = await db.execute(query)
+    docs = result.scalars().all()
+
+    return [
+        {
+            "id": str(d.id),
+            "filename": d.filename,
+            "doc_type": d.doc_type,
+            "chunk_count": d.chunk_count,
+            "file_size": d.file_size or 0,
+            "profile_id": str(d.profile_id) if d.profile_id else None,
+            "created_at": d.created_at.isoformat() if d.created_at else None,
+        }
+        for d in docs
+    ]
+
+
+@router.delete("/documents/{doc_id}")
+async def delete_document(
+    doc_id: str,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a document and all its chunks."""
+    result = await db.execute(
+        select(KnowledgeDocument).where(
+            KnowledgeDocument.id == doc_id,
+            KnowledgeDocument.user_id == user.uid,
+        )
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        return {"error": "Documento não encontrado"}
+
+    # Delete chunks first
+    await db.execute(
+        text("DELETE FROM ghost_doc_chunks WHERE document_id = :did"),
+        {"did": doc_id},
+    )
+    await db.delete(doc)
+    await db.commit()
+
+    return {"deleted": True, "document_id": doc_id}
 
 @router.get("/profiles")
 async def list_profiles(
@@ -191,7 +254,8 @@ async def generate_text(
     query_embedding = embed(req.prompt)
     content_results = await db.execute(
         text("""
-            SELECT c.content FROM ghost_doc_chunks c
+            SELECT c.content, d.title, d.doc_type
+            FROM ghost_doc_chunks c
             JOIN ghost_knowledge_docs d ON c.document_id = d.id
             WHERE d.profile_id = :pid AND d.doc_type = 'content'
               AND c.embedding IS NOT NULL
@@ -200,7 +264,17 @@ async def generate_text(
         """),
         {"pid": req.profile_id, "emb": str(query_embedding)},
     )
-    content_chunks = [row[0] for row in content_results]
+    raw_chunks = [dict(row._mapping) for row in content_results]
+    content_chunks = [c["content"] for c in raw_chunks]
+
+    # Deduplicate sources by title
+    seen_titles = set()
+    sources = []
+    for c in raw_chunks:
+        title = c.get("title", "")
+        if title and title not in seen_titles:
+            seen_titles.add(title)
+            sources.append({"title": title, "type": c.get("doc_type", "")})
 
     # Build prompt: signature (tiny) + content RAG + user request
     context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
@@ -220,4 +294,66 @@ async def generate_text(
         chat_history=req.chat_history,
     )
 
-    return {"text": response, "profile": profile.name}
+    return {"text": response, "profile": profile.name, "sources": sources}
+
+
+@router.post("/generate-stream")
+async def generate_text_stream(
+    req: GenerateRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Stream text generation using Style Signature + Content RAG.
+    Returns Server-Sent Events (SSE) with text chunks.
+    """
+    from fastapi.responses import StreamingResponse
+    from app.core.ai import generate_stream
+
+    # Get profile with signature
+    result = await db.execute(
+        select(StyleProfile).where(StyleProfile.id == req.profile_id)
+    )
+    profile = result.scalar_one_or_none()
+    if not profile or not profile.style_signature:
+        return {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}
+
+    # RAG: search content documents
+    query_embedding = embed(req.prompt)
+    content_results = await db.execute(
+        text("""
+            SELECT c.content, d.title, d.doc_type
+            FROM ghost_doc_chunks c
+            JOIN ghost_knowledge_docs d ON c.document_id = d.id
+            WHERE d.profile_id = :pid AND d.doc_type = 'content'
+              AND c.embedding IS NOT NULL
+            ORDER BY c.embedding <=> :emb::vector
+            LIMIT 5
+        """),
+        {"pid": req.profile_id, "emb": str(query_embedding)},
+    )
+    raw_chunks = [dict(row._mapping) for row in content_results]
+    content_chunks = [c["content"] for c in raw_chunks]
+
+    context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
+
+    full_prompt = f"""
+[CONTEÚDO FACTUAL (Base RAG)]
+{context}
+
+[PEDIDO DO USUÁRIO]
+{req.prompt}
+"""
+
+    async def event_generator():
+        import json as _json
+        async for chunk_text in generate_stream(
+            module="ghost",
+            prompt=full_prompt,
+            system_instruction=profile.system_prompt,
+            chat_history=req.chat_history,
+        ):
+            yield f"data: {_json.dumps({'text': chunk_text})}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

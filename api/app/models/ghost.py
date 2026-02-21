@@ -32,6 +32,7 @@ class KnowledgeDocument(Base):
     profile_id = Column(UUID(as_uuid=True), nullable=True, index=True)
     filename = Column(String(255), nullable=False)
     doc_type = Column(String(50), nullable=False)  # style, content
+    file_size = Column(Integer, default=0)  # bytes
     chunk_count = Column(Integer, default=0)
     created_at = Column(DateTime, server_default=func.now())
 

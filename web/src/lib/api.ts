@@ -50,16 +50,52 @@ async function uploadFile<T = unknown>(path: string, file: File, params: Record<
   return res.json()
 }
 
+/**
+ * Stream a POST request as SSE (Server-Sent Events).
+ * Returns a reader that yields text chunks.
+ */
+async function streamRequest(path: string, body: unknown): Promise<ReadableStreamDefaultReader<Uint8Array>> {
+  const user = auth.currentUser
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  }
+
+  if (user) {
+    const token = await user.getIdToken()
+    headers["Authorization"] = `Bearer ${token}`
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`API ${res.status}: ${text}`)
+  }
+
+  if (!res.body) throw new Error("No response body for stream")
+  return res.body.getReader()
+}
+
 // ── gabi.writer ──
 
 export const gabiWriter = {
   profiles: () => request("/api/ghost/profiles"),
-  createProfile: (name: string) => request("/api/ghost/profiles", { method: "POST", body: JSON.stringify({ name }) }),
+  createProfile: (data: { name: string }) => request("/api/ghost/profiles", { method: "POST", body: JSON.stringify(data) }),
   extractStyle: (profileId: string) => request(`/api/ghost/profiles/${profileId}/extract-style`, { method: "POST" }),
   generate: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }) =>
     request("/api/ghost/generate", { method: "POST", body: JSON.stringify(data) }),
+  generateStream: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }) =>
+    streamRequest("/api/ghost/generate-stream", data),
   upload: (profileId: string, docType: string, file: File) =>
     uploadFile("/api/ghost/upload", file, { profile_id: profileId, doc_type: docType }),
+  documents: (profileId?: string) =>
+    request(`/api/ghost/documents${profileId ? `?profile_id=${profileId}` : ""}`),
+  deleteDocument: (docId: string) =>
+    request(`/api/ghost/documents/${docId}`, { method: "DELETE" }),
 }
 
 // ── gabi.legal ──
@@ -103,6 +139,7 @@ export const gabiCare = {
 export const gabiAdmin = {
   users: () => request("/api/admin/users"),
   stats: () => request("/api/admin/stats"),
+  analytics: () => request("/api/admin/analytics"),
   updateRole: (userId: string, role: string) =>
     request(`/api/admin/users/${userId}/role`, { method: "PATCH", body: JSON.stringify({ role }) }),
   approveUser: (userId: string, allowedModules: string[]) =>
@@ -113,6 +150,15 @@ export const gabiAdmin = {
     request(`/api/admin/users/${userId}/modules`, { method: "PATCH", body: JSON.stringify({ allowed_modules: allowedModules }) }),
   updateStatus: (userId: string, isActive: boolean) =>
     request(`/api/admin/users/${userId}/status`, { method: "PATCH", body: JSON.stringify({ is_active: isActive }) }),
+}
+
+// ── Chat History ──
+
+export const gabiChat = {
+  sessions: (module?: string) => request(`/api/chat/sessions${module ? `?module=${module}` : ""}`),
+  messages: (sessionId: string) => request(`/api/chat/sessions/${sessionId}/messages`),
+  exportMd: (sessionId: string) => request<{ markdown: string; title: string }>(`/api/chat/sessions/${sessionId}/export`),
+  deleteSession: (sessionId: string) => request(`/api/chat/sessions/${sessionId}`, { method: "DELETE" }),
 }
 
 // ── Auth ──
@@ -129,8 +175,10 @@ export const gabi = {
   care: gabiCare,
   admin: gabiAdmin,
   auth: gabiAuth,
+  chat: gabiChat,
   ghost: gabiWriter,
   law: gabiLegal,
   ntalk: gabiData,
   insightcare: gabiCare,
 }
+

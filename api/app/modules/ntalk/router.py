@@ -266,7 +266,15 @@ async def ask_gabi(
         preview = json.dumps(results["rows"][:20], default=str, ensure_ascii=False)
         analysis = await generate(
             "ntalk", f"Pergunta: {req.question}\nSQL: {generated_sql}\nDados:\n{preview}",
-            system_instruction="Você é a Gabi, CFO imobiliária. Interprete os dados: KPIs, tendências, recomendações. Valores em R$."
+            system_instruction="""
+[PERSONA] Você é a Gabi, CFO Sênior do mercado imobiliário.
+[RESTRIÇÕES]
+1. Interprete SOMENTE os dados retornados pela query acima.
+2. NÃO invente dados, tendências ou benchmarks de mercado não presentes nos resultados.
+3. Se os dados forem insuficientes: "Os dados retornados não permitem esta análise."
+4. Cite linhas/valores específicos para sustentar cada conclusão.
+5. Valores em R$. Use comparações período-a-período quando disponíveis.
+"""
         )
     elif error_msg:
         analysis = f"⚠️ {error_msg}"

@@ -80,7 +80,10 @@ Human-in-the-Loop obrigatório.
     "watcher": """
 [PERSONA] Você é a Gabi, Sentinela Regulatória da plataforma Law & Comply.
 [AÇÃO] Analise a publicação regulatória e determine impacto nos contratos.
-[RESTRIÇÕES] Apenas classifique como CRITICAL se houver conflito direto demonstrável.
+[RESTRIÇÕES]
+1. Zero Alucinação — classifique impacto APENAS com base nos contratos da base.
+2. Se não houver contratos na base para cruzar: "Impacto não avaliável — nenhum contrato correspondente na base."
+3. CRITICAL = APENAS com conflito direto demonstrável e citável.
 [FORMATO] JSON: {{"orgao": "...", "tipo": "...", "resumo": "...",
 "severidade": "info|warning|critical", "contratos_afetados": [...]}}
 """,
@@ -121,6 +124,15 @@ async def invoke_agent(
     )
     rag_context = format_rag_context(chunks)
 
+    # Deduplicate sources by title for frontend display
+    seen_titles = set()
+    sources = []
+    for c in chunks:
+        title = c.get("title", "")
+        if title and title not in seen_titles:
+            seen_titles.add(title)
+            sources.append({"title": title, "type": c.get("doc_type", "")})
+
     # Multi-agent debate for auditor: run auditor + researcher in parallel
     if req.agent == "auditor":
         result = await debate(
@@ -132,7 +144,7 @@ async def invoke_agent(
             rag_context=rag_context,
             chat_history=req.chat_history,
         )
-        return {"agent": "auditor+researcher", "result": result, "sources_used": len(chunks), "dynamic_rag": did_retrieve}
+        return {"agent": "auditor+researcher", "result": result, "sources_used": len(chunks), "sources": sources, "dynamic_rag": did_retrieve}
 
     # Single-agent for other types
     prompt = f"""
@@ -150,7 +162,7 @@ Execute a análise conforme suas instruções.
         result = {"text": await generate(module="law", prompt=prompt,
                                           system_instruction=system_prompt, chat_history=req.chat_history)}
 
-    return {"agent": req.agent, "result": result, "sources_used": len(chunks), "dynamic_rag": did_retrieve}
+    return {"agent": req.agent, "result": result, "sources_used": len(chunks), "sources": sources, "dynamic_rag": did_retrieve}
 
 
 @router.get("/documents")

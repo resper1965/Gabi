@@ -59,3 +59,8 @@ app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
 # ── Auth Router ──
 from app.core.auth import router as auth_router
 app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
+
+# ── Chat Router ──
+from app.modules.chat.router import router as chat_router
+app.include_router(chat_router, prefix="/api/chat", tags=["Chat"])
+

@@ -4,6 +4,7 @@ Verifies Firebase ID tokens, auto-creates users with domain-based policy,
 and enforces module-level access control.
 """
 
+import logging
 from dataclasses import dataclass, field
 
 import firebase_admin
@@ -17,6 +18,7 @@ from app.database import get_db
 from app.models.user import User
 
 settings = get_settings()
+logger = logging.getLogger("gabi.auth")
 
 ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
 
@@ -38,7 +40,14 @@ def _init_firebase():
     else:
         cred = credentials.ApplicationDefault()
 
-    _firebase_app = firebase_admin.initialize_app(cred)
+    options = {}
+    if settings.firebase_project_id:
+        options['projectId'] = settings.firebase_project_id
+        logger.info("Initializing Firebase Admin with projectId=%s", settings.firebase_project_id)
+    else:
+        logger.warning("Initializing Firebase Admin WITHOUT explicit projectId")
+
+    _firebase_app = firebase_admin.initialize_app(cred, options)
 
 
 @dataclass
@@ -59,38 +68,52 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
     name = decoded.get("name")
     picture = decoded.get("picture")
 
-    result = await db.execute(select(User).where(User.firebase_uid == uid))
-    user = result.scalar_one_or_none()
+    logger.debug("Upserting user %s", email)
+    try:
+        result = await db.execute(select(User).where(User.firebase_uid == uid))
+        user = result.scalar_one_or_none()
+    except Exception as e:
+        logger.error("Database error during user lookup: %s", e)
+        raise
 
     if user is None:
-        # Determine role and status based on email domain
-        domain = email.split("@")[-1].lower() if "@" in email else ""
+        # Check if user exists by email (to handle UID changes or pre-existing accounts)
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
 
-        if email.lower() in [e.lower() for e in settings.admin_emails]:
-            role = "superadmin"
-            user_status = "approved"
-            modules = ALL_MODULES
-        elif domain in [d.lower() for d in settings.auto_approve_domains]:
-            role = "user"
-            user_status = "approved"
-            modules = ALL_MODULES
+        if user:
+            logger.info("Found existing user by email %s, updating UID", email)
+            user.firebase_uid = uid
+            changed = True
         else:
-            role = "user"
-            user_status = "pending"
-            modules = []
+            # Determine role and status based on email domain
+            logger.info("Creating new user: %s", email)
+            domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        user = User(
-            firebase_uid=uid,
-            email=email,
-            name=name,
-            picture=picture,
-            role=role,
-            status=user_status,
-            allowed_modules=modules,
-        )
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
+            if email.lower() in [e.lower() for e in settings.admin_emails]:
+                role = "superadmin"
+                user_status = "approved"
+                modules = ALL_MODULES
+            elif domain in [d.lower() for d in settings.auto_approve_domains]:
+                role = "user"
+                user_status = "approved"
+                modules = ALL_MODULES
+            else:
+                role = "user"
+                user_status = "pending"
+                modules = []
+
+            user = User(
+                firebase_uid=uid,
+                email=email,
+                name=name,
+                picture=picture,
+                role=role,
+                status=user_status,
+                allowed_modules=modules,
+            )
+            db.add(user)
+            changed = True
     else:
         # Update profile info from Google account
         changed = False
@@ -119,7 +142,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         if changed:
             await db.commit()
 
-    print(f"DEBUG: User {email} has role {user.role}, status {user.status}, modules {user.allowed_modules}")
+    logger.debug("User %s: role=%s status=%s", email, user.role, user.status)
     return user
 
 
@@ -133,9 +156,7 @@ async def get_current_user(
     _init_firebase()
 
     auth_header = request.headers.get("Authorization", "")
-    print(f"DEBUG: Auth header presence: {bool(auth_header)}")
     if not auth_header.startswith("Bearer "):
-        print(f"DEBUG: Invalid header format: '{auth_header[:15]}...'")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token de autenticação não fornecido",
@@ -146,7 +167,7 @@ async def get_current_user(
     try:
         decoded = firebase_auth.verify_id_token(token)
     except Exception as e:
-        print(f"❌ Token verification failed: {e}")
+        logger.warning("Token verification failed: %s", e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
