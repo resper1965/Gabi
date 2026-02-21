@@ -87,6 +87,15 @@ export function OnboardingStepper({ moduleAccent = "var(--color-mod-ghost)", onS
           Começar
           <ArrowRight className="w-4 h-4" />
         </button>
+
+        {/* Docs link */}
+        <a
+          href="/docs"
+          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          Ver documentação completa →
+        </a>
       </div>
     </div>
   )

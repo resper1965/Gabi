@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
+import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
 import { ShieldCheck, ChevronDown, ChevronUp } from "lucide-react"
 import { toast } from "sonner"
@@ -123,6 +124,7 @@ export default function InsightCarePage() {
         </div>
       </header>
       <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder={`Pergunte à gabi. sobre ${agents.find((a) => a.key === agent)?.desc.toLowerCase()}...`} moduleAccent={ACCENT} />
+      <HelpTooltip module="insightcare" moduleAccent={ACCENT} />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronLeft,
   Settings,
+  BookOpen,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -109,6 +110,27 @@ export function Sidebar() {
             </Link>
           )
         })}
+
+        {/* Docs Link — visible to all users */}
+        {!collapsed && (
+          <div className="pt-4 pb-1 px-3">
+            <span className="text-[0.6rem] font-semibold text-slate-600 uppercase tracking-widest">
+              Ajuda
+            </span>
+          </div>
+        )}
+        {collapsed && <div className="pt-2" />}
+        <Link
+          href="/docs"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-tech)] transition-all duration-200 ${
+            pathname === "/docs"
+              ? "nav-link-active bg-white/5 text-white"
+              : "text-slate-400 hover:text-white hover:bg-white/5"
+          }`}
+        >
+          <BookOpen className="w-5 h-5 shrink-0" style={{ color: pathname === "/docs" ? "#10b981" : undefined }} />
+          {!collapsed && <span className="text-sm font-medium">Documentação</span>}
+        </Link>
 
         {/* Admin Link */}
         {(profile?.role === "admin" || profile?.role === "superadmin") && (

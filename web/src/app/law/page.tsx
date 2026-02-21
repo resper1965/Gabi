@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
+import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
 import { Scale, ChevronDown, ChevronUp } from "lucide-react"
 import { toast } from "sonner"
@@ -120,6 +121,7 @@ export default function LawPage() {
         </div>
       </header>
       <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder={`Pergunte à gabi. ${agents.find((a) => a.key === agent)?.label}...`} moduleAccent={ACCENT} />
+      <HelpTooltip module="law" moduleAccent={ACCENT} />
     </div>
   )
 }

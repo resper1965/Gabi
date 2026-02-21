@@ -5,6 +5,7 @@ import { ChatPanel, type Message } from "@/components/chat-panel"
 import { KnowledgePanel } from "@/components/knowledge-panel"
 import { OnboardingStepper } from "@/components/onboarding-stepper"
 import { ChatHistorySidebar } from "@/components/chat-history-sidebar"
+import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
 import { PenTool, History } from "lucide-react"
 
@@ -165,6 +166,7 @@ export default function GhostPage() {
         module="ghost"
         moduleAccent={ACCENT}
       />
+      <HelpTooltip module="ghost" moduleAccent={ACCENT} />
     </div>
   )
 }

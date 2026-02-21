@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
+import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
 import { Database, Settings, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
@@ -90,6 +91,7 @@ export default function NTalkPage() {
         </div>
       </header>
       <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder="Pergunte sobre seus dados..." moduleAccent={ACCENT} />
+      <HelpTooltip module="ntalk" moduleAccent={ACCENT} />
     </div>
   )
 }
