@@ -11,6 +11,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.core.analytics import log_event
 from app.core.auth import CurrentUser, get_current_user
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
@@ -295,6 +296,8 @@ async def ask_gabi(
             new_summary = await summarize(req.chat_history)
         except Exception:
             pass
+
+    await log_event(db, user.uid, "ntalk", "query", metadata={"has_sql": bool(generated_sql)})
 
     return {"interpretation": ai_result.get("interpretation", ""), "sql": generated_sql or None,
             "results": results, "analysis": analysis, "summary": new_summary}

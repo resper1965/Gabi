@@ -9,6 +9,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.core.analytics import log_event
 from app.core.auth import CurrentUser, get_current_user
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
@@ -144,6 +145,7 @@ async def invoke_agent(
             rag_context=rag_context,
             chat_history=req.chat_history,
         )
+        await log_event(db, user.uid, "law", "query", metadata={"agent": "auditor+researcher", "sources": len(chunks)})
         return {"agent": "auditor+researcher", "result": result, "sources_used": len(chunks), "sources": sources, "dynamic_rag": did_retrieve}
 
     # Single-agent for other types
@@ -162,6 +164,7 @@ Execute a análise conforme suas instruções.
         result = {"text": await generate(module="law", prompt=prompt,
                                           system_instruction=system_prompt, chat_history=req.chat_history)}
 
+    await log_event(db, user.uid, "law", "query", metadata={"agent": req.agent, "sources": len(chunks)})
     return {"agent": req.agent, "result": result, "sources_used": len(chunks), "sources": sources, "dynamic_rag": did_retrieve}
 
 

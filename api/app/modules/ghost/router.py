@@ -8,6 +8,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.core.analytics import log_event
 from app.core.auth import CurrentUser, get_current_user, require_role
 from app.core.ai import generate
 from app.core.embeddings import embed
@@ -293,6 +294,8 @@ async def generate_text(
         system_instruction=profile.system_prompt,
         chat_history=req.chat_history,
     )
+
+    await log_event(db, user.uid, "ghost", "query", metadata={"profile": profile.name, "sources": len(sources)})
 
     return {"text": response, "profile": profile.name, "sources": sources}
 

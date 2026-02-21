@@ -55,6 +55,7 @@ bash scripts/deploy.sh
 | `GET` | `/health` | Liveness probe |
 | `GET` | `/health/ready` | Readiness (DB, Vertex, Firebase, embeddings) |
 | `POST` | `/api/ghost/generate` | Gerar texto com estilo |
+| `POST` | `/api/ghost/generate-stream` | Streaming SSE — gerar texto em tempo real |
 | `POST` | `/api/ghost/upload` | Upload de documentos de estilo/conteúdo |
 | `POST` | `/api/law/agent` | Invocar agente jurídico |
 | `POST` | `/api/law/upload` | Upload de documentos legais |
@@ -64,6 +65,12 @@ bash scripts/deploy.sh
 | `POST` | `/api/insightcare/upload` | Upload de docs/XLSX |
 | `GET` | `/api/admin/users` | Listar usuários |
 | `GET` | `/api/admin/stats` | Estatísticas do sistema |
+| `GET` | `/api/admin/analytics` | Analytics de uso (7 dias) |
+| `GET` | `/api/chat/sessions` | Listar sessões de chat |
+| `GET` | `/api/chat/sessions/:id/messages` | Mensagens de uma sessão |
+| `GET` | `/api/chat/sessions/:id/export` | Exportar sessão como markdown |
+| `DELETE` | `/api/chat/sessions/:id` | Deletar sessão |
+| `POST` | `/api/auth/me` | Info do usuário autenticado |
 
 ## Arquitetura
 
@@ -71,20 +78,22 @@ bash scripts/deploy.sh
 Gabi/
 ├── api/                     # FastAPI backend
 │   ├── app/
-│   │   ├── core/            # ai, auth, embeddings, ingest, health, rate_limit, memory
-│   │   ├── models/          # SQLAlchemy: user, ghost, law, ntalk, insightcare
-│   │   ├── modules/         # Routers: ghost, law, ntalk, insightcare, admin
+│   │   ├── core/            # ai, auth, embeddings, ingest, health, rate_limit, memory, analytics
+│   │   ├── models/          # SQLAlchemy: user, ghost, law, ntalk, insightcare, analytics
+│   │   ├── modules/         # Routers: ghost, law, ntalk, insightcare, admin, chat
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   └── main.py
-│   ├── alembic/             # Migrations
+│   ├── alembic/             # Migrations (5 revisions)
+│   ├── tests/               # pytest (25 tests)
 │   ├── Dockerfile
 │   └── entrypoint.sh        # alembic upgrade + uvicorn
 ├── web/                     # Next.js frontend
 │   ├── src/
 │   │   ├── app/             # Pages: ghost, law, ntalk, insightcare, admin, login
-│   │   ├── components/      # sidebar, chat-panel, upload-button, error-boundary
-│   │   └── lib/             # api.ts, firebase.ts
+│   │   ├── components/      # sidebar, chat-panel, upload-button, chat-history, knowledge-panel
+│   │   ├── hooks/           # use-keyboard-shortcuts
+│   │   └── lib/             # api.ts, firebase.ts, i18n.ts
 │   └── Dockerfile
 ├── packages/core/           # Shared TS utilities
 ├── scripts/deploy.sh

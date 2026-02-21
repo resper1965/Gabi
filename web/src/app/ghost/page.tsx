@@ -4,8 +4,9 @@ import { useState, useCallback, useRef } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { KnowledgePanel } from "@/components/knowledge-panel"
 import { OnboardingStepper } from "@/components/onboarding-stepper"
+import { ChatHistorySidebar } from "@/components/chat-history-sidebar"
 import { gabi } from "@/lib/api"
-import { PenTool } from "lucide-react"
+import { PenTool, History } from "lucide-react"
 
 const ACCENT = "var(--color-mod-ghost)"
 const CTX_WINDOW = 10
@@ -16,6 +17,7 @@ export default function GhostPage() {
   const [panelOpen, setPanelOpen] = useState(false)
   const [profileId, setProfileId] = useState("default")
   const [showOnboarding, setShowOnboarding] = useState(true)
+  const [historyOpen, setHistoryOpen] = useState(false)
   const streamingMsgRef = useRef<string | null>(null)
 
   const handleSend = useCallback(async (text: string) => {
@@ -107,14 +109,23 @@ export default function GhostPage() {
             </div>
           </div>
 
-          {/* Panel toggle */}
-          <KnowledgePanel
-            isOpen={false}
-            onToggle={() => setPanelOpen(!panelOpen)}
-            moduleAccent={ACCENT}
-            onProfileChange={handleProfileChange}
-            activeProfileId={profileId}
-          />
+          {/* Panel toggle + History */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHistoryOpen(!historyOpen)}
+              className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors cursor-pointer"
+              title="Histórico"
+            >
+              <History className="w-4 h-4" />
+            </button>
+            <KnowledgePanel
+              isOpen={false}
+              onToggle={() => setPanelOpen(!panelOpen)}
+              moduleAccent={ACCENT}
+              onProfileChange={handleProfileChange}
+              activeProfileId={profileId}
+            />
+          </div>
         </header>
 
         {/* Onboarding or Chat */}
@@ -142,6 +153,18 @@ export default function GhostPage() {
           activeProfileId={profileId}
         />
       )}
+
+      {/* Chat History sidebar */}
+      <ChatHistorySidebar
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onLoadSession={(msgs) => {
+          setMessages(msgs.map((m, i) => ({ id: `hist-${i}`, role: m.role as "user" | "assistant", content: m.content, metadata: m.metadata as Record<string, unknown> | undefined })))
+          setShowOnboarding(false)
+        }}
+        module="ghost"
+        moduleAccent={ACCENT}
+      />
     </div>
   )
 }

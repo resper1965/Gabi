@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, type FormEvent } from "react"
 import { Send, Loader2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 
 export interface Message {
   id: string
@@ -37,6 +38,29 @@ export function ChatPanel({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
+
+  // Keyboard shortcuts: Cmd+Enter to send, Escape to clear
+  useKeyboardShortcuts([
+    {
+      key: "Enter",
+      meta: true,
+      action: () => {
+        if (input.trim() && !isLoading && !isStreaming) {
+          const text = input.trim()
+          setInput("")
+          if (onSendStream) handleStream(text)
+          else onSend(text)
+        }
+      },
+    },
+    {
+      key: "Escape",
+      action: () => {
+        setInput("")
+        textareaRef.current?.blur()
+      },
+    },
+  ])
 
   const handleStream = useCallback(async (text: string) => {
     if (!onSendStream) return
