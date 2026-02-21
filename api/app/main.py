@@ -15,10 +15,12 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Pre-warm embedding model on startup."""
+    """Pre-warm embedding model and Firebase on startup."""
     import threading
     from app.core.embeddings import _get_model
+    from app.core.auth import _init_firebase
     threading.Thread(target=_get_model, daemon=True).start()
+    _init_firebase()
     yield
 
 

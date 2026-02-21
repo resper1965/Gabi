@@ -84,7 +84,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         if user:
             logger.info("Found existing user by email %s, updating UID", email)
             user.firebase_uid = uid
-            changed = True
+            await db.commit()
         else:
             # Determine role and status based on email domain
             logger.info("Creating new user: %s", email)
@@ -113,7 +113,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
                 allowed_modules=modules,
             )
             db.add(user)
-            changed = True
+            await db.commit()
     else:
         # Update profile info from Google account
         changed = False

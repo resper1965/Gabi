@@ -176,9 +176,4 @@ export const gabi = {
   admin: gabiAdmin,
   auth: gabiAuth,
   chat: gabiChat,
-  ghost: gabiWriter,
-  law: gabiLegal,
-  ntalk: gabiData,
-  insightcare: gabiCare,
 }
-

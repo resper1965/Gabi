@@ -28,7 +28,7 @@ def _embed_cached(text_hash: str, text: str) -> tuple:
 
 def embed(text: str) -> list[float]:
     """Generate embedding for a single text (cached)."""
-    text_hash = hashlib.md5(text.encode()).hexdigest()
+    text_hash = hashlib.sha256(text.encode()).hexdigest()
     return list(_embed_cached(text_hash, text))
 
 

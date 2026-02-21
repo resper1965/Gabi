@@ -5,14 +5,16 @@ Falls back to in-memory token bucket if Redis is unavailable.
 """
 
 import logging
-import os
 import time
 from collections import defaultdict
 from dataclasses import dataclass, field
 
 from fastapi import HTTPException, status
 
+from app.config import get_settings
+
 logger = logging.getLogger("gabi.rate_limit")
+settings = get_settings()
 
 # ── Redis connection (lazy) ──
 
@@ -26,9 +28,9 @@ def _get_redis():
         return None
     if _redis is not None:
         return _redis
-    redis_url = os.environ.get("REDIS_URL")
+    redis_url = settings.redis_url
     if not redis_url:
-        logger.info("REDIS_URL not set, using in-memory rate limiter")
+        logger.info("redis_url not set, using in-memory rate limiter")
         _redis_failed = True
         return None
     try:
@@ -101,6 +103,22 @@ def _check_memory(user_id: str, cost: float = 1.0) -> None:
     bucket.tokens -= cost
 
 
+# Periodic cleanup of stale buckets (>5min since last use)
+_BUCKET_TTL = 300
+_last_cleanup = time.time()
+
+
+def _cleanup_buckets() -> None:
+    global _last_cleanup
+    now = time.time()
+    if now - _last_cleanup < _BUCKET_TTL:
+        return
+    _last_cleanup = now
+    stale = [uid for uid, b in _buckets.items() if now - b.last_refill > _BUCKET_TTL]
+    for uid in stale:
+        del _buckets[uid]
+
+
 # ── Public API ──
 
 def check_rate_limit(user_id: str, cost: float = 1.0) -> None:
@@ -118,4 +136,5 @@ def check_rate_limit(user_id: str, cost: float = 1.0) -> None:
         except Exception as e:
             logger.warning("Redis rate check failed (%s), using memory", e)
 
+    _cleanup_buckets()
     _check_memory(user_id, cost)

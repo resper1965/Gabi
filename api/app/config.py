@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     admin_emails: list[str] = ["resper@ness.com.br", "resper@bekaa.eu"]
     auto_approve_domains: list[str] = ["ness.com.br", "bekaa.eu"]
 
+    # Redis (rate limiting)
+    redis_url: str = ""
+
     model_config = {"env_file": ".env", "env_prefix": "GABI_"}
 
 

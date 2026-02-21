@@ -32,8 +32,6 @@ async def log_event(
             metadata_=json.dumps(metadata) if metadata else None,
         )
         db.add(event)
-        await db.commit()
+        await db.flush()  # flush only — let the router's commit handle persistence
     except Exception as e:
         logger.warning("Failed to log analytics event: %s", e)
-        # Don't let analytics failures break the main flow
-        await db.rollback()

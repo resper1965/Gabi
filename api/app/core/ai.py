@@ -15,7 +15,7 @@ settings = get_settings()
 
 _initialized = False
 
-ModuleName = Literal["ghost", "law", "ntalk"]
+ModuleName = Literal["ghost", "law", "ntalk", "insightcare"]
 
 MODEL_MAP: dict[ModuleName, str] = {
     "ghost": settings.model_ghost,  # Flash: creativity
@@ -101,6 +101,19 @@ async def generate_stream(
             yield chunk.text
 
 
+def safe_parse_json(text: str) -> dict:
+    """Parse JSON from LLM output, stripping markdown fences if present."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"raw": text}
+
+
 async def generate_json(
     module: ModuleName,
     prompt: str,
@@ -108,15 +121,4 @@ async def generate_json(
 ) -> dict:
     """Generate and parse JSON response."""
     text = await generate(module, prompt, system_instruction)
-    text = text.strip()
-
-    # Strip markdown code fences
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        return {"raw": text}
+    return safe_parse_json(text)

@@ -9,8 +9,15 @@ import json
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.ai import generate
+from app.core.ai import generate, safe_parse_json
 from app.core.embeddings import embed
+
+# Allowlist of valid table pairs to prevent SQL injection
+ALLOWED_TABLE_PAIRS = {
+    "law": ("law_chunks", "law_documents", "doc_type"),
+    "ghost": ("ghost_chunks", "ghost_documents", "doc_type"),
+    "insightcare": ("insightcare_chunks", "insightcare_documents", "doc_type"),
+}
 
 
 INTENT_PROMPT = """Analise esta pergunta do usuário e decida se precisa buscar documentos.
@@ -44,12 +51,7 @@ async def should_retrieve(
 
     try:
         raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
-        raw = raw.strip()
-        if raw.startswith("```"):
-            raw = raw.split("```")[1]
-            if raw.startswith("json"):
-                raw = raw[4:]
-        result = json.loads(raw)
+        result = safe_parse_json(raw)
         return {
             "needs_rag": bool(result.get("needs_rag", True)),
             "refined_query": result.get("refined_query", question),
@@ -65,15 +67,18 @@ async def retrieve_if_needed(
     chat_history: list[dict] | None,
     db: AsyncSession,
     *,
-    chunks_table: str = "law_chunks",
-    docs_table: str = "law_documents",
-    doc_type_col: str = "doc_type",
+    module: str = "law",
     limit: int = 8,
 ) -> tuple[list[dict], bool]:
     """
     Dynamic RAG: check intent, then retrieve only if needed.
     Returns (chunks, did_retrieve).
     """
+    # Validate table names against allowlist (prevent SQL injection)
+    if module not in ALLOWED_TABLE_PAIRS:
+        return [], False
+    chunks_table, docs_table, doc_type_col = ALLOWED_TABLE_PAIRS[module]
+
     intent = await should_retrieve(question, chat_history)
 
     if not intent["needs_rag"]:
@@ -82,6 +87,7 @@ async def retrieve_if_needed(
     # Embed the refined query (often more search-friendly than raw question)
     query_embedding = embed(intent["refined_query"])
 
+    # Table names are safe — validated against ALLOWED_TABLE_PAIRS above
     results = await db.execute(
         text(f"""
             SELECT c.content, d.title, d.{doc_type_col} as doc_type
