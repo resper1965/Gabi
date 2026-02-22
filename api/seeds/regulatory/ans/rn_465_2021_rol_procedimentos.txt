@@ -1,46 +1,127 @@
-RESOLUÇÃO NORMATIVA - RN Nº 465, DE 24 DE FEVEREIRO DE 2021
-Atualiza o Rol de Procedimentos e Eventos em Saúde — ANS
+RESOLUÇÃO NORMATIVA – RN Nº 465, DE 24 DE FEVEREIRO DE 2021
+Atualiza o Rol de Procedimentos e Eventos em Saúde, que constitui a referência básica para cobertura assistencial mínima nos planos privados de assistência à saúde, contratados a partir de 1º de janeiro de 1999, e naqueles adaptados conforme previsto no art. 35 da Lei nº 9.656, de 3 de junho de 1998.
 
-Art. 1º Esta Resolução Normativa – RN atualiza o Rol de Procedimentos e Eventos em Saúde, que constitui a referência básica para cobertura assistencial mínima nos planos privados de assistência à saúde, contratados a partir de 1º de janeiro de 1999, fixa as diretrizes de utilização e dá outras providências.
+============================================================
 
-Art. 2º O Rol de Procedimentos e Eventos em Saúde, na forma do Anexo I, contém os procedimentos e eventos em saúde cuja cobertura é obrigatória pelas operadoras de planos privados de assistência à saúde.
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
 
-Art. 3º O Rol poderá ser revisto e atualizado a cada 2 (dois) anos.
+Art. 1º Esta Resolução Normativa atualiza o Rol de Procedimentos e Eventos em Saúde, que constitui a referência básica para cobertura assistencial mínima nos planos privados de assistência à saúde.
 
-Art. 4º A título excepcional, poderá ser realizada inclusão extraordinária de procedimento ou evento em saúde no Rol no intervalo entre as atualizações ordinárias.
+Parágrafo único. O Rol de Procedimentos e Eventos em Saúde estabelece a cobertura obrigatória a ser garantida nos planos privados de assistência à saúde contratados a partir de 1º de janeiro de 1999 e naqueles adaptados conforme previsto no art. 35 da Lei nº 9.656, de 3 de junho de 1998.
 
-CAPÍTULO II — DAS DIRETRIZES DE UTILIZAÇÃO
+Art. 2º Para fins desta Resolução Normativa, consideram-se:
+I - Diretriz de Utilização (DUT): critérios técnicos que devem ser observados para o uso adequado e racional de determinados procedimentos e eventos em saúde;
+II - Diretriz Clínica de Utilização (DCU): critérios técnicos baseados em evidência científica para a indicação de cobertura de determinados procedimentos;
+III - Protocolo de Utilização: conjunto de critérios a serem seguidos para autorização de determinados procedimentos;
+IV - cobertura assistencial: conjunto de direitos do beneficiário para utilização dos serviços de saúde;
+V - lista de procedimentos e eventos em saúde: relação de procedimentos que devem ser obrigatoriamente cobertos;
+VI - segmentação assistencial: tipo de plano conforme cobertura (ambulatorial, hospitalar com ou sem obstetrícia, odontológico).
 
-Art. 5º As Diretrizes de Utilização - DUT, na forma do Anexo II desta Resolução Normativa, estabelecem os critérios que devem ser observados pelas operadoras em relação a determinados procedimentos e eventos em saúde, para que a cobertura seja obrigatória.
+CAPÍTULO II — DA COBERTURA ASSISTENCIAL
 
-Art. 6º A DUT poderá estabelecer critérios e condições nas seguintes hipóteses:
-I - critérios para cobertura de procedimentos de alta complexidade e/ou alto custo;
-II - critérios para indicação de procedimentos;
-III - critérios para cobertura de órteses, próteses e materiais especiais;
-IV - critérios para cobertura de medicamentos.
+Seção I — Disposições Gerais
 
-CAPÍTULO III — DAS COBERTURAS
+Art. 3º A cobertura assistencial de que trata o Rol de Procedimentos compreende todos os procedimentos clínicos, cirúrgicos, obstétricos e os atendimentos de urgência e emergência, na forma estabelecida nesta Resolução.
 
-Art. 7º Os procedimentos e eventos listados no Rol são de cobertura obrigatória, observando-se as seguintes segmentações por tipo de plano:
-I - plano ambulatorial;
-II - plano hospitalar com obstetrícia;
-III - plano hospitalar sem obstetrícia;
-IV - plano de referência;
-V - plano odontológico.
+Art. 4º A cobertura dos procedimentos constantes do Rol abrange:
+I - consultas médicas, em número ilimitado, em clínicas básicas e especializadas reconhecidas pelo Conselho Federal de Medicina;
+II - consultas/sessões com:
+a) nutricionista;
+b) psicólogo;
+c) terapeuta ocupacional;
+d) fisioterapeuta;
+e) fonoaudiólogo;
+III - procedimentos de orientação e planejamento familiar;
+IV - atendimento nos serviços de urgência e emergência;
+V - procedimentos de transplantes listados no Rol;
+VI - exames complementares, incluindo radiologia, ultrassonografia, tomografia, ressonância magnética, medicina nuclear, endoscopia e outros;
+VII - internações hospitalares, sem limitação de prazo.
 
-Art. 8º É obrigatória a cobertura dos procedimentos e eventos em saúde constantes do Rol para a segmentação do plano contratado, não sendo permitida a exclusão de nenhum procedimento, evento ou cobertura, exceto quando expressamente autorizado pela legislação.
+Art. 5º A cobertura assistencial inclui:
+I - tratamento das lesões bucais (estomatologia);
+II - procedimentos ambulatoriais, incluindo quimioterapia e radioterapia ambulatoriais;
+III - hemodiálise e diálise peritoneal - CAPD;
+IV - próteses, órteses e seus acessórios ligados ao ato cirúrgico;
+V - nutrição parenteral e enteral;
+VI - procedimentos considerados especiais:
+a) hemoterapia;
+b) quimioterapia oncológica;
+c) radioterapia;
+d) hemodiálise e diálise peritoneal;
+e) litotripsia;
+f) medicina nuclear;
+g) procedimentos diagnósticos e terapêuticos em hemodinâmica;
+VII - medicamentos:
+a) para uso no processo de quimioterapia oncológica, conforme protocolos e diretrizes do CONITEC ou da ANVISA;
+b) antineoplásicos orais para uso domiciliar (regulamentação específica);
+c) medicamentos registrados na ANVISA e incluídos em protocolos específicos.
 
-Art. 10. São garantidos pelo plano referência:
-I - cobertura de todas as doenças listadas no CID-10 (Classificação Estatística Internacional de Doenças e Problemas Relacionados à Saúde);
-II - atendimento nos segmentos ambulatorial e hospitalar com obstetrícia;
-III - cobertura de urgência e emergência.
+Seção II — Da Segmentação Ambulatorial
 
-CAPÍTULO IV — DAS DISPOSIÇÕES SOBRE PROCEDIMENTOS ESPECÍFICOS
+Art. 6º O plano ambulatorial compreende os atendimentos realizados em consultório ou em ambulatório, definidos e listados no Rol, não incluindo internação hospitalar ou procedimentos para fins de diagnóstico ou terapia que necessitem de ambiente hospitalar.
 
-Art. 12. A cobertura de transplantes obedecerá à legislação específica vigente.
+Art. 7º No plano ambulatorial, são obrigatórias:
+I - coberturas de consultas médicas, em número ilimitado, em todas as especialidades médicas;
+II - serviços de apoio diagnóstico;
+III - tratamentos e demais procedimentos ambulatoriais;
+IV - procedimentos ambulatoriais solicitados pelo dentista, quando coberto pelo plano;
+V - cirurgias ambulatoriais constantes do Rol.
 
-Art. 13. A cobertura de quimioterapia, radioterapia e hemoterapia é obrigatória, conforme indicação médica.
+Seção III — Da Segmentação Hospitalar
 
-Art. 14. A cobertura de procedimentos de reprodução humana assistida é obrigatória quando preenchidos os requisitos estabelecidos na DUT.
+Art. 8º O plano hospitalar compreende os atendimentos realizados em regime de internação hospitalar, incluindo:
+I - internação hospitalar, em número ilimitado de dias;
+II - internação em centro de terapia intensiva (CTI/UTI), sem limitação de prazo;
+III - honorários médicos, serviços gerais de enfermagem e alimentação;
+IV - exames complementares indispensáveis para o controle da evolução da doença e elucidação diagnóstica, fornecimento de medicamentos, anestésicos, gases medicinais, transfusões e sessões de quimioterapia e radioterapia, conforme prescrição do médico assistente, realizados ou ministrados durante o período de internação;
+V - taxa de sala cirúrgica, incluindo equipamentos e instrumentos necessários;
+VI - procedimentos de fisioterapia necessários ao tratamento hospitalar;
+VII - alimentação, incluindo nutrição parenteral e enteral;
+VIII - órteses e próteses ligadas ao ato cirúrgico.
 
-Art. 15. A cobertura de cirurgia plástica reconstrutiva é obrigatória quando decorrente de mutilação por acidente, tratamento oncológico ou outras situações cobertas.
+Art. 9º A cobertura hospitalar com obstetrícia inclui, além das coberturas do art. 8º:
+I - consultas e exames do pré-natal;
+II - parto normal ou cesariana;
+III - cobertura assistencial ao recém-nascido, filho natural ou adotivo do beneficiário, durante os primeiros 30 dias;
+IV - inscrição do recém-nascido como dependente, isento de carência, no prazo de 30 dias.
+
+CAPÍTULO III — DAS DIRETRIZES DE UTILIZAÇÃO (DUT)
+
+Art. 10. As Diretrizes de Utilização definem os critérios para a realização de determinados procedimentos constantes do Rol, considerando:
+I - as melhores evidências científicas disponíveis;
+II - a pertinência e a necessidade clínica;
+III - a efetividade e a segurança do procedimento;
+IV - a compatibilidade com a doença ou condição de saúde do beneficiário.
+
+Art. 11. A operadora de planos de assistência à saúde poderá solicitar justificativa clínica do profissional assistente para os procedimentos que possuam DUT.
+Parágrafo único. A justificativa clínica deve conter informações suficientes para a análise da indicação do procedimento, sendo vedado à operadora exigir que o médico assistente se atenha a uma única opção terapêutica.
+
+Art. 12. Os pedidos de autorização para procedimentos constantes das DUTs devem ser respondidos em até:
+I - 24 horas para urgência e emergência;
+II - 10 dias úteis para demais procedimentos ambulatoriais e internações eletivas;
+III - 21 dias úteis para procedimentos de alta complexidade, incluindo cirurgias eletivas.
+
+CAPÍTULO IV — DOS MEDICAMENTOS
+
+Art. 13. A cobertura de medicamentos nos planos de saúde abrange:
+I - medicamentos registrados na ANVISA utilizados durante a internação hospitalar;
+II - medicamentos antineoplásicos orais e injetáveis para uso em ambiente ambulatorial ou hospitalar, conforme protocolos;
+III - medicamentos para controle de efeitos adversos e adjuvantes relacionados a tratamentos oncológicos;
+IV - medicamentos para terapias-alvo aprovados pela ANVISA para a indicação terapêutica;
+V - imunobiológicos quando prescritos conforme critérios do Protocolo de Uso definido pela ANS.
+
+Art. 14. Não estão cobertos:
+I - medicamentos não registrados na ANVISA;
+II - uso off-label de medicamentos, salvo quando comprovada a eficácia por evidências científicas robustas e haja recomendação de pelo menos um órgão de avaliação tecnológica em saúde reconhecido;
+III - medicamentos para tratamento domiciliar, salvo os antineoplásicos orais e os previstos em regulamentação específica.
+
+CAPÍTULO V — DAS DISPOSIÇÕES FINAIS
+
+Art. 15. O Rol de Procedimentos e Eventos em Saúde deve ser revisado periodicamente pela ANS, com base em evidências científicas e considerando:
+I - incorporação de novas tecnologias em saúde;
+II - exclusão de procedimentos obsoletos;
+III - atualização das Diretrizes de Utilização.
+
+Art. 16. As operadoras devem garantir a realização dos procedimentos e eventos constantes do Rol em todo o território nacional.
+
+Art. 17. Esta Resolução Normativa entra em vigor em 1º de abril de 2021.

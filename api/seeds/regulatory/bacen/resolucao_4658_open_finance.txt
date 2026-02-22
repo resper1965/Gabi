@@ -1,0 +1,127 @@
+RESOLUÇÃO CONJUNTA Nº 1, DE 4 DE MAIO DE 2020
+(Regulamenta o Open Finance — Sistema Financeiro Aberto)
+Dispõe sobre a implementação do Sistema Financeiro Aberto (Open Finance).
+
+============================================================
+
+CAPÍTULO I — DO OBJETO E DO ÂMBITO DE APLICAÇÃO
+
+Art. 1º Esta Resolução Conjunta dispõe sobre a implementação do Sistema Financeiro Aberto (Open Finance).
+
+Art. 2º O Open Finance tem como objetivos:
+I - incentivar a inovação;
+II - promover a concorrência;
+III - aumentar a eficiência do Sistema Financeiro Nacional e do Sistema de Pagamentos Brasileiro;
+IV - promover a cidadania financeira.
+
+Art. 3º Devem participar obrigatoriamente do Open Finance:
+I - as instituições enquadradas nos segmentos S1 e S2 (bancos múltiplos, bancos comerciais, bancos de investimento, bancos de câmbio, caixas econômicas);
+II - as demais instituições autorizadas a funcionar pelo Banco Central do Brasil que tenham optado por participar.
+
+Art. 4º Para os fins desta Resolução, consideram-se:
+I - compartilhamento de dados e de serviços: disponibilização padronizada de dados e serviços por meio de abertura e integração de sistemas;
+II - dados de cadastro: informações de identificação e de qualificação dos clientes;
+III - dados transacionais: informações relativas às transações dos clientes;
+IV - instituição receptora de dados: instituição participante que recebe dados de outra instituição participante;
+V - instituição transmissora de dados: instituição participante que compartilha dados com outra instituição participante;
+VI - interface dedicada: interface de programação de aplicações (API) padronizada;
+VII - iniciação de pagamento: serviço de pagamento que inicia uma transação de pagamento pelo usuário final.
+
+CAPÍTULO II — DOS DADOS A SEREM COMPARTILHADOS
+
+Seção I — Dados sobre Produtos e Serviços
+
+Art. 5º As instituições participantes devem compartilhar dados sobre:
+I - canais de atendimento;
+II - produtos e serviços disponibilizados, incluindo suas condições, taxas, tarifas e informações sobre operações de câmbio;
+III - as agências e os correspondentes, indicando localização, horário de atendimento e serviços oferecidos.
+
+Seção II — Dados de Cadastro e Transacionais
+
+Art. 6º As instituições participantes devem compartilhar, quando autorizadas pelo cliente:
+I - dados de cadastro:
+a) nome, endereço, data de nascimento, nacionalidade, estado civil, CPF ou CNPJ;
+b) filiação, renda/faturamento, patrimônio;
+c) qualificação – PEP, ocupação, dados de constituição;
+II - dados transacionais referentes a:
+a) contas de depósito à vista e de poupança;
+b) contas de pagamento pré-pagas;
+c) operações de crédito (empréstimos, financiamentos, cartão de crédito, cheque especial);
+d) operações de câmbio;
+e) investimentos (renda fixa, renda variável, fundos de investimento, previdência);
+f) seguros, previdência complementar e capitalização.
+
+CAPÍTULO III — DO CONSENTIMENTO
+
+Art. 7º O compartilhamento de dados de cadastro e de dados transacionais de clientes requer consentimento do cliente.
+§ 1º O consentimento deve ser:
+I - prévio;
+II - expresso;
+III - informado;
+IV - inequívoco;
+V - com finalidade determinada;
+VI - com prazo de validade compatível com a finalidade, limitado a 12 meses, renovável.
+§ 2º O consentimento pode ser revogado a qualquer momento pelo cliente.
+§ 3º O cliente deve ter visibilidade sobre quais dados foram compartilhados, com quem e para qual finalidade.
+
+Art. 8º O consentimento deve ser obtido por meio de interface eletrônica dedicada da instituição transmissora de dados, que apresente de forma clara:
+I - a instituição receptora e a finalidade do compartilhamento;
+II - os dados ou serviços abrangidos;
+III - o prazo de validade do consentimento;
+IV - a data e hora da solicitação do consentimento.
+
+CAPÍTULO IV — DOS REQUISITOS TÉCNICOS
+
+Art. 9º As instituições participantes devem implementar interfaces dedicadas (APIs) com:
+I - autenticação mútua entre participantes;
+II - criptografia na transmissão de dados;
+III - certificados digitais ICP-Brasil;
+IV - rastreabilidade e auditoria de acessos;
+V - mecanismos de controle de acesso baseados em perfil;
+VI - disponibilidade mínima de 99,5% mensal;
+VII - tempo de resposta máximo definido em regulamentação complementar.
+
+Art. 10. As interfaces dedicadas devem observar padrões técnicos definidos pela convenção do Open Finance, incluindo:
+I - padrões de segurança (OAuth 2.0, OpenID Connect, FAPI);
+II - padrões de API (RESTful, JSON);
+III - padrões de consentimento;
+IV - padrões de certificação.
+
+CAPÍTULO V — DA RESPONSABILIDADE
+
+Art. 11. A instituição transmissora de dados é responsável pela:
+I - confiabilidade, integridade e segurança dos dados transmitidos até a efetiva recepção pela instituição receptora;
+II - verificação da legitimidade do consentimento fornecido pelo cliente;
+III - disponibilidade da interface dedicada.
+
+Art. 12. A instituição receptora de dados é responsável por:
+I - utilizar os dados recebidos exclusivamente para a finalidade consentida pelo cliente;
+II - manter sigilo sobre os dados recebidos;
+III - descartar os dados ao término do prazo de consentimento ou quando revogado pelo cliente;
+IV - implementar mecanismos de segurança compatíveis com a sensibilidade dos dados.
+
+CAPÍTULO VI — DA GOVERNANÇA
+
+Art. 13. As instituições participantes devem aderir à estrutura de governança do ecossistema do Open Finance, que inclui:
+I - convenção entre os participantes;
+II - estrutura responsável pela governança (incluindo diretório de participantes);
+III - padrões técnicos, de segurança e de certificação;
+IV - resolução de disputas entre participantes.
+
+Art. 14. O Banco Central do Brasil poderá:
+I - alterar os prazos e escopo do compartilhamento;
+II - definir novos dados ou serviços a serem compartilhados;
+III - estabelecer critérios adicionais de segurança;
+IV - aplicar medidas prudenciais e sancionatórias em caso de descumprimento.
+
+CAPÍTULO VII — DISPOSIÇÕES TRANSITÓRIAS E FINAIS
+
+Art. 15. A implementação do Open Finance observará as seguintes fases:
+I - Fase 1: dados de produtos e serviços (canais, tarifas, taxas);
+II - Fase 2: dados cadastrais e transacionais (contas, cartões, operações de crédito);
+III - Fase 3: iniciação de transação de pagamento e encaminhamento de proposta de operação de crédito;
+IV - Fase 4: demais dados (câmbio, investimentos, seguros, previdência).
+
+Art. 16. As instituições devem designar diretor responsável pelo cumprimento das obrigações previstas nesta Resolução.
+
+Art. 17. Esta Resolução Conjunta entra em vigor na data de sua publicação.

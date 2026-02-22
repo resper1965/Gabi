@@ -1,0 +1,112 @@
+RESOLUÇÃO CMN Nº 4.966, DE 25 DE NOVEMBRO DE 2021
+Dispõe sobre os conceitos e os critérios contábeis aplicáveis a instrumentos financeiros, bem como para a designação e o reconhecimento das relações de proteção (hedge) pelas instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+============================================================
+
+CAPÍTULO I — DISPOSIÇÕES GERAIS
+
+Art. 1º Esta Resolução dispõe sobre os conceitos e os critérios contábeis aplicáveis a instrumentos financeiros, bem como para a designação e o reconhecimento das relações de proteção (hedge) pelas instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+Art. 2º Para fins desta Resolução, consideram-se:
+I - instrumento financeiro: contrato que dá origem a um ativo financeiro para uma entidade e a um passivo financeiro ou instrumento patrimonial para outra entidade;
+II - ativo financeiro: qualquer ativo que seja:
+a) caixa;
+b) instrumento patrimonial de outra entidade;
+c) direito contratual de receber caixa ou outro ativo financeiro de outra entidade;
+d) direito contratual de trocar ativos ou passivos financeiros com outra entidade em condições potencialmente favoráveis;
+III - passivo financeiro: qualquer passivo que seja:
+a) obrigação contratual de entregar caixa ou outro ativo financeiro a outra entidade;
+b) obrigação contratual de trocar ativos ou passivos financeiros com outra entidade em condições potencialmente desfavoráveis;
+IV - derivativo: instrumento financeiro que apresente, cumulativamente, as seguintes características:
+a) o valor se altera em resposta a mudanças em uma variável especificada (taxa de juros, preço de título ou valor mobiliário, preço de mercadoria, taxa de câmbio, índice de preços ou de taxas, rating ou índice de crédito);
+b) não é necessário desembolso inicial ou o desembolso inicial é menor do que seria exigido em contratos que respondam de forma semelhante a mudanças nos fatores de mercado;
+c) a liquidação ocorre em data futura.
+
+CAPÍTULO II — CLASSIFICAÇÃO DE ATIVOS FINANCEIROS
+
+Art. 3º Os ativos financeiros devem ser classificados nas seguintes categorias de mensuração:
+I - custo amortizado;
+II - valor justo por meio de outros resultados abrangentes;
+III - valor justo por meio do resultado.
+
+Art. 4º Um ativo financeiro deve ser mensurado pelo custo amortizado quando, cumulativamente:
+I - o ativo for mantido dentro de modelo de negócios cujo objetivo seja manter ativos financeiros para recebimento de fluxos de caixa contratuais; e
+II - os termos contratuais do ativo financeiro derem origem, em datas específicas, a fluxos de caixa que constituam exclusivamente pagamentos de principal e juros sobre o valor do principal em aberto (teste SPPI).
+
+Art. 5º Um ativo financeiro deve ser mensurado pelo valor justo por meio de outros resultados abrangentes quando, cumulativamente:
+I - o ativo for mantido dentro de modelo de negócios cujo objetivo seja atingido tanto pelo recebimento de fluxos de caixa contratuais quanto pela venda de ativos financeiros; e
+II - os termos contratuais satisfizerem o teste SPPI.
+
+Art. 6º Um ativo financeiro que não se enquadre no art. 4º nem no art. 5º deve ser mensurado pelo valor justo por meio do resultado.
+
+CAPÍTULO III — DA PERDA DE CRÉDITO ESPERADA
+
+Art. 7º As instituições referidas no art. 1º devem constituir provisão para perdas de crédito esperadas associadas a ativos financeiros mensurados pelo custo amortizado ou pelo valor justo por meio de outros resultados abrangentes.
+
+Art. 8º A perda de crédito esperada é a média ponderada pela probabilidade de ocorrência das perdas de crédito, estimada com base em:
+I - montante imparcial e ponderado pela probabilidade, determinado pela avaliação de uma faixa de resultados possíveis;
+II - valor temporal do dinheiro;
+III - informações razoáveis e fundamentáveis, disponíveis sem custo ou esforço excessivo na data-base, sobre eventos passados, condições correntes e previsões de condições econômicas futuras.
+
+Art. 9º Os ativos financeiros devem ser classificados em três estágios:
+I - Estágio 1: ativos financeiros com risco de crédito que não tenha aumentado significativamente desde o reconhecimento inicial — provisão equivalente à perda de crédito esperada para 12 meses;
+II - Estágio 2: ativos financeiros com risco de crédito que tenha aumentado significativamente desde o reconhecimento inicial, mas sem evidência objetiva de imparidade — provisão equivalente à perda de crédito esperada para a vida inteira;
+III - Estágio 3: ativos financeiros com evidência objetiva de imparidade (créditos problemáticos) — provisão equivalente à perda de crédito esperada para a vida inteira.
+
+Art. 10. Para avaliar se houve aumento significativo do risco de crédito, a instituição deve considerar:
+I - alterações na probabilidade de default desde o reconhecimento inicial;
+II - alterações no rating interno ou externo;
+III - informações de mercado relevantes;
+IV - indicadores macroeconômicos;
+V - prazo remanescente do instrumento;
+VI - atraso superior a 30 dias como presunção relativa de aumento significativo de risco.
+
+Art. 11. Considera-se em situação de default o ativo financeiro que apresentar:
+I - atraso superior a 90 dias, salvo se a instituição demonstrar que outro critério é mais adequado;
+II - evidência de que o devedor não honrará integralmente suas obrigações, sem que a instituição recorra a ações como a execução de garantias.
+
+CAPÍTULO IV — DA MENSURAÇÃO PELO CUSTO AMORTIZADO
+
+Art. 12. O custo amortizado de um ativo ou passivo financeiro é o valor pelo qual o instrumento foi mensurado no reconhecimento inicial, menos as amortizações de principal, mais ou menos a amortização acumulada da diferença entre esse valor inicial e o valor de vencimento utilizando o método da taxa de juros efetiva, ajustado por qualquer provisão para perdas.
+
+Art. 13. A taxa de juros efetiva é a taxa que desconta exatamente os pagamentos ou recebimentos futuros estimados de caixa ao longo da vida esperada do instrumento financeiro.
+
+CAPÍTULO V — DA MENSURAÇÃO PELO VALOR JUSTO
+
+Art. 14. Valor justo é o preço que seria recebido pela venda de um ativo ou pago pela transferência de um passivo em uma transação ordenada entre participantes do mercado na data de mensuração.
+
+Art. 15. Na determinação do valor justo, a instituição deve:
+I - maximizar o uso de dados observáveis relevantes;
+II - minimizar o uso de dados não observáveis.
+
+Art. 16. A hierarquia do valor justo classifica em três níveis as informações utilizadas nas técnicas de avaliação:
+I - Nível 1: preços cotados (não ajustados) em mercados ativos para ativos ou passivos idênticos;
+II - Nível 2: informações observáveis, direta ou indiretamente, que não se enquadrem no Nível 1;
+III - Nível 3: informações não observáveis para o ativo ou passivo.
+
+CAPÍTULO VI — DA CONTABILIDADE DE HEDGE
+
+Art. 17. A contabilidade de hedge tem por objetivo representar, nas demonstrações contábeis, o efeito das atividades de gestão de risco da instituição que utilizam instrumentos financeiros para gerenciar exposições a riscos específicos que poderiam afetar o resultado.
+
+Art. 18. São elegíveis para hedge accounting:
+I - hedge de valor justo: proteção contra exposição a mudanças no valor justo de ativo ou passivo reconhecido;
+II - hedge de fluxo de caixa: proteção contra exposição à variabilidade nos fluxos de caixa;
+III - hedge de investimento líquido em operação no exterior.
+
+Art. 19. Para designar uma relação de hedge, a instituição deve:
+I - haver documentação formal que identifique o instrumento de hedge, o item protegido, a natureza do risco, a estratégia de gestão de risco e como será avaliada a efetividade;
+II - demonstrar que a relação de hedge é efetiva;
+III - utilizar apenas instrumentos derivativos ou ativos/passivos financeiros não derivativos mensurados pelo valor justo;
+IV - demonstrar que o risco coberto é um risco identificável e mensurado de forma confiável.
+
+CAPÍTULO VII — DISPOSIÇÕES FINAIS
+
+Art. 20. As instituições referidas no art. 1º devem:
+I - manter documentação formal de sua política de classificação e mensuração de instrumentos financeiros;
+II - manter registro da metodologia utilizada para apuração da perda de crédito esperada;
+III - divulgar informações sobre instrumentos financeiros em notas explicativas.
+
+Art. 21. O Banco Central do Brasil poderá editar normas complementares necessárias à execução desta Resolução.
+
+Art. 22. Esta Resolução entra em vigor em 1º de janeiro de 2025.
+Parágrafo único. As instituições de que trata o art. 1º poderão aplicar esta Resolução a partir de 1º de janeiro de 2024.

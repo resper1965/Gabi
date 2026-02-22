@@ -1,78 +1,260 @@
-INSTRUÇÕES CVM — NORMAS DO MERCADO DE CAPITAIS
-Comissão de Valores Mobiliários
+RESOLUÇÃO CVM Nº 175, DE 23 DE DEZEMBRO DE 2022
+Dispõe sobre a constituição, o funcionamento, a transparência, a publicidade e a distribuição de cotas dos fundos de investimento, bem como sobre a prestação de serviços para os fundos, e revoga a Instrução CVM nº 555/2014.
 
-=== RESOLUÇÃO CVM Nº 175, DE 23 DE DEZEMBRO DE 2022 ===
-Dispõe sobre a constituição, o funcionamento e a divulgação de informações dos fundos de investimento.
+============================================================
 
-CAPÍTULO I — DAS DISPOSIÇÕES GERAIS
+PARTE GERAL
 
-Art. 1º Esta Resolução dispõe sobre a constituição, o funcionamento e a divulgação de informações dos fundos de investimento, observado o disposto na Lei nº 10.406, de 10 de janeiro de 2002 (Código Civil).
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
 
-Art. 2º O fundo de investimento é uma comunhão de recursos constituída sob a forma de condomínio de natureza especial, destinada à aplicação em ativos financeiros, bens e direitos de qualquer natureza.
+Art. 1º Esta Resolução dispõe sobre a constituição, o funcionamento, a transparência, a publicidade e a distribuição de cotas dos fundos de investimento, bem como sobre a prestação de serviços para os fundos.
 
-Art. 3º São participantes do fundo de investimento:
-I – o administrador;
-II – o gestor;
-III – o distribuidor;
-IV – o custodiante;
-V – o cotista.
+Art. 2º Para os efeitos desta Resolução, consideram-se:
+I - fundo de investimento: comunhão de recursos constituída sob a forma de condomínio de natureza especial, destinada à aplicação em ativos financeiros, bens e direitos de qualquer natureza;
+II - cotista: titular de cotas de fundo de investimento;
+III - gestor: pessoa jurídica autorizada pela CVM para o exercício profissional de administração de carteiras de valores mobiliários, responsável pela gestão profissional dos ativos da carteira do fundo;
+IV - administrador: pessoa jurídica autorizada pela CVM para o exercício profissional de administração de carteiras de valores mobiliários, responsável pela administração do fundo;
+V - prestador de serviços essenciais: administrador, gestor, custodiante e distribuidor;
+VI - distribuidor: instituição financeira ou pessoa jurídica autorizada pela CVM para atuar na distribuição de cotas de fundos de investimento;
+VII - custodiante: instituição responsável pela guarda e controle dos ativos do fundo;
+VIII - assembleia geral de cotistas: órgão soberano do fundo de investimento;
+IX - regulamento: documento que rege o funcionamento do fundo;
+X - lâmina de informações essenciais: documento resumido com as principais características do fundo;
+XI - classe de cotas: subdivisão do patrimônio do fundo em séries distintas;
+XII - subclasse de cotas: subdivisão de uma classe de cotas.
 
-Art. 4º São deveres do administrador:
-I – diligência;
-II – lealdade aos interesses dos cotistas;
-III – transparência na divulgação de informações;
-IV – exercer suas atividades com boa fé.
+CAPÍTULO II — DA CONSTITUIÇÃO DO FUNDO
 
-Art. 5º O regulamento do fundo deve conter, no mínimo:
-I – denominação e classificação do fundo;
-II – prazo de duração;
-III – política de investimento;
-IV – taxa de administração e performance;
-V – condições de aplicação e resgate;
-VI – política de distribuição de resultados.
+Art. 3º O fundo de investimento é constituído por deliberação de um administrador, que deve providenciar o registro do fundo na CVM.
 
-=== RESOLUÇÃO CVM Nº 80, DE 29 DE MARÇO DE 2022 ===
-Dispõe sobre o registro e a prestação de informações de emissores de valores mobiliários.
+Art. 4º O registro do fundo junto à CVM depende do prévio envio de:
+I - regulamento do fundo;
+II - declaração de adequação à legislação e regulamentação vigentes;
+III - dados dos prestadores de serviços essenciais;
+IV - informações sobre as classes e subclasses de cotas, se houver.
 
-Art. 1º Esta Resolução dispõe sobre o registro de emissores de valores mobiliários admitidos à negociação em mercados regulamentados.
+Art. 5º O regulamento deve conter, no mínimo:
+I - denominação e classificação do fundo;
+II - prazo de duração do fundo (determinado ou indeterminado);
+III - política de investimento, com indicação dos ativos que podem compor a carteira, dos riscos associados e das vedações;
+IV - taxa de administração e, se houver, taxa de performance;
+V - condições de emissão, distribuição e resgate de cotas;
+VI - exercício social e periodicidade de distribuição de rendimentos, quando aplicável;
+VII - política de divulgação de informações;
+VIII - formas de convocação e deliberação da assembleia geral;
+IX - identificação dos prestadores de serviços essenciais;
+X - existência ou não de taxa de ingresso e de taxa de saída;
+XI - limite mínimo para permanência no fundo, se houver.
 
-Art. 2º São obrigações do emissor registrado:
-I – manter atualizado o formulário de referência;
-II – divulgar fatos relevantes;
-III – publicar demonstrações financeiras;
-IV – realizar assembleia geral ordinária anualmente;
-V – observar as práticas de governança corporativa.
+CAPÍTULO III — DA ADMINISTRAÇÃO
 
-Art. 3º Fato relevante é qualquer ato ou fato ocorrido ou relacionado aos negócios do emissor que possa influir de modo ponderável na cotação dos valores mobiliários ou na decisão dos investidores.
+Art. 6º O administrador e o gestor devem ser pessoas jurídicas autorizadas pela CVM para administração de carteiras de valores mobiliários.
 
-Art. 4º O fato relevante deve ser divulgado:
-I – antes da abertura ou após o fechamento dos mercados;
-II – de forma ampla, imediata e simultânea;
-III – em linguagem acessível ao público investidor.
+Art. 7º Compete ao administrador, dentre outras atribuições:
+I - providenciar o registro do fundo na CVM;
+II - elaborar e divulgar as informações periódicas e eventuais do fundo;
+III - manter atualizados os registros dos cotistas;
+IV - efetuar a emissão e o resgate de cotas;
+V - manter atualizado o valor da cota e do patrimônio líquido do fundo;
+VI - prestar contas aos cotistas;
+VII - cumprir as deliberações da assembleia geral;
+VIII - manter observância às normas de compliance e prevenção à lavagem de dinheiro.
 
-=== RESOLUÇÃO CVM Nº 88, DE 27 DE JUNHO DE 2022 ===
-Dispõe sobre ofertas públicas de distribuição de valores mobiliários.
+Art. 8º Compete ao gestor:
+I - negociar, em nome do fundo, os ativos financeiros, bens e direitos que compõem a carteira;
+II - operar nos mercados de derivativos em nome do fundo;
+III - verificar o enquadramento dos ativos da carteira aos limites e à política de investimento;
+IV - controlar e gerenciar os riscos da carteira;
+V - selecionar e monitorar os ativos que compõem ou que possam compor a carteira.
 
-Art. 1º Qualquer oferta pública de distribuição de valores mobiliários será realizada em regime de registro na CVM.
+Art. 9º O administrador e o gestor devem agir com diligência, lealdade e boa-fé, em benefício exclusivo dos interesses dos cotistas.
+Parágrafo único. O administrador e o gestor respondem pelos prejuízos causados ao fundo em decorrência de suas ações ou omissões que violem deveres fiduciários.
 
-Art. 2º São requisitos para o registro de oferta pública:
-I – registro do emissor na CVM;
-II – contratação de instituição líder;
-III – elaboração de prospecto;
-IV – demonstrações financeiras auditadas;
-V – parecer jurídico.
+CAPÍTULO IV — DA POLÍTICA DE INVESTIMENTO
 
-=== INSTRUÇÃO CVM Nº 555 (parcialmente revogada pela Res. 175) ===
-Referência histórica sobre fundos de investimento.
+Art. 10. O fundo deve atender aos seguintes requisitos quanto à composição e diversificação de carteira:
+I - não aplicar mais de 20% do patrimônio líquido em ativos emitidos por uma mesma instituição financeira;
+II - não aplicar mais de 10% do patrimônio líquido em ativos emitidos por um mesmo emissor que não seja instituição financeira;
+III - não aplicar mais de 5% do patrimônio líquido em ativos emitidos por pessoas físicas;
+IV - não deter mais de 20% do patrimônio líquido de um mesmo fundo de investimento.
 
-Art. 1º Esta Instrução dispõe sobre a constituição, a administração, o funcionamento e a divulgação de informações dos fundos de investimento.
+Parágrafo único. Os limites do caput podem ser alterados por regulamentação específica para cada tipo de fundo (FI, FIA, FII, FIDC, entre outros).
 
-Nota: A ICVM 555 foi revogada pela Resolução CVM nº 175/2022, que entrou em vigor em 02/10/2023. Referências à ICVM 555 em contratos e regulamentos devem ser interpretadas conforme a nova resolução.
+Art. 11. O fundo pode utilizar instrumentos derivativos para:
+I - proteção (hedge) da carteira;
+II - síntese de posições; ou
+III - alavancagem, quando previsto no regulamento.
+§ 1º A alavancagem implica a possibilidade de perda superior ao patrimônio líquido do fundo, devendo esta possibilidade ser informada no regulamento e nos materiais de divulgação.
 
-=== GOVERNANÇA CORPORATIVA — CÓDIGO DAS MELHORES PRÁTICAS ===
+CAPÍTULO V — DAS CLASSES E SUBCLASSES
 
-Princípios fundamentais do mercado de capitais brasileiro:
-1. Transparência (disclosure) — Disponibilizar informações relevantes de forma tempestiva e equitativa.
-2. Equidade (fairness) — Tratamento justo e igualitário de todos os acionistas e demais partes interessadas.
-3. Prestação de contas (accountability) — Os agentes devem prestar contas de sua atuação de modo claro.
-4. Responsabilidade corporativa — Zelar pela viabilidade econômico-financeira da organização.
+Art. 12. O fundo pode emitir diferentes classes de cotas, com direitos e obrigações distintos, observadas as seguintes regras:
+I - cada classe constitui um patrimônio segregado;
+II - os ativos e as obrigações de cada classe não se comunicam com as demais;
+III - cada classe pode ter política de investimento, taxas e prazos distintos;
+IV - a insolvência de uma classe não afeta as demais.
+
+Art. 13. As classes podem ser subdivididas em subclasses, que se diferenciam em relação a:
+I - taxa de administração;
+II - taxa de performance;
+III - prazo de resgate;
+IV - aplicação mínima;
+V - público-alvo.
+
+CAPÍTULO VI — DA TRANSPARÊNCIA E DIVULGAÇÃO
+
+Art. 14. O administrador deve divulgar:
+I - diariamente: valor da cota e do patrimônio líquido;
+II - mensalmente: extrato com posição e movimentação de cotas;
+III - anualmente: demonstrações contábeis auditadas por auditor independente;
+IV - imediatamente: fato relevante que possa influenciar a decisão do cotista.
+
+Art. 15. A lâmina de informações essenciais deve conter:
+I - resumo da política de investimento;
+II - riscos assumidos pelo fundo;
+III - taxas cobradas;
+IV - rentabilidade histórica;
+V - informações sobre composição da carteira;
+VI - informações sobre liquidez e resgate.
+
+Art. 16. É vedada a divulgação de informações falsas, enganosas, imprecisas ou incompletas sobre o fundo.
+
+CAPÍTULO VII — DA ASSEMBLEIA GERAL
+
+Art. 17. Compete privativamente à assembleia geral de cotistas deliberar sobre:
+I - demonstrações contábeis;
+II - substituição do administrador, do gestor ou do custodiante;
+III - alteração da política de investimento;
+IV - aumento das taxas de administração ou de performance;
+V - fusão, cisão, incorporação ou encerramento do fundo;
+VI - emissão de novas classes ou subclasses de cotas;
+VII - alteração do regulamento.
+
+Art. 18. A assembleia geral pode ser convocada pelo administrador, pelo gestor, pelo custodiante ou por cotistas que detenham, no mínimo, 5% das cotas.
+
+CAPÍTULO VIII — DO RESGATE E DA LIQUIDEZ
+
+Art. 19. O prazo de cotização e de pagamento do resgate deve estar especificado no regulamento.
+§ 1º O prazo de cotização é o tempo entre o pedido de resgate e a conversão das cotas.
+§ 2º O prazo de pagamento é o tempo entre a conversão das cotas e o efetivo crédito ao cotista.
+
+Art. 20. O administrador pode declarar o fechamento do fundo para resgates em situações excepcionais de iliquidez, mediante deliberação em assembleia geral convocada no prazo de 1 dia.
+
+CAPÍTULO IX — DISPOSIÇÕES FINAIS
+
+Art. 21. Os fundos devem adotar práticas de responsabilidade e governança corporativa, incluindo:
+I - prevenção à lavagem de dinheiro e ao financiamento do terrorismo;
+II - identificação e gestão de conflitos de interesse;
+III - compliance regulatório;
+IV - gestão de riscos operacionais.
+
+Art. 22. A CVM poderá solicitar informações adicionais e aplicar sanções em caso de descumprimento desta Resolução.
+
+Art. 23. Esta Resolução entra em vigor em 2 de outubro de 2023.
+
+
+============================================================
+
+
+RESOLUÇÃO CVM Nº 80, DE 29 DE MARÇO DE 2022
+Dispõe sobre o registro e a prestação de informações periódicas e eventuais dos emissores de valores mobiliários admitidos à negociação em mercados regulamentados de valores mobiliários.
+
+============================================================
+
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
+
+Art. 1º Esta Resolução dispõe sobre o registro e a prestação de informações periódicas e eventuais dos emissores de valores mobiliários admitidos à negociação em mercados regulamentados de valores mobiliários.
+
+Art. 2º Para os efeitos desta Resolução, consideram-se:
+I - emissor: pessoa jurídica que emite valores mobiliários e os tem admitidos à negociação em mercado regulamentado;
+II - administrador: membro do conselho de administração, diretor ou membro de órgão com função técnica ou consultiva criado pelo estatuto;
+III - controlador: pessoa natural ou jurídica, ou grupo de pessoas vinculadas por acordo de acionistas ou sob controle comum, que exerce poder de controle sobre o emissor;
+IV - valores mobiliários: ações, debêntures, bônus de subscrição, certificados de depósito de valores mobiliários, cotas de fundos de investimento, notas comerciais e outros títulos definidos em lei;
+V - mercado regulamentado: ambiente de negociação administrado por entidade administradora autorizada pela CVM.
+
+CAPÍTULO II — DO REGISTRO DE EMISSOR
+
+Art. 3º O registro de emissor é obrigatório para companhias que tenham valores mobiliários admitidos à negociação em mercado regulamentado.
+
+Art. 4º O registro de emissor divide-se nas seguintes categorias:
+I - Categoria A: emissor autorizado a ter qualquer valor mobiliário admitido à negociação;
+II - Categoria B: emissor autorizado a ter admitidos à negociação apenas valores mobiliários que não sejam ações ou certificados de depósito de ações.
+
+Art. 5º O pedido de registro deve ser instruído com:
+I - estatuto social consolidado;
+II - ata de assembleia ou reunião que deliberou sobre a oferta que motivou o pedido;
+III - formulário de referência (documento consolidado com informações detalhadas sobre o emissor);
+IV - demonstrações financeiras dos últimos 3 exercícios sociais.
+
+CAPÍTULO III — DA PRESTAÇÃO DE INFORMAÇÕES PERIÓDICAS
+
+Art. 6º Os emissores registrados devem prestar as seguintes informações periódicas à CVM:
+I - Formulário de Referência: documento consolidado que contém informações sobre:
+a) atividades do emissor;
+b) fatores de risco;
+c) administradores e conselheiros;
+d) remuneração dos administradores;
+e) estrutura de capital e controladores;
+f) dados financeiros selecionados;
+g) comentários dos administradores sobre a situação financeira;
+h) propriedades, plantas e equipamentos;
+i) valores mobiliários emitidos;
+j) transações com partes relacionadas;
+k) políticas de governança corporativa;
+II - Demonstrações Financeiras Anuais:
+a) balanço patrimonial;
+b) demonstração de resultado;
+c) demonstração de resultado abrangente;
+d) demonstração de fluxo de caixa;
+e) demonstração das mutações do patrimônio líquido;
+f) notas explicativas;
+g) relatório do auditor independente;
+III - Formulário de Demonstrações Financeiras Padronizadas (DFP);
+IV - Informações Trimestrais (ITR):
+a) demonstrações financeiras do trimestre;
+b) relatório de revisão especial do auditor independente.
+
+Art. 7º Os prazos para envio das informações periódicas são:
+I - Formulário de Referência: até 5 meses após o encerramento do exercício social;
+II - Demonstrações Financeiras: até 3 meses após o encerramento do exercício social;
+III - Informações Trimestrais: até 45 dias após o encerramento de cada trimestre.
+
+CAPÍTULO IV — DAS INFORMAÇÕES EVENTUAIS
+
+Art. 8º O emissor deve divulgar imediatamente, por meio de comunicação à CVM e ao mercado:
+I - fato relevante: qualquer decisão, ato ou fato que possa influir de modo ponderável na cotação dos valores mobiliários, na decisão de investimento ou no exercício de direitos;
+II - atos societários relevantes, incluindo:
+a) convocações e deliberações de assembleia geral;
+b) alterações na composição do conselho de administração e da diretoria;
+c) aquisição ou alienação de participações relevantes;
+d) celebração, alteração ou rescisão de acordo de acionistas;
+e) desdobramento, grupamento ou bonificação de ações;
+f) emissão de valores mobiliários;
+g) operações de fusão, cisão, incorporação ou transformação;
+h) pedido ou deferimento de recuperação judicial ou falência.
+
+Art. 9º O administrador deve manter sigilo sobre informação relevante até sua divulgação ao mercado. Em caso de vazamento, o emissor deve imediatamente divulgar a informação.
+
+CAPÍTULO V — DA GOVERNANÇA
+
+Art. 10. O emissor deve adotar e divulgar práticas de governança corporativa, incluindo:
+I - política de divulgação de informações;
+II - política de negociação de valores mobiliários;
+III - código de conduta;
+IV - política de transações com partes relacionadas;
+V - política de gestão de riscos;
+VI - política de remuneração dos administradores.
+
+Art. 11. O comitê de auditoria (quando existente) deve:
+I - opinar sobre a contratação e destituição de auditor independente;
+II - avaliar a efetividade dos controles internos;
+III - receber e tratar denúncias sobre descumprimento de dispositivos legais;
+IV - reunir-se periodicamente com o auditor independente e com a diretoria.
+
+CAPÍTULO VI — DISPOSIÇÕES FINAIS
+
+Art. 12. A CVM poderá solicitar do emissor, a qualquer tempo, informações adicionais.
+
+Art. 13. O descumprimento desta Resolução sujeita o emissor e seus administradores às sanções previstas na legislação vigente.
+
+Art. 14. Esta Resolução entra em vigor em 2 de janeiro de 2023.

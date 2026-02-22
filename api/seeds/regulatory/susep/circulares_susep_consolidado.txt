@@ -1,58 +1,261 @@
-CIRCULAR SUSEP Nº 648, DE 10 DE MARÇO DE 2022
-Dispõe sobre os requisitos de segurança cibernética e de tecnologia da informação — SUSEP
+CIRCULAR SUSEP Nº 648, DE 28 DE OUTUBRO DE 2022
+Dispõe sobre requisitos de segurança cibernética a serem observados pelas sociedades seguradoras, entidades abertas de previdência complementar, sociedades de capitalização e resseguradores locais.
 
-Art. 1º Esta Circular estabelece requisitos de segurança cibernética e de tecnologia da informação a serem observados pelas sociedades seguradoras, entidades abertas de previdência complementar, sociedades de capitalização e resseguradores locais.
+============================================================
 
-Art. 2º As supervisionadas devem implementar política de segurança cibernética com o objetivo de assegurar a confidencialidade, a integridade e a disponibilidade dos dados e dos sistemas de informação.
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
 
-Art. 3º A política de segurança deve contemplar, no mínimo:
-I – os objetivos de segurança cibernética;
-II – os procedimentos e controles para redução de vulnerabilidades;
-III – controles para rastreabilidade da informação;
-IV – controles sobre tratamento de incidentes;
-V – classificação de dados e informações.
+Art. 1º Esta Circular estabelece os requisitos de segurança cibernética a serem observados pelas sociedades seguradoras, entidades abertas de previdência complementar, sociedades de capitalização e resseguradores locais (doravante "supervisionadas").
 
-Art. 4º As supervisionadas devem estabelecer plano de resposta a incidentes contemplando:
-I – identificação e análise de causa e impacto;
-II – comunicação à SUSEP de incidentes relevantes;
-III – avaliação de necessidade de comunicação aos titulares de dados (LGPD).
+Art. 2º Para fins desta Circular, consideram-se:
+I - incidente cibernético: evento adverso, confirmado ou sob suspeita, relacionado à segurança de sistemas de computação ou de redes de computadores;
+II - incidente cibernético relevante: incidente cibernético que tenha potencial para causar prejuízo significativo à supervisionada, a seus clientes ou ao sistema de seguros privados;
+III - dados sensíveis: dados pessoais sobre origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou organização de caráter religioso, filosófico ou político, dados referentes à saúde ou à vida sexual, dado genético ou biométrico;
+IV - ativos de informação: base de dados, arquivos, documentação de sistemas, manuais, material de treinamento, procedimentos de suporte ou operação, planos de continuidade, arranjos de recuperação de desastres, trilhas de auditoria e informações armazenadas;
+V - computação em nuvem: disponibilidade sob demanda de recursos computacionais, especialmente armazenamento de dados e capacidade de processamento, sem gerenciamento ativo direto pelo usuário.
 
-=== CIRCULAR SUSEP Nº 637, DE 13 DE JULHO DE 2021 ===
-Dispõe sobre as regras e critérios para operação dos seguros de pessoas.
+CAPÍTULO II — DA POLÍTICA DE SEGURANÇA CIBERNÉTICA
 
-Art. 1º Esta Circular dispõe sobre as regras e os critérios para estruturação, comercialização e administração de seguros de pessoas.
+Art. 3º As supervisionadas devem implementar e manter política de segurança cibernética compatível com o seu porte, perfil de risco, modelo de negócios, natureza de suas operações e complexidade de seus produtos, serviços e processos.
 
-Art. 2º Os seguros de pessoas compreendem:
-I - seguro de vida;
+Art. 4º A política de segurança cibernética deve contemplar, no mínimo:
+I - os objetivos de segurança cibernética;
+II - a estrutura organizacional e as responsabilidades pela segurança cibernética;
+III - procedimentos e controles voltados para:
+a) a autenticação e controle de acesso;
+b) a criptografia;
+c) a prevenção e detecção de intrusão;
+d) a prevenção de vazamento de informações;
+e) a realização de testes e varreduras periódicas para detecção de vulnerabilidades;
+f) a proteção contra software malicioso;
+g) o registro e controle de acessos;
+h) a segmentação de redes de comunicação;
+i) a manutenção de cópias de segurança (backup) dos dados e das informações;
+IV - a classificação dos dados e das informações quanto à relevância e confidencialidade;
+V - os procedimentos relativos ao uso de serviços de computação em nuvem;
+VI - os mecanismos de disseminação da cultura de segurança cibernética;
+VII - as diretrizes para gestão de riscos cibernéticos;
+VIII - as diretrizes para o tratamento de incidentes cibernéticos;
+IX - os procedimentos para a gestão de vulnerabilidades;
+X - os critérios para a contratação de serviços de tecnologia da informação e comunicação.
+
+Art. 5º A política de segurança cibernética deve ser:
+I - aprovada pelo conselho de administração ou, na sua inexistência, pela diretoria da supervisionada;
+II - revisada anualmente ou sempre que houver alterações relevantes;
+III - divulgada a todos os funcionários e prestadores de serviço relevantes;
+IV - compatível com os requisitos de proteção de dados pessoais, em especial a LGPD.
+
+CAPÍTULO III — DO PLANO DE AÇÃO E RESPOSTA A INCIDENTES
+
+Art. 6º As supervisionadas devem estabelecer plano de ação e resposta a incidentes cibernéticos que contemple:
+I - definição de incidente cibernético relevante, de acordo com critérios estabelecidos pela supervisionada;
+II - procedimentos para contenção, erradicação, recuperação e comunicação de incidentes;
+III - procedimentos para preservação de evidências e rastreabilidade;
+IV - mecanismos de comunicação com:
+a) a Susep;
+b) clientes e público em geral, quando aplicável;
+c) outras autoridades reguladoras e órgãos de controle, quando cabível;
+V - cronograma de testes periódicos do plano;
+VI - critérios para avaliação dos impactos financeiros, operacionais e reputacionais.
+
+Art. 7º As supervisionadas devem comunicar à Susep a ocorrência de incidentes cibernéticos relevantes no prazo máximo de:
+I - 24 horas: comunicação preliminar com as informações disponíveis;
+II - 72 horas: comunicação complementar com informações detalhadas sobre o incidente, impacto e medidas adotadas;
+III - 30 dias: relatório final com análise da causa raiz, impacto total e medidas corretivas implementadas.
+
+Art. 8º A comunicação de incidente deve conter, no mínimo:
+I - data e hora da detecção;
+II - descrição do incidente e dos sistemas afetados;
+III - impacto estimado (número de registros, clientes afetados, dados expostos);
+IV - medidas de contenção e recuperação adotadas;
+V - análise preliminar da causa raiz;
+VI - medidas preventivas planejadas.
+
+CAPÍTULO IV — DA GESTÃO DE RISCOS CIBERNÉTICOS
+
+Art. 9º As supervisionadas devem implementar processo de gestão de riscos cibernéticos que contemple:
+I - identificação dos ativos de tecnologia da informação e respectivas vulnerabilidades e ameaças;
+II - avaliação e classificação dos riscos identificados;
+III - definição de medidas de tratamento dos riscos;
+IV - monitoramento contínuo dos riscos cibernéticos;
+V - revisão periódica da avaliação de riscos.
+
+Art. 10. As supervisionadas devem realizar, no mínimo anualmente:
+I - teste de vulnerabilidade e de penetração (pentest) nos sistemas críticos;
+II - avaliação independente dos controles de segurança cibernética;
+III - simulação de cenários de incidentes cibernéticos.
+
+Art. 11. Os resultados dos testes e avaliações devem ser:
+I - documentados e apresentados à diretoria ou ao conselho de administração;
+II - utilizados para atualização do plano de ação e resposta a incidentes;
+III - mantidos à disposição da Susep pelo prazo mínimo de 5 anos.
+
+CAPÍTULO V — DA CONTRATAÇÃO DE SERVIÇOS DE TECNOLOGIA
+
+Art. 12. A contratação de serviços de processamento e armazenamento de dados e de computação em nuvem deve observar:
+I - avaliação prévia da capacidade do prestador de serviço em atender aos requisitos de segurança;
+II - formalização contratual que contemple:
+a) mecanismos de monitoramento e auditoria;
+b) procedimentos para tratamento e proteção de dados;
+c) localização dos dados e processamento;
+d) responsabilidades em caso de incidentes;
+e) procedimentos de encerramento e transferência de dados;
+III - garantia de acesso da Susep aos dados, documentação e informações;
+IV - manutenção da responsabilidade da supervisionada pela segurança dos dados e informações, independentemente da contratação de terceiros.
+
+Art. 13. Quando o serviço for prestado no exterior, a supervisionada deve:
+I - assegurar o cumprimento da legislação brasileira de proteção de dados;
+II - garantir o acesso da Susep aos dados e informações;
+III - manter cópia de segurança dos dados em território nacional;
+IV - avaliar os riscos associados à jurisdição estrangeira.
+
+CAPÍTULO VI — DA GOVERNANÇA
+
+Art. 14. As supervisionadas devem:
+I - designar diretor responsável pela política de segurança cibernética;
+II - manter função ou área específica de segurança cibernética, proporcional ao porte e complexidade;
+III - assegurar a independência da função de segurança cibernética em relação à área de tecnologia da informação;
+IV - incluir as questões de segurança cibernética na agenda da diretoria e do conselho de administração.
+
+Art. 15. O diretor responsável pela segurança cibernética deve:
+I - manter-se atualizado sobre ameaças e vulnerabilidades cibernéticas;
+II - reportar periodicamente à diretoria e ao conselho sobre a situação de segurança cibernética;
+III - assegurar a implementação e manutenção dos controles de segurança;
+IV - zelar pela conformidade com a regulamentação aplicável.
+
+CAPÍTULO VII — DISPOSIÇÕES FINAIS
+
+Art. 16. A documentação relativa à política de segurança cibernética, ao plano de ação e resposta a incidentes, e aos testes e avaliações realizados deve ficar à disposição da Susep pelo prazo mínimo de 5 anos.
+
+Art. 17. O descumprimento das disposições desta Circular sujeita a supervisionada às sanções previstas na legislação vigente.
+
+Art. 18. Esta Circular entra em vigor em 1º de fevereiro de 2023.
+
+
+============================================================
+
+
+CIRCULAR SUSEP Nº 637, DE 21 DE JULHO DE 2021
+Dispõe sobre os seguros de pessoas e planos de previdência complementar aberta.
+
+============================================================
+
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
+
+Art. 1º Esta Circular dispõe sobre os seguros de pessoas e os planos de previdência complementar aberta, definindo regras para a estruturação, a comercialização, a operação e a fiscalização desses produtos.
+
+Art. 2º Para fins desta Circular, consideram-se:
+I - seguro de pessoas: contrato que tem por objeto garantir o pagamento de indenização ao segurado ou aos seus beneficiários em caso de ocorrência de eventos relacionados à vida, integridade física ou saúde do segurado;
+II - plano de previdência complementar aberta: plano de acumulação de recursos destinado à complementação de aposentadoria;
+III - PGBL (Plano Gerador de Benefício Livre): plano de previdência com benefício fiscal na fase de acumulação;
+IV - VGBL (Vida Gerador de Benefício Livre): seguro de pessoas com cobertura por sobrevivência;
+V - coberturas de risco: coberturas que garantem o pagamento de capital segurado em caso de morte, invalidez ou doenças;
+VI - provisões técnicas: reservas constituídas pela supervisionada para garantir o cumprimento de suas obrigações.
+
+CAPÍTULO II — DOS SEGUROS DE PESSOAS
+
+Seção I — Modalidades
+
+Art. 3º Os seguros de pessoas compreendem:
+I - seguro de vida:
+a) seguro de vida individual;
+b) seguro de vida em grupo;
+c) seguro de vida com cobertura de sobrevivência;
 II - seguro de acidentes pessoais;
 III - seguro de viagem;
-IV - seguro prestamista;
+IV - seguro prestamista (vinculado a operações de crédito);
 V - seguro educacional;
-VI - seguro de diária por incapacidade temporária;
-VII - seguro de desemprego ou perda de renda.
+VI - seguro funeral;
+VII - seguro de diária por incapacidade temporária;
+VIII - seguro de diária por internação hospitalar;
+IX - seguro desemprego (perda involuntária de emprego).
 
-Art. 3º As condições gerais do seguro devem conter, no mínimo:
-I – objeto do seguro e riscos cobertos;
-II – riscos excluídos;
-III – âmbito geográfico;
-IV – períodos de carência;
-V – franquias e participações obrigatórias do segurado;
-VI – critérios de cálculo e de pagamento da indenização;
-VII – obrigações do segurado;
-VIII – procedimentos para comunicação e regulação de sinistros;
-IX – prazo de prescrição.
+Seção II — Da Contratação
 
-=== RESOLUÇÃO CNSP Nº 432, DE 12 DE NOVEMBRO DE 2021 ===
-Dispõe sobre provisões técnicas e ativos de cobertura.
+Art. 4º A contratação de seguro de pessoas deve observar:
+I - a proposta de seguro deve ser redigida em linguagem clara e acessível;
+II - devem ser informados ao proponente:
+a) as coberturas contratadas;
+b) os riscos excluídos;
+c) os limites de indenização;
+d) o prêmio;
+e) a carência, quando aplicável;
+f) as condições de renovação;
+g) as condições de cancelamento;
+III - a aceitação do risco pela seguradora deve ser comunicada em até 15 dias;
+IV - é vedada a recusa de proposta sem justificativa;
+V - a seguradora deve devolver o prêmio pago no caso de recusa da proposta.
 
-Art. 1º Esta Resolução estabelece critérios e condições para a constituição e adequação das provisões técnicas e dos ativos garantidores.
+Art. 5º Nos seguros de vida em grupo:
+I - o estipulante é responsável pela administração do contrato;
+II - todos os seguráveis devem ter a oportunidade de ingressar no grupo;
+III - a rescisão do contrato por parte do estipulante não prejudica as coberturas dos segurados;
+IV - o certificado individual deve ser entregue a cada segurado.
 
-Art. 2º As provisões técnicas devem ser constituídas de acordo com:
-I – nota técnica atuarial;
-II – critérios mínimos definidos pela SUSEP;
-III – princípios atuariais geralmente aceitos.
+Seção III — Das Coberturas
 
-Art. 3º Os ativos garantidores devem ser:
-I – suficientes para cobertura integral das provisões técnicas;
-II – diversificados conforme limites prudenciais;
-III – líquidos e mensuráveis a valor de mercado.
+Art. 6º As coberturas dos seguros de pessoas podem incluir:
+I - morte natural;
+II - morte acidental;
+III - invalidez permanente total ou parcial por acidente;
+IV - invalidez funcional permanente total por doença;
+V - doenças graves;
+VI - diária por incapacidade temporária;
+VII - diária por internação hospitalar;
+VIII - desemprego involuntário;
+IX - despesas médicas, hospitalares e odontológicas por acidente;
+X - sobrevivência (benefício por acumulação).
+
+Art. 7º As condições gerais devem definir claramente:
+I - os eventos cobertos e seus critérios de caracterização;
+II - as exclusões de cobertura;
+III - os períodos de carência, quando aplicáveis;
+IV - o capital segurado ou a forma de cálculo da indenização;
+V - os procedimentos para comunicação do sinistro.
+
+CAPÍTULO III — DOS PLANOS DE PREVIDÊNCIA COMPLEMENTAR ABERTA
+
+Art. 8º Os planos de previdência complementar aberta devem prever:
+I - período de diferimento (acumulação): fase em que o participante acumula recursos;
+II - período de benefício: fase em que os recursos são convertidos em renda ou resgatados;
+III - taxas de carregamento e de administração financeira;
+IV - regras de resgate e portabilidade.
+
+Art. 9º O participante tem direito a:
+I - realizar aportes regulares ou esporádicos;
+II - alterar o valor e a periodicidade das contribuições;
+III - resgatar total ou parcialmente os recursos acumulados, respeitados os prazos contratuais;
+IV - portar os recursos para outro plano de previdência;
+V - indicar e alterar beneficiários;
+VI - receber informações periódicas sobre a evolução de seus recursos.
+
+Art. 10. As provisões técnicas dos planos de previdência devem:
+I - ser constituídas com base em hipóteses atuariais adequadas;
+II - ser avaliadas periodicamente por atuário habilitado;
+III - ser suficientes para garantir o cumprimento das obrigações;
+IV - estar aplicadas conforme regras de investimento definidas pelo Conselho Monetário Nacional.
+
+CAPÍTULO IV — DAS PROVISÕES TÉCNICAS
+
+Art. 11. As supervisionadas devem constituir as seguintes provisões técnicas:
+I - Provisão de Prêmios Não Ganhos (PPNG);
+II - Provisão de Sinistros a Liquidar (PSL);
+III - Provisão de Sinistros Ocorridos e Não Avisados (IBNR);
+IV - Provisão Matemática de Benefícios a Conceder (PMBaC) — para previdência;
+V - Provisão Matemática de Benefícios Concedidos (PMBC) — para previdência;
+VI - Provisão de Despesas Relacionadas (PDR);
+VII - outras provisões específicas conforme regulamentação complementar.
+
+Art. 12. As provisões devem ser:
+I - calculadas conforme metodologias aprovadas pela Susep;
+II - objeto de teste de adequação periódico;
+III - auditadas anualmente por auditor independente;
+IV - reportadas à Susep conforme periodicidade estabelecida.
+
+CAPÍTULO V — DISPOSIÇÕES FINAIS
+
+Art. 13. As supervisionadas devem manter à disposição da Susep toda a documentação relativa aos produtos comercializados, incluindo condições gerais, notas técnicas atuariais e materiais de divulgação.
+
+Art. 14. O descumprimento das disposições desta Circular sujeita a supervisionada às sanções previstas na legislação vigente.
+
+Art. 15. Esta Circular entra em vigor em 1º de setembro de 2021.

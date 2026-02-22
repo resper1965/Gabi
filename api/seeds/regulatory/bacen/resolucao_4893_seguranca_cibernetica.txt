@@ -1,0 +1,110 @@
+RESOLUÇÃO BCB Nº 85, DE 8 DE ABRIL DE 2021
+(Antiga Resolução nº 4.893, de 26 de fevereiro de 2021)
+Dispõe sobre a política de segurança cibernética e sobre os requisitos para a contratação de serviços de processamento e armazenamento de dados e de computação em nuvem a serem observados pelas instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+============================================================
+
+CAPÍTULO I — OBJETO E ÂMBITO DE APLICAÇÃO
+
+Art. 1º Esta Resolução dispõe sobre a política de segurança cibernética e sobre os requisitos para a contratação de serviços de processamento e armazenamento de dados e de computação em nuvem a serem observados pelas instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+Art. 2º Para fins desta Resolução, entende-se por:
+I - dados: quaisquer informações armazenadas ou processadas em ambiente computacional;
+II - incidente relevante: evento adverso confirmado que comprometa a segurança de dados ou a disponibilidade de serviços relevantes;
+III - instituição contratante: instituição referida no art. 1º que contrate serviços de processamento, armazenamento de dados e computação em nuvem;
+IV - serviços relevantes: operações de pagamento, operações de crédito, câmbio e outros serviços cuja interrupção possa impactar clientes e o sistema financeiro.
+
+CAPÍTULO II — DA POLÍTICA DE SEGURANÇA CIBERNÉTICA
+
+Art. 3º As instituições referidas no art. 1º devem implementar e manter política de segurança cibernética formulada com base em princípios e diretrizes que busquem assegurar a confidencialidade, a integridade e a disponibilidade dos dados e dos sistemas de informação utilizados.
+
+Art. 4º A política de segurança cibernética deve contemplar, no mínimo:
+I - os objetivos de segurança cibernética da instituição;
+II - os procedimentos e os controles adotados para reduzir a vulnerabilidade da instituição a incidentes e atender aos demais objetivos de segurança cibernética;
+III - os controles específicos, incluindo os voltados para a rastreabilidade da informação, que busquem garantir a segurança das informações sensíveis;
+IV - o registro, a análise da causa e do impacto, bem como o controle dos efeitos de incidentes relevantes para as atividades da instituição;
+V - as diretrizes para:
+a) a elaboração de cenários de incidentes considerados nos testes de continuidade de negócios;
+b) a definição de procedimentos e de controles voltados à prevenção e ao tratamento dos incidentes a serem adotados por empresas prestadoras de serviços a terceiros que manuseiem dados ou informações sensíveis ou que sejam relevantes para a condução das atividades operacionais da instituição;
+c) a classificação dos dados e das informações quanto à relevância;
+d) a definição dos parâmetros a serem utilizados na avaliação da relevância dos incidentes;
+VI - os mecanismos para disseminação da cultura de segurança cibernética na instituição, incluindo:
+a) a implementação de programas de capacitação e de avaliação periódica de pessoal;
+b) a prestação de informações a clientes e usuários sobre precauções na utilização de produtos e serviços financeiros;
+VII - as iniciativas para compartilhamento de informações sobre os incidentes relevantes, mencionados no inciso IV, com as demais instituições referidas no art. 1º.
+
+Art. 5º A política de segurança cibernética deve ser compatível com:
+I - o porte, o perfil de risco e o modelo de negócio da instituição;
+II - a natureza das operações e a complexidade dos produtos, serviços, atividades e processos da instituição;
+III - a sensibilidade dos dados e das informações sob responsabilidade da instituição.
+
+Art. 6º A política de segurança cibernética deve ser divulgada aos funcionários da instituição e às empresas prestadoras de serviços a terceiros, mediante linguagem clara, acessível e em nível de detalhamento compatível com as funções desempenhadas e com a sensibilidade das informações de que tenham conhecimento.
+
+Art. 7º As instituições referidas no art. 1º devem divulgar ao público resumo contendo as linhas gerais da política de segurança cibernética.
+
+CAPÍTULO III — DO PLANO DE AÇÃO E DE RESPOSTA A INCIDENTES
+
+Art. 8º As instituições referidas no art. 1º devem estabelecer plano de ação e de resposta a incidentes, com abordagem e escopo definidos pela instituição, com a finalidade imediata de conter o incidente e mitigar riscos associados, devendo contemplar, no mínimo:
+I - as ações a serem desenvolvidas pela instituição para adequar suas estruturas organizacional e operacional aos princípios e às diretrizes da política de segurança cibernética;
+II - as rotinas, os procedimentos, os controles e as tecnologias a serem utilizados na prevenção e na resposta a incidentes, em conformidade com as diretrizes da política de segurança cibernética;
+III - a área responsável pelo registro e controle dos efeitos de incidentes relevantes.
+
+Art. 9º As instituições referidas no art. 1º devem designar diretor responsável pela política de segurança cibernética e pela execução do plano de ação e de resposta a incidentes.
+Parágrafo único. O diretor mencionado no caput pode desempenhar outras funções na instituição, desde que não haja conflito de interesses.
+
+CAPÍTULO IV — DA CONTRATAÇÃO DE SERVIÇOS DE PROCESSAMENTO E ARMAZENAMENTO DE DADOS E DE COMPUTAÇÃO EM NUVEM
+
+Art. 10. As instituições referidas no art. 1º devem assegurar que suas políticas, estratégias e estruturas para gerenciamento de riscos previstas na regulamentação em vigor contemplem a contratação de serviços relevantes de processamento e armazenamento de dados e de computação em nuvem, no País ou no exterior.
+
+Art. 11. Previamente à contratação de serviços relevantes de processamento e armazenamento de dados e de computação em nuvem, as instituições devem:
+I - adotar práticas de governança corporativa e de gestão proporcionais à relevância do serviço a ser contratado e aos riscos a que estejam expostas;
+II - verificar a capacidade do potencial prestador de serviço de assegurar:
+a) o cumprimento da legislação e da regulamentação em vigor;
+b) o acesso da instituição aos dados e às informações a serem processados ou armazenados pelo prestador de serviço;
+c) a confidencialidade, a integridade, a disponibilidade e a recuperação dos dados e das informações processados ou armazenados pelo prestador de serviço;
+d) a sua aderência a certificações exigidas pela instituição para a prestação do serviço a ser contratado;
+e) o acesso da instituição contratante aos relatórios elaborados por empresa de auditoria especializada independente contratada pelo prestador de serviço, relativos aos procedimentos e aos controles utilizados na prestação dos serviços a serem contratados;
+f) o provimento de informações e de recursos de gestão adequados ao monitoramento dos serviços a serem prestados;
+g) a identificação e a segregação dos dados dos clientes da instituição por meio de controles físicos ou lógicos;
+h) a qualidade dos controles de acesso voltados à proteção dos dados e das informações dos clientes da instituição;
+III - considerar a criticidade do serviço e a sensibilidade dos dados envolvidos.
+
+Art. 12. Os contratos para prestação de serviços relevantes de processamento, armazenamento de dados e computação em nuvem devem prever:
+I - a indicação dos países e da região em cada país onde os serviços poderão ser prestados e os dados poderão ser armazenados, processados e gerenciados;
+II - a adoção de medidas de segurança para a transmissão e armazenamento dos dados;
+III - a manutenção, enquanto o contrato estiver vigente, da segregação dos dados e dos controles de acesso para proteção das informações dos clientes;
+IV - a obrigatoriedade, em caso de extinção do contrato, de:
+a) transferência dos dados ao novo prestador de serviços ou à instituição contratante;
+b) exclusão dos dados pela empresa contratada substituída, após a confirmação da transferência dos dados prevista na alínea "a";
+V - o acesso da instituição contratante:
+a) às informações fornecidas pela empresa contratada;
+b) às informações relativas às certificações e aos relatórios de auditoria especializada;
+VI - a obrigação de a empresa contratada notificar a instituição contratante sobre a subcontratação de serviços relevantes para a instituição;
+VII - a permissão de acesso do Banco Central do Brasil aos contratos e aos acordos firmados para a prestação de serviços, à documentação e às informações referentes aos serviços prestados, aos dados armazenados e às informações sobre os processamentos realizados.
+
+CAPÍTULO V — DA COMUNICAÇÃO DE INCIDENTES
+
+Art. 13. As instituições referidas no art. 1º devem comunicar ao Banco Central do Brasil a ocorrência de incidentes relevantes e as interrupções dos serviços relevantes.
+§ 1º A comunicação deve ser feita no prazo máximo de 24 horas a partir do conhecimento pela instituição da ocorrência do incidente.
+§ 2º A comunicação deve conter, no mínimo:
+I - a descrição do incidente;
+II - os riscos e as consequências identificados;
+III - as medidas adotadas para a contenção e a solução do incidente;
+IV - o nome e o CPF do diretor de que trata o art. 9º.
+
+Art. 14. O Banco Central do Brasil poderá adotar medidas prudenciais preventivas com finalidade de assegurar que as instituições observem a regulamentação em vigor, inclusive por meio de:
+I - determinação para que a instituição apresente e execute plano de adequação;
+II - realização de avaliação específica das condições de segurança cibernética da instituição.
+
+CAPÍTULO VI — DISPOSIÇÕES FINAIS
+
+Art. 15. A política de segurança cibernética e o plano de ação e de resposta a incidentes devem ser aprovados pelo conselho de administração ou, na sua inexistência, pela diretoria da instituição.
+
+Art. 16. A política de segurança cibernética deve ser revisada, no mínimo, anualmente.
+
+Art. 17. As instituições referidas no art. 1º devem elaborar relatório anual sobre a implementação do plano de ação e de resposta a incidentes, com data-base de 31 de dezembro de cada ano.
+Parágrafo único. O relatório de que trata o caput deve ser apresentado ao conselho de administração ou, na sua inexistência, à diretoria da instituição até 31 de março do ano seguinte ao da data-base.
+
+Art. 18. A documentação relativa à política de segurança cibernética, ao plano de ação e de resposta a incidentes e ao relatório anual deve ficar à disposição do Banco Central do Brasil pelo prazo mínimo de cinco anos.
+
+Art. 19. Esta Resolução entra em vigor na data de sua publicação.

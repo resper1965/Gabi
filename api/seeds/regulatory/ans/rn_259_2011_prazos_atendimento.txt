@@ -1,52 +1,102 @@
-RESOLUÇÃO NORMATIVA - RN Nº 259, DE 17 DE JUNHO DE 2011
-Dispõe sobre a garantia de atendimento dos beneficiários de planos privados de assistência à saúde — ANS
+RESOLUÇÃO NORMATIVA – RN Nº 259, DE 17 DE JUNHO DE 2011
+Dispõe sobre a garantia de atendimento dos beneficiários de plano privado de assistência à saúde e altera a Instrução Normativa – IN nº 23, de 1º de dezembro de 2009, da Diretoria de Normas e Habilitação dos Produtos – DIPRO.
 
-CAPÍTULO I — DAS DISPOSIÇÕES GERAIS
+============================================================
 
-Art. 1º Esta Resolução Normativa – RN dispõe sobre a garantia de atendimento dos beneficiários de plano privado de assistência à saúde e estabelece critérios de regulação para adaptação ao Rol de Procedimentos e Eventos em Saúde.
+CAPÍTULO I — DISPOSIÇÕES PRELIMINARES
 
-Art. 2º As operadoras de planos privados de assistência à saúde devem garantir o atendimento integral dos seus beneficiários.
+Art. 1º Ficam estabelecidos os prazos máximos de atendimento para cobertura assistencial no âmbito dos planos privados de assistência à saúde.
 
-CAPÍTULO II — DOS PRAZOS MÁXIMOS DE ATENDIMENTO
+Art. 2º Para fins desta Resolução Normativa, consideram-se:
+I - prestador de serviço de saúde: pessoas jurídicas ou físicas que prestam serviços de assistência à saúde;
+II - rede assistencial: conjunto de prestadores de serviço de saúde disponibilizados pela operadora;
+III - atendimento: efetiva prestação do serviço de saúde ao beneficiário;
+IV - prazo máximo de atendimento: tempo entre a data da solicitação e o efetivo atendimento;
+V - garantia de atendimento: obrigação de a operadora assegurar o atendimento dos beneficiários dentro dos prazos máximos estabelecidos.
 
-Art. 3º As operadoras deverão garantir o atendimento aos seus beneficiários observando os seguintes prazos máximos:
-I - consulta básica (pediatria, clínica médica, cirurgia geral, ginecologia e obstetrícia): 7 (sete) dias úteis;
-II - consulta nas demais especialidades: 14 (quatorze) dias úteis;
-III - consulta/sessão com fonoaudiólogo: 10 (dez) dias úteis;
-IV - consulta/sessão com nutricionista: 10 (dez) dias úteis;
-V - consulta/sessão com psicólogo: 10 (dez) dias úteis;
-VI - consulta/sessão com terapeuta ocupacional: 10 (dez) dias úteis;
-VII - consulta/sessão com fisioterapeuta: 10 (dez) dias úteis;
-VIII - procedimentos de alta complexidade (PAC): 21 (vinte e um) dias úteis;
-IX - atendimento em regime de hospital-dia: 10 (dez) dias úteis;
-X - atendimento em regime de internação eletiva: 21 (vinte e um) dias úteis;
-XI - urgência e emergência: imediato;
-XII - exames de alta complexidade: 21 (vinte e um) dias úteis;
-XIII - demais exames: 10 (dez) dias úteis.
+CAPÍTULO II — DOS PRAZOS MÁXIMOS PARA ATENDIMENTO
 
-CAPÍTULO III — DA REDE DE ATENDIMENTO
+Art. 3º Os prazos máximos para atendimento dos beneficiários de planos de assistência à saúde são os seguintes:
 
-Art. 4º Para fins desta Resolução, considera-se rede assistencial o conjunto de serviços de saúde, incluindo profissionais, clínicas, laboratórios, hospitais e demais estabelecimentos contratados, credenciados, cooperados ou referenciados pela operadora.
+I - Consulta básica (pediatria, clínica médica, cirurgia geral, ginecologia e obstetrícia): 7 dias úteis;
+II - Consulta em demais especialidades médicas: 14 dias úteis;
+III - Consulta/sessão com fonoaudiólogo: 10 dias úteis;
+IV - Consulta/sessão com nutricionista: 10 dias úteis;
+V - Consulta/sessão com psicólogo: 10 dias úteis;
+VI - Consulta/sessão com terapeuta ocupacional: 10 dias úteis;
+VII - Consulta/sessão com fisioterapeuta: 10 dias úteis;
+VIII - Consulta e procedimentos realizados em consultório/clínica com cirurgião-dentista: 7 dias úteis;
+IX - Serviços de diagnóstico por laboratório de análises clínicas em regime ambulatorial: 3 dias úteis;
+X - Demais serviços de diagnóstico e terapia em regime ambulatorial: 10 dias úteis;
+XI - Procedimentos de alta complexidade (PAC): 21 dias úteis;
+XII - Atendimento em regime de hospital-dia: 10 dias úteis;
+XIII - Atendimento em regime de internação eletiva: 21 dias úteis;
+XIV - Urgência e emergência: atendimento imediato;
+XV - Consulta de retorno: no prazo definido pelo profissional assistente.
 
-Art. 5º A operadora deverá manter rede de prestadores de serviços de saúde dimensionada e suficiente para garantir o atendimento dos seus beneficiários nos prazos previstos no art. 3º.
+Art. 4º Os prazos estabelecidos no art. 3º são aplicáveis a todos os planos privados de assistência à saúde, independentemente da data de contratação, do tipo de contratação e da segmentação.
 
-Art. 6º Na hipótese de não haver prestador disponível na rede assistencial para cumprimento dos prazos máximos de atendimento, a operadora deverá:
-I - comunicar o beneficiário sobre a impossibilidade;
-II - garantir o atendimento em prestador não integrante da rede assistencial;
-III - arcar com os custos do atendimento.
+Art. 5º Os prazos a que se refere o art. 3º devem ser garantidos pela operadora em relação a, no mínimo, um prestador de serviço habilitado em cada especialidade, possível de ser acessado pelo beneficiário.
 
-CAPÍTULO IV — DA INFORMAÇÃO AO BENEFICIÁRIO
+CAPÍTULO III — DA GARANTIA DE ATENDIMENTO
 
-Art. 7º A operadora deverá informar ao beneficiário, quando da contratação do plano:
-I - a relação de prestadores integrantes da rede assistencial;
-II - os prazos máximos para atendimento;
-III - os canais de atendimento para agendamento e reclamações.
+Art. 6º Quando não for possível a garantia do atendimento no prazo, a operadora deverá:
+I - registrar e atender a demanda do beneficiário;
+II - providenciar o atendimento em prestador não integrante da rede assistencial, sem ônus para o beneficiário;
+III - comunicar ao beneficiário o direito de ser atendido por prestador fora da rede.
 
-Art. 8º A ANS disponibilizará canal de atendimento ao beneficiário para recebimento de denúncias sobre o descumprimento dos prazos previstos nesta Resolução.
+§ 1º Caso a operadora não consiga garantir o atendimento conforme previsto no caput, o beneficiário poderá:
+I - ser atendido por prestador não integrante da rede assistencial do plano, cabendo à operadora o ressarcimento integral dos custos;
+II - buscar o atendimento junto à ANS.
 
-CAPÍTULO V — DAS PENALIDADES
+§ 2º O valor do ressarcimento deve corresponder, no mínimo, ao maior valor da tabela de referência utilizada pela operadora.
 
-Art. 9º O descumprimento dos prazos máximos de atendimento sujeitará a operadora às penalidades previstas na legislação vigente, incluindo:
-I - multa por infração administrativa;
-II - determinação de adequação da rede assistencial;
-III - suspensão da comercialização de planos.
+Art. 7º A operadora de plano privado de assistência à saúde deverá manter canal de atendimento ao beneficiário para:
+I - receber a solicitação de atendimento;
+II - gerar protocolo de atendimento, com data e hora do registro;
+III - orientar o beneficiário sobre os prazos máximos e sobre o procedimento em caso de descumprimento;
+IV - encaminhar o beneficiário para atendimento.
+
+Art. 8º Em caso de urgência ou emergência, a operadora deve garantir o atendimento imediato, observadas as seguintes disposições:
+I - atendimento imediato: cobertura no serviço de urgência e emergência, nas primeiras 12 horas de atendimento;
+II - após as primeiras 12 horas: cobertura dos procedimentos necessários até a alta médica, quando o plano cobrir internação hospitalar;
+III - área geográfica de abrangência: a operadora deve garantir atendimento de urgência e emergência em toda a área de atuação do plano.
+
+CAPÍTULO IV — DA REDE ASSISTENCIAL
+
+Art. 9º A operadora deve manter rede assistencial suficiente para garantir os prazos máximos previstos nesta Resolução.
+
+Art. 10. A operadora deve comunicar à ANS, no prazo de até 30 dias, as reduções de rede que comprometam a garantia de atendimento.
+
+Art. 11. A substituição de prestador de serviço deve ser:
+I - comunicada ao beneficiário com antecedência mínima de 30 dias;
+II - por prestador equivalente;
+III - sem alteração de padrão de atendimento.
+
+Art. 12. No caso de desmembramento, transferência, substituição ou exclusão de prestador de serviço:
+I - a operadora deve garantir que beneficiários internados concluam o tratamento no mesmo prestador;
+II - a comunicação deve ser individual ao beneficiário.
+
+CAPÍTULO V — DO MONITORAMENTO
+
+Art. 13. A ANS monitorará o cumprimento dos prazos máximos estabelecidos nesta Resolução.
+
+Art. 14. A operadora deve:
+I - disponibilizar relatório de atendimento pelo canal da ANS;
+II - manter registros de todas as demandas dos beneficiários, incluindo protocolo, data, hora e prazo informado;
+III - fornecer relatórios quando solicitado pela ANS.
+
+Art. 15. O descumprimento desta Resolução sujeitará a operadora às sanções previstas na legislação vigente, incluindo:
+I - advertência;
+II - multa;
+III - suspensão do exercício do cargo;
+IV - inabilitação permanente para exercício de cargos de direção;
+V - cancelamento da autorização de funcionamento e alienação da carteira da operadora.
+
+CAPÍTULO VI — DISPOSIÇÕES FINAIS
+
+Art. 16. A operadora de plano privado de assistência à saúde deve dar publicidade aos prazos máximos de atendimento junto aos beneficiários.
+
+Art. 17. Os prazos de que trata esta Resolução Normativa poderão ser revisados pela ANS, mediante proposta fundamentada.
+
+Art. 18. Esta Resolução Normativa entra em vigor na data de sua publicação.
