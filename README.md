@@ -48,6 +48,40 @@ export GCP_PROJECT_ID=your-project
 bash scripts/deploy.sh
 ```
 
+### Ingestão Multi-Agência (Compliance-Grade)
+
+Para manter o acervo regulatório das 8 agências atualizado, configure o cron no servidor para rodar:
+
+```bash
+# Ingestão unificada para todas as agências (BACEN, CMN, CVM, SUSEP, ANS, ANPD, ANEEL)
+# Roda todos os scripts na ordem correta
+uv run python scripts/ingest_all_agencies.py
+
+# Scripts individuais:
+uv run python scripts/ingest_bcb_rss.py
+uv run python scripts/ingest_bcb_normativos.py
+uv run python scripts/ingest_cmn_normativos.py
+uv run python scripts/ingest_susep.py
+uv run python scripts/ingest_ans.py
+uv run python scripts/ingest_anpd.py
+uv run python scripts/ingest_aneel.py
+```
+
+### Ingestão Base de Conhecimento Jurídica (BKJ) - Agente Jurídico
+
+Para alimentar o motor de RAG e a matriz hierárquica (Livro > Título > Artigo > Parágrafo > Inciso) das Leis Federais consolidadas através do Planalto:
+
+```bash
+# Ingestão de Códigos Fundamentais (Civil, Penal, Processo Civil, CDC, LGPD)
+uv run python scripts/ingest_laws_core.py
+
+# Ingestão de Leis Financeiras e Sancionadoras (Anticorrupção, Lavagem, Crimes SFN)
+# Controlado via flag ENABLE_FINANCIAL=true no .env
+uv run python scripts/ingest_laws_financial.py
+```
+
+Certifique-se de configurar as variáveis no seu `.env` conforme o arquivo `.env.example`.
+
 ## API Endpoints
 
 | Method | Path | Description |

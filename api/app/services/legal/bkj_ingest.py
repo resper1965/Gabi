@@ -1,0 +1,103 @@
+import asyncio
+from typing import List, Optional
+from datetime import datetime, timezone
+import uuid
+import hashlib
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models.legal import LegalDocument, LegalVersion, LegalProvision, LegalDomain
+from app.services.legal_structure_parser import parse_legal_structure, LegalProvisionSchema
+
+class LegalIngester:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def _generate_hash(self, text: str) -> str:
+        return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+    def ingest_law(self, 
+                   canonical_url: str, 
+                   act_type: str, 
+                   law_number: str, 
+                   clean_text: str,
+                   domain: Optional[LegalDomain] = None) -> LegalDocument:
+        """
+        Ingests a law idempotently. If the hash hasn't changed, skips provisions.
+        """
+        content_hash = self._generate_hash(clean_text)
+        
+        # 1. Find or Create Document
+        stmt = select(LegalDocument).filter_by(canonical_url=canonical_url)
+        doc = self.db.execute(stmt).scalar_one_or_none()
+        
+        if not doc:
+            doc = LegalDocument(
+                doc_id=str(uuid.uuid4()),
+                authority="PLANALTO",
+                act_type=act_type,
+                law_number=law_number,
+                canonical_url=canonical_url,
+                captured_at=datetime.now(timezone.utc)
+            )
+            self.db.add(doc)
+            self.db.flush() # get ID
+
+        # 2. Check current version hash
+        current_version = None
+        if doc.current_version_id:
+            stmt_v = select(LegalVersion).filter_by(id=doc.current_version_id)
+            current_version = self.db.execute(stmt_v).scalar_one_or_none()
+
+        if current_version and current_version.content_hash == content_hash:
+            print(f"[{law_number}] IDEMPOTENT: Hash unchanged ({content_hash[:8]}). Skipping parsing.")
+            return doc
+            
+        # 3. Hash changed or new document. Create new Version
+        print(f"[{law_number}] NEW VERSION: Compiling new version from Planalto...")
+        
+        # Mark old versions as not current
+        stmt_old = select(LegalVersion).filter_by(doc_id=doc.id, is_current=True)
+        old_versions = self.db.execute(stmt_old).scalars().all()
+        for ov in old_versions:
+            ov.is_current = False
+
+        new_version = LegalVersion(
+            doc_id=doc.id,
+            content_hash=content_hash,
+            retrieved_at=datetime.now(timezone.utc),
+            mime_type="text/plain",
+            is_current=True
+        )
+        self.db.add(new_version)
+        self.db.flush()
+        
+        doc.current_version_id = new_version.id
+
+        # 4. Parse Structure Deeply
+        print(f"[{law_number}] Chunking provisions...")
+        schema_provisions = parse_legal_structure(clean_text, law_name=act_type + " " + law_number)
+        
+        provisions_to_insert = []
+        for p in schema_provisions:
+            provisions_to_insert.append(LegalProvision(
+                doc_id=doc.id,
+                version_id=new_version.id,
+                structure_path=p.structure_path,
+                article_number=p.article_number,
+                paragraph=p.paragraph,
+                inciso=p.inciso,
+                alinea=p.alinea,
+                item=p.item,
+                text=p.text,
+                legal_domain=domain
+            ))
+            
+        if provisions_to_insert:
+            self.db.bulk_save_objects(provisions_to_insert)
+            
+        new_version.parse_metadata = {"provisions_count": len(provisions_to_insert)}
+        self.db.commit()
+        
+        print(f"[{law_number}] SUCCESS: Saved {len(provisions_to_insert)} provisions.")
+        return doc
