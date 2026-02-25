@@ -1,16 +1,28 @@
 "use client"
 
 import { useAuth } from "./auth-provider"
-import { usePathname } from "next/navigation"
-import { Sidebar } from "./sidebar"
-import { ErrorBoundary } from "./error-boundary"
+import { usePathname, useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
+import { AppLayout } from "./layout/app-layout"
+import { useEffect } from "react"
 
 const PUBLIC_PATHS = ["/login"]
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Redirect handling with useEffect for client-side navigation
+  useEffect(() => {
+    if (!loading) {
+      if (PUBLIC_PATHS.includes(pathname) && user) {
+        router.push("/")
+      } else if (!PUBLIC_PATHS.includes(pathname) && !user) {
+        router.push("/login")
+      }
+    }
+  }, [user, loading, pathname, router])
 
   // Loading state
   if (loading) {
@@ -24,29 +36,21 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Public pages (login) — no sidebar, no auth required
-  if (PUBLIC_PATHS.includes(pathname)) {
-    if (user) {
-      // Already logged in, redirect to dashboard
-      if (typeof window !== "undefined") window.location.href = "/"
-      return null
-    }
-    return <>{children}</>
-  }
-
-  // Protected pages — require auth
-  if (!user) {
-    if (typeof window !== "undefined") window.location.href = "/login"
+  // Prevent flash of content before redirect
+  const isPublic = PUBLIC_PATHS.includes(pathname)
+  if ((isPublic && user) || (!isPublic && !user)) {
     return null
   }
 
-  // Authenticated layout: sidebar + content + error boundary
+  // Public pages (login) — no sidebar, no auth required
+  if (isPublic) {
+    return <>{children}</>
+  }
+
+  // Authenticated layout: unified app layout (includes sidebar and main area)
   return (
-    <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <ErrorBoundary>{children}</ErrorBoundary>
-      </main>
-    </div>
+    <AppLayout>
+      {children}
+    </AppLayout>
   )
 }
