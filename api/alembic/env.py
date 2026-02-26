@@ -14,6 +14,9 @@ if config.config_file_name is not None:
 # Override URL from env var (avoids configparser interpolation issues)
 db_url = os.environ.get("GABI_DATABASE_URL")
 if db_url:
+    # Secret Manager stores postgresql:// but we need asyncpg driver
+    if db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
     config.set_main_option("sqlalchemy.url", db_url)
 
 # Import ALL models so Alembic detects them

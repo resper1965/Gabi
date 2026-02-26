@@ -13,11 +13,10 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from app.config import get_settings
 from app.core.logging_config import setup_logging
 
-# ── Initialize structured logging FIRST ──
+# ── Initialize settings, then structured logging ──
+settings = get_settings()
 setup_logging(level=settings.log_level)
 logger = logging.getLogger("gabi.app")
-
-settings = get_settings()
 
 
 @asynccontextmanager
