@@ -42,8 +42,14 @@ steps:
       - "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN}"
       - "--build-arg"
       - "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${_FIREBASE_PROJECT_ID}.firebasestorage.app"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=563447386199"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_APP_ID=1:563447386199:web:58002f335c8d7cec021312"
       - "."
-    waitFor: ["test-api"] # Start after tests pass
+    waitFor: ["test-api"]
 
   # ── Push Images ──
   - id: "push-api"
@@ -80,9 +86,8 @@ steps:
           --memory=1Gi --cpu=1 \
           --min-instances=0 --max-instances=2 \
           --port=8080 \
-          --add-cloudsql-instances=${PROJECT_ID}:${_REGION}:ngabi-db-production \
           --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi-staging.ness.com.br\",\"http://localhost:3000\"]##GABI_ADMIN_EMAILS=[\"resper@ness.com.br\",\"resper@bekaa.eu\"]##GABI_AUTO_APPROVE_DOMAINS=[\"ness.com.br\",\"bekaa.eu\"]##GABI_LOG_LEVEL=DEBUG##PYTHONPATH=/app" \
-          --set-secrets="GABI_DATABASE_URL=database-url-production:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=firebase-service-account-production:latest"
+          --set-secrets="GABI_DATABASE_URL=database-url:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=firebase-admin-private-key:latest"
     waitFor: ["push-api"]
 
   # ── Deploy Web to Staging ──
@@ -105,11 +110,10 @@ steps:
 substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
-  _STAGING_API_URL: https://gabi-api-staging-935866797303.southamerica-east1.run.app
-  # Firebase — override via Cloud Build trigger substitutions
-  _FIREBASE_API_KEY: "" # Set in trigger config
-  _FIREBASE_AUTH_DOMAIN: "" # Set in trigger config
-  _FIREBASE_PROJECT_ID: "" # Set in trigger config
+  _STAGING_API_URL: https://gabi-api-staging-3yxil5gluq-rj.a.run.app
+  _FIREBASE_API_KEY: "AIzaSyAUMsVa5PBniJzU3yB9_JB9kaMAJGPvayE"
+  _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
+  _FIREBASE_PROJECT_ID: "nghost-gabi"
 
 options:
   logging: CLOUD_LOGGING_ONLY

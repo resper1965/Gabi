@@ -29,6 +29,12 @@ steps:
       - "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${_FIREBASE_AUTH_DOMAIN}"
       - "--build-arg"
       - "NEXT_PUBLIC_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${_FIREBASE_PROJECT_ID}.firebasestorage.app"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=563447386199"
+      - "--build-arg"
+      - "NEXT_PUBLIC_FIREBASE_APP_ID=1:563447386199:web:58002f335c8d7cec021312"
       - "."
     waitFor: ["-"] # parallel with API build
 
@@ -69,9 +75,8 @@ steps:
           --concurrency=10 \
           --cpu-boost \
           --port=8080 \
-          --add-cloudsql-instances=${PROJECT_ID}:${_REGION}:ngabi-db-production \
           --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi.ness.com.br\"]##GABI_ADMIN_EMAILS=[\"resper@ness.com.br\",\"resper@bekaa.eu\"]##GABI_AUTO_APPROVE_DOMAINS=[\"ness.com.br\",\"bekaa.eu\"]##GABI_LOG_LEVEL=INFO##PYTHONPATH=/app" \
-          --set-secrets="GABI_DATABASE_URL=database-url-production:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=firebase-service-account-production:latest"
+          --set-secrets="GABI_DATABASE_URL=database-url:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=firebase-admin-private-key:latest"
     waitFor: ["push-api"]
 
   # ── Deploy Web to Production ──
@@ -95,11 +100,10 @@ steps:
 substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
-  _PROD_API_URL: https://gabi-api-935866797303.southamerica-east1.run.app
-  # All Firebase values via Cloud Build trigger substitutions (never hardcoded)
-  _FIREBASE_API_KEY: "" # Set in trigger config
-  _FIREBASE_AUTH_DOMAIN: "" # Set in trigger config
-  _FIREBASE_PROJECT_ID: "" # Set in trigger config
+  _PROD_API_URL: https://gabi-api-3yxil5gluq-rj.a.run.app
+  _FIREBASE_API_KEY: "AIzaSyAUMsVa5PBniJzU3yB9_JB9kaMAJGPvayE"
+  _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
+  _FIREBASE_PROJECT_ID: "nghost-gabi"
 
 options:
   logging: CLOUD_LOGGING_ONLY
