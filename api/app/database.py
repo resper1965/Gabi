@@ -12,8 +12,13 @@ from app.config import get_settings
 logger = logging.getLogger("gabi.database")
 settings = get_settings()
 
+# Auto-convert sync driver to async (Secret Manager stores postgresql://)
+_db_url = settings.database_url
+if _db_url.startswith("postgresql://"):
+    _db_url = _db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
 engine = create_async_engine(
-    settings.database_url,
+    _db_url,
     pool_size=20,
     max_overflow=30,
     pool_timeout=30,          # Max seconds to wait for a connection
