@@ -1,13 +1,15 @@
 """
 Gabi Hub — Embedding Service (Shared)
-Open-source BGE-m3 running locally. Cost: $0.
-Uses LRU cache to avoid re-computing identical queries.
+Uses Vertex AI text-embedding (server-side). No local model, no PyTorch.
+LRU cache to avoid re-computing identical queries.
 """
 
 import hashlib
 from functools import lru_cache
 
 import numpy as np
+from google.cloud import aiplatform
+from vertexai.language_models import TextEmbeddingModel
 
 _model = None
 
@@ -15,15 +17,15 @@ _model = None
 def _get_model():
     global _model
     if _model is None:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer("BAAI/bge-m3")
+        _model = TextEmbeddingModel.from_pretrained("text-multilingual-embedding-002")
     return _model
 
 
 @lru_cache(maxsize=2048)
 def _embed_cached(text_hash: str, text: str) -> tuple:
     """Cache embedding results by text hash. Returns tuple for hashability."""
-    return tuple(_get_model().encode(text, normalize_embeddings=True).tolist())
+    result = _get_model().get_embeddings([text])
+    return tuple(result[0].values)
 
 
 def embed(text: str) -> list[float]:
@@ -33,8 +35,16 @@ def embed(text: str) -> list[float]:
 
 
 def embed_batch(texts: list[str]) -> list[list[float]]:
-    """Batch embedding generation (uses cache per-item)."""
-    return [embed(t) for t in texts]
+    """Batch embedding generation via Vertex AI (max 250 per call)."""
+    if not texts:
+        return []
+    results = []
+    # Vertex AI supports up to 250 texts per batch
+    for i in range(0, len(texts), 250):
+        batch = texts[i : i + 250]
+        embeddings = _get_model().get_embeddings(batch)
+        results.extend([e.values for e in embeddings])
+    return results
 
 
 def similarity(a: list[float], b: list[float]) -> float:
