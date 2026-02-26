@@ -21,14 +21,15 @@ logger = logging.getLogger("gabi.app")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Pre-warm embedding model and Firebase on startup."""
-    import threading
-    from app.core.embeddings import _get_model
+    """Pre-warm services on startup (non-blocking — app starts even if services fail)."""
     from app.core.auth import _init_firebase
     logger.info("Starting Gabi Hub API v0.3.0")
-    threading.Thread(target=_get_model, daemon=True).start()
-    _init_firebase()
-    logger.info("Startup complete — all services initialized")
+    try:
+        _init_firebase()
+        logger.info("Firebase initialized")
+    except Exception as e:
+        logger.warning("Firebase init failed (non-fatal): %s", e)
+    logger.info("Startup complete")
     yield
     logger.info("Shutting down Gabi Hub API")
 
