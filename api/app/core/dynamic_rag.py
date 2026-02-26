@@ -111,7 +111,62 @@ async def retrieve_if_needed(
     )
 
     chunks = [dict(row._mapping) for row in results]
+    
+    # ── Enhancement for "law" module: Fetch Regulatory Insights ──
+    if module == "law":
+        insights = await retrieve_regulatory_insights(intent["refined_query"], db)
+        for ins in insights:
+            # Add to chunks as a special type
+            chunks.append({
+                "content": f"ANÁLISE IA (GABI): {ins['resumo_executivo']}\nRISCO: {ins['risco_nivel']}\nJUSTIFICATIVA: {ins['risco_justificativa']}",
+                "title": f"Análise: {ins['authority']} {ins['tipo_ato']} {ins['numero']}",
+                "doc_type": "ia_insight"
+            })
+
     return chunks, True
+
+
+async def retrieve_regulatory_insights(query: str, db: AsyncSession, limit: int = 3) -> list[dict]:
+    """
+    Search for existing AI analyses based on the query.
+    This uses a basic keyword match on the authority/number since normative queries are specific.
+    """
+    from sqlalchemy import or_
+    from app.models.regulatory import RegulatoryAnalysis, RegulatoryVersion, RegulatoryDocument
+
+    # Extract potential authority/number patterns (e.g., "BCB 355", "Resolução 123")
+    # For now, we perform a broader search on title/number in documents
+    stmt = (
+        select(RegulatoryAnalysis, RegulatoryDocument)
+        .join(RegulatoryVersion, RegulatoryAnalysis.version_id == RegulatoryVersion.id)
+        .join(RegulatoryDocument, RegulatoryVersion.document_id == RegulatoryDocument.id)
+        .where(
+            or_(
+                RegulatoryDocument.numero.ilike(f"%{query}%"),
+                RegulatoryDocument.tipo_ato.ilike(f"%{query}%"),
+                RegulatoryAnalysis.resumo_executivo.ilike(f"%{query}%")
+            )
+        )
+        .order_by(RegulatoryAnalysis.analisado_em.desc())
+        .limit(limit)
+    )
+    
+    try:
+        results = await db.execute(stmt)
+        insights = []
+        for analysis, doc in results.all():
+            insights.append({
+                "authority": doc.authority,
+                "tipo_ato": doc.tipo_ato,
+                "numero": doc.numero,
+                "resumo_executivo": analysis.resumo_executivo,
+                "risco_nivel": analysis.risco_nivel,
+                "risco_justificativa": analysis.risco_justificativa
+            })
+        return insights
+    except Exception as e:
+        print(f"Error fetching regulatory insights: {e}")
+        return []
 
 
 def format_rag_context(chunks: list[dict]) -> str:

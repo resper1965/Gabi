@@ -294,3 +294,41 @@ async def list_documents(
     docs = result.scalars().all()
     return [{"id": str(d.id), "filename": d.filename, "title": d.title,
              "type": d.doc_type, "chunks": d.chunk_count} for d in docs]
+
+
+@router.get("/insights")
+async def list_care_insights(
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List AI-generated insights for Insurance/Health (ANS, SUSEP).
+    """
+    from app.models.regulatory import RegulatoryAnalysis, RegulatoryVersion, RegulatoryDocument
+    
+    # Filter by ANS and SUSEP authorities
+    result = await db.execute(
+        select(RegulatoryAnalysis, RegulatoryVersion, RegulatoryDocument)
+        .join(RegulatoryVersion, RegulatoryAnalysis.version_id == RegulatoryVersion.id)
+        .join(RegulatoryDocument, RegulatoryVersion.document_id == RegulatoryDocument.id)
+        .where(RegulatoryDocument.authority.in_(["ANS", "SUSEP"]))
+        .order_by(RegulatoryAnalysis.analisado_em.desc())
+        .limit(50)
+    )
+    
+    insights = []
+    for analysis, version, doc in result.all():
+        insights.append({
+            "id": analysis.id,
+            "doc_id": doc.id,
+            "authority": doc.authority,
+            "tipo_ato": doc.tipo_ato,
+            "numero": doc.numero,
+            "resumo_executivo": analysis.resumo_executivo,
+            "risco_nivel": analysis.risco_nivel,
+            "risco_justificativa": analysis.risco_justificativa,
+            "analisado_em": analysis.analisado_em,
+            "extra_data": analysis.extra_data
+        })
+        
+    return insights

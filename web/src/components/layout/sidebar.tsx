@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   Settings,
   BookOpen,
+  Sparkles,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -93,6 +94,30 @@ export function Sidebar() {
         >
           <LayoutDashboard className={`w-5 h-5 shrink-0 ${pathname === "/" ? "text-[var(--color-gabi-primary)]" : ""}`} />
           {!collapsed && <span className="text-sm font-medium tracking-tight">Painel Principal</span>}
+        </Link>
+
+        <Link
+          href="/law/insights"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+            pathname === "/law/insights"
+              ? "bg-white/5 text-white"
+              : "text-slate-400 hover:text-white hover:bg-white/5"
+          }`}
+        >
+          <Sparkles className={`w-5 h-5 shrink-0 ${pathname === "/law/insights" ? "text-amber-400" : ""}`} />
+          {!collapsed && <span className="text-sm font-medium tracking-tight">Insights Jurídicos</span>}
+        </Link>
+
+        <Link
+          href="/insightcare/insights"
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+            pathname === "/insightcare/insights"
+              ? "bg-white/5 text-white"
+              : "text-slate-400 hover:text-white hover:bg-white/5"
+          }`}
+        >
+          <Sparkles className={`w-5 h-5 shrink-0 ${pathname === "/insightcare/insights" ? "text-emerald-400" : ""}`} />
+          {!collapsed && <span className="text-sm font-medium tracking-tight">Insights Seguros</span>}
         </Link>
 
         {/* Section: Modules */}

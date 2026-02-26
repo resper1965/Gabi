@@ -107,6 +107,7 @@ export const gabiLegal = {
   alerts: () => request("/api/law/alerts"),
   upload: (docType: string, file: File, title?: string) =>
     uploadFile("/api/law/upload", file, { doc_type: docType, ...(title ? { title } : {}) }),
+  insights: () => request("/api/law/insights"),
 }
 
 // ── gabi.data ──
@@ -132,6 +133,7 @@ export const gabiCare = {
   documents: (tenantId: string) => request(`/api/insightcare/documents/${tenantId}`),
   upload: (tenantId: string, docType: string, file: File, clientId?: string) =>
     uploadFile("/api/insightcare/upload", file, { tenant_id: tenantId, doc_type: docType, ...(clientId ? { client_id: clientId } : {}) }),
+  insights: () => request("/api/insightcare/insights"),
 }
 
 // ── Admin ──

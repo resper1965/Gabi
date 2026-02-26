@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
-import { Scale, ChevronDown, ChevronUp } from "lucide-react"
+import { Scale, ChevronDown, ChevronUp, Sparkles } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const ACCENT = "var(--color-mod-law)"
 const CTX_WINDOW = 10
@@ -17,6 +18,13 @@ export default function LawPage() {
   const [agent, setAgent] = useState("auditor")
   const [docType, setDocType] = useState("law")
   const [showUpload, setShowUpload] = useState(false)
+  const [recentInsights, setRecentInsights] = useState<Array<{ id: number; authority: string; numero: string; tipo_ato: string }>>([])
+
+  useEffect(() => {
+    gabi.legal.insights().then((data) => {
+      if (Array.isArray(data)) setRecentInsights(data.slice(0, 3) as any)
+    }).catch(console.error)
+  }, [])
 
   const agents = [
     { key: "auditor", label: "Auditora", desc: "Cruza contratos com regulações" },
@@ -70,7 +78,18 @@ export default function LawPage() {
             </div>
             <div>
               <h1 className="text-lg font-semibold">gabi.legal</h1>
-              <p className="text-xs text-zinc-500">Sua Auditora Jurídica</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-zinc-500">Sua Auditora Jurídica</p>
+                {recentInsights.length > 0 && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                    <Link href="/law/insights" className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 font-medium transition-colors group">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      {recentInsights.length} análises hoje
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button

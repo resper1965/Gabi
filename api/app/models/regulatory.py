@@ -2,7 +2,7 @@ import enum
 from typing import List, Optional
 from datetime import datetime, timezone
 
-from sqlalchemy import String, DateTime, Text, Enum, ForeignKey
+from sqlalchemy import String, DateTime, Text, Enum, ForeignKey, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from pgvector.sqlalchemy import Vector
 
@@ -64,6 +64,24 @@ class RegulatoryVersion(Base):
     provisions: Mapped[List["RegulatoryProvision"]] = relationship(
         "RegulatoryProvision", back_populates="version", cascade="all, delete-orphan"
     )
+
+    analysis: Mapped[Optional["RegulatoryAnalysis"]] = relationship(
+        "RegulatoryAnalysis", back_populates="version", uselist=False, cascade="all, delete-orphan"
+    )
+
+class RegulatoryAnalysis(Base):
+    __tablename__ = "regulatory_analyses"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    version_id: Mapped[int] = mapped_column(ForeignKey("regulatory_versions.id"), unique=True)
+    resumo_executivo: Mapped[Optional[str]] = mapped_column(Text)
+    risco_nivel: Mapped[str] = mapped_column(String(20)) # Baixo, Médio, Alto
+    risco_justificativa: Mapped[Optional[str]] = mapped_column(Text)
+    extra_data: Mapped[dict] = mapped_column(JSON) # Store full extraction (obligations, entities, etc)
+    analisado_em: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    # Relationships
+    version: Mapped["RegulatoryVersion"] = relationship("RegulatoryVersion", back_populates="analysis")
 
 class RegulatoryProvision(Base):
     __tablename__ = "regulatory_provisions"

@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
-import { ShieldCheck, ChevronDown, ChevronUp } from "lucide-react"
+import { ShieldCheck, ChevronDown, ChevronUp, Sparkles } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const ACCENT = "var(--color-mod-insightcare)"
 const CTX_WINDOW = 10
@@ -18,6 +19,13 @@ export default function InsightCarePage() {
   const [summary, setSummary] = useState<string | null>(null)
   const [docType, setDocType] = useState("policy")
   const [showUpload, setShowUpload] = useState(false)
+  const [recentInsights, setRecentInsights] = useState<Array<{ id: number; authority: string; numero: string }>>([])
+
+  useEffect(() => {
+    gabi.insightcare.insights().then((data) => {
+      if (Array.isArray(data)) setRecentInsights(data.slice(0, 3) as Array<{ id: number; authority: string; numero: string }>)
+    }).catch(console.error)
+  }, [])
 
   const agents = [
     { key: "policy_analyst", label: "Apólices", desc: "Analisa e compara coberturas" },
@@ -68,12 +76,23 @@ export default function InsightCarePage() {
       <header className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[var(--radius-tech)] flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
+            <div className="w-8 h-8 rounded-tech flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
               <ShieldCheck className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-semibold">gabi.care</h1>
-              <p className="text-xs text-zinc-500">Sua Analista de Seguros</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-zinc-500">Sua Analista de Seguros</p>
+                {recentInsights.length > 0 && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
+                    <Link href="/insightcare/insights" className="flex items-center gap-1 text-[10px] text-blue-500 hover:text-blue-400 font-medium transition-colors">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      Sentinela ativa: {recentInsights.length} alertas
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -112,7 +131,7 @@ export default function InsightCarePage() {
             <button
               key={a.key}
               onClick={() => setAgent(a.key)}
-              className={`px-3 py-1.5 rounded-[var(--radius-tech)] text-xs font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-tech text-xs font-medium transition-all duration-200 cursor-pointer ${
                 agent === a.key ? "text-white" : "bg-white/5 text-slate-400 hover:text-white"
               }`}
               style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}30` } : undefined}

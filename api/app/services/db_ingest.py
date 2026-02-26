@@ -8,10 +8,12 @@ from app.models.regulatory import (
     RegulatoryDocument,
     RegulatoryVersion,
     RegulatoryProvision,
+    RegulatoryAnalysis,
     RssItem
 )
 from app.models.audit import IngestRun, IngestRunItem, IngestStatus, IngestSource
 from app.schemas.ingest import RegulatoryDocumentSchema, RssItemSchema, ProvisionSchema
+from app.services.analyzer import analyze_normative
 
 class DBIngester:
     def __init__(self, session: AsyncSession):
@@ -67,6 +69,9 @@ class DBIngester:
                 
                 doc.current_version_id = version.id
                 
+                # AI Analysis
+                await self._analyze_and_store(version.id, doc_schema.texto_integral)
+                
                 # Add provisions
                 self._add_provisions(version.id, doc_schema.provisions)
                 
@@ -89,6 +94,9 @@ class DBIngester:
                     await self.session.flush()
                     doc.current_version_id = new_version.id
                     
+                    # AI Analysis
+                    await self._analyze_and_store(new_version.id, doc_schema.texto_integral)
+
                     self._add_provisions(new_version.id, doc_schema.provisions)
                     
                     run.itens_atualizados += 1
@@ -104,6 +112,21 @@ class DBIngester:
             run.erros += 1
             self._log_item(run.id, IngestStatus.FAILED, doc_schema.id_fonte, error_msg=str(e))
             await self.session.commit()
+
+    async def _analyze_and_store(self, version_id: int, text_content: str):
+        try:
+            analysis_data = await analyze_normative(text_content)
+            analysis = RegulatoryAnalysis(
+                version_id=version_id,
+                resumo_executivo=analysis_data.get("resumo_executivo"),
+                risco_nivel=analysis_data.get("risco_nivel", "Médio"),
+                risco_justificativa=analysis_data.get("risco_justificativa"),
+                extra_data=analysis_data
+            )
+            self.session.add(analysis)
+        except Exception as e:
+            # We don't want to fail the whole ingestion if AI fails
+            print(f"AI Analysis failed for version {version_id}: {e}")
 
     def _add_provisions(self, version_id: int, provisions: List[ProvisionSchema]):
         for prov in provisions:

@@ -34,7 +34,10 @@ export default function NTalkPage() {
       if (res.results) content += `\n\n_${res.results.row_count} linhas retornadas_`
 
       setMessages((prev) => [...prev, {
-        id: (Date.now() + 1).toString(), role: "assistant", content,
+        id: (Date.now() + 1).toString(), 
+        role: "assistant", 
+        content,
+        metadata: { results: res.results }
       }])
 
       if (res.summary) setSummary(res.summary)

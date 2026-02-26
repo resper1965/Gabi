@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback, type FormEvent } from "react"
 import { Send, Loader2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
+import { DataTable } from "@/components/data-table"
+import { DataChart } from "@/components/data-chart"
 
 export interface Message {
   id: string
@@ -181,7 +183,7 @@ export function ChatPanel({
                               >
                                 Copiar
                               </button>
-                              <pre className="bg-black/30 rounded-[var(--radius-tech)] p-3 overflow-x-auto text-xs">
+                              <pre className="bg-black/30 rounded-tech p-3 overflow-x-auto text-xs">
                                 <code className={className} style={{ fontFamily: "var(--font-data)" }} {...props}>
                                   {children}
                                 </code>
@@ -200,7 +202,7 @@ export function ChatPanel({
                         )
                       },
                       table: ({ children }) => (
-                        <div className="overflow-x-auto my-2 rounded-[var(--radius-tech)] border border-white/10">
+                        <div className="overflow-x-auto my-2 rounded-tech border border-white/10">
                           <table className="w-full text-xs">{children}</table>
                         </div>
                       ),
@@ -221,6 +223,23 @@ export function ChatPanel({
                   >
                     {msg.content}
                   </ReactMarkdown>
+
+                  {/* SQL Results Visuals — for gabi.data */}
+                  {(() => {
+                    const results = msg.metadata?.results as { columns: string[], rows: Record<string, string | number | null>[] } | undefined
+                    if (!results?.columns || !results?.rows || results.rows.length === 0) return null
+                    
+                    // Show chart only if we have at least one numeric column (besides ID) and one string column
+                    const hasNumeric = results.columns.some(c => typeof results.rows[0][c] === "number" && !c.toLowerCase().includes("id"))
+                    
+                    return (
+                      <>
+                        {hasNumeric && <DataChart columns={results.columns} rows={results.rows} />}
+                        <DataTable columns={results.columns} rows={results.rows} accent={moduleAccent} />
+                      </>
+                    )
+                  })()}
+
                   {/* RAG Source Cards */}
                   {(() => {
                     const sources = msg.metadata?.sources as Array<{ title: string; type: string }> | undefined
