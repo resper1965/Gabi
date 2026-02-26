@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
 import { HelpTooltip } from "@/components/help-tooltip"
