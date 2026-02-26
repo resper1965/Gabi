@@ -1,12 +1,25 @@
+"""
+Gabi Hub — Database Configuration
+Async SQLAlchemy engine with enterprise-grade pool settings.
+"""
+
+import logging
+
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
+
 from app.config import get_settings
 
+logger = logging.getLogger("gabi.database")
 settings = get_settings()
 
 engine = create_async_engine(
     settings.database_url,
-    pool_size=15,
-    max_overflow=25,
+    pool_size=20,
+    max_overflow=30,
+    pool_timeout=30,          # Max seconds to wait for a connection
+    pool_recycle=1800,        # Recycle connections after 30min (Cloud SQL proxy compat)
+    pool_pre_ping=True,       # Test connection health before using
+    echo=settings.sql_echo,   # SQL debug logging (off in prod)
 )
 
 async_session = async_sessionmaker(engine, expire_on_commit=False)

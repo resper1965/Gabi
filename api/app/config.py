@@ -38,7 +38,11 @@ class Settings(BaseSettings):
     # Redis (rate limiting)
     redis_url: str = ""
 
-    model_config = {"env_file": ".env", "env_prefix": "GABI_"}
+    # Observability
+    log_level: str = "INFO"
+    sql_echo: bool = False  # Set True for SQL debug logging
+
+    model_config = {"env_file": ".env", "env_prefix": "GABI_", "extra": "ignore"}
 
 
 @lru_cache

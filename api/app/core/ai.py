@@ -1,16 +1,21 @@
 """
 Gabi Hub — AI Service with intelligent model routing.
 Each module uses the optimal model for its task.
+Protected by circuit breaker against Vertex AI outages.
 """
 
 import json
+import logging
+import time
 from typing import AsyncGenerator, Literal
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
 from app.config import get_settings
+from app.core.circuit_breaker import vertex_ai_breaker
 
+logger = logging.getLogger("gabi.ai")
 settings = get_settings()
 
 _initialized = False
@@ -77,11 +82,24 @@ async def generate(
     system_instruction: str | None = None,
     chat_history: list[dict] | None = None,
 ) -> str:
-    """Generate text using the module-appropriate model."""
-    model = get_model(module, system_instruction)
-    contents = _build_contents(prompt, chat_history)
-    response = model.generate_content(contents)
-    return response.text
+    """Generate text using the module-appropriate model. Protected by circuit breaker."""
+    if not vertex_ai_breaker.can_execute():
+        logger.warning("Vertex AI circuit breaker OPEN — returning fallback for module=%s", module)
+        return "⚠️ O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes."
+
+    start = time.perf_counter()
+    try:
+        model = get_model(module, system_instruction)
+        contents = _build_contents(prompt, chat_history)
+        response = model.generate_content(contents)
+        vertex_ai_breaker.record_success()
+        duration_ms = round((time.perf_counter() - start) * 1000, 1)
+        logger.info("AI generate: module=%s, duration=%sms", module, duration_ms)
+        return response.text
+    except Exception as e:
+        vertex_ai_breaker.record_failure()
+        logger.error("AI generate failed: module=%s, error=%s", module, str(e), exc_info=True)
+        raise
 
 
 async def generate_stream(
@@ -90,15 +108,24 @@ async def generate_stream(
     system_instruction: str | None = None,
     chat_history: list[dict] | None = None,
 ) -> AsyncGenerator[str, None]:
-    """Stream text chunks using the module-appropriate model.
-    Yields individual text chunks as they arrive from the model.
-    """
-    model = get_model(module, system_instruction)
-    contents = _build_contents(prompt, chat_history)
-    response = model.generate_content(contents, stream=True)
-    for chunk in response:
-        if chunk.text:
-            yield chunk.text
+    """Stream text chunks using the module-appropriate model. Protected by circuit breaker."""
+    if not vertex_ai_breaker.can_execute():
+        logger.warning("Vertex AI circuit breaker OPEN — returning fallback stream for module=%s", module)
+        yield "⚠️ O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes."
+        return
+
+    try:
+        model = get_model(module, system_instruction)
+        contents = _build_contents(prompt, chat_history)
+        response = model.generate_content(contents, stream=True)
+        for chunk in response:
+            if chunk.text:
+                yield chunk.text
+        vertex_ai_breaker.record_success()
+    except Exception as e:
+        vertex_ai_breaker.record_failure()
+        logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
+        raise
 
 
 def safe_parse_json(text: str) -> dict:

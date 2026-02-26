@@ -3,12 +3,19 @@ Gabi Hub — Unified FastAPI Application
 Serves all 4 modules: nGhost, Law & Comply, nTalkSQL, InsightCare
 """
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from app.config import get_settings
+from app.core.logging_config import setup_logging
+
+# ── Initialize structured logging FIRST ──
+setup_logging(level=settings.log_level)
+logger = logging.getLogger("gabi.app")
 
 settings = get_settings()
 
@@ -19,25 +26,46 @@ async def lifespan(app: FastAPI):
     import threading
     from app.core.embeddings import _get_model
     from app.core.auth import _init_firebase
+    logger.info("Starting Gabi Hub API v0.3.0")
     threading.Thread(target=_get_model, daemon=True).start()
     _init_firebase()
+    logger.info("Startup complete — all services initialized")
     yield
+    logger.info("Shutting down Gabi Hub API")
 
 
 app = FastAPI(
     title="Gabi Hub API",
     description="Unified AI Backend — nGhost + Law & Comply + nTalkSQL + InsightCare",
-    version="0.2.0",
+    version="0.3.0",
     lifespan=lifespan,
+    docs_url="/docs" if settings.gcp_project_id == "" else None,  # Disable docs in prod
+    redoc_url=None,
 )
 
+# ── Middleware (order matters: last added = first executed) ──
+
+# 1. CORS — tightened: explicit methods and headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Request-ID"],
 )
+
+# 2. Request logging — structured JSON with correlation
+from app.middleware.request_logging import RequestLoggingMiddleware
+app.add_middleware(RequestLoggingMiddleware)
+
+# 3. Security headers — HSTS, CSP, X-Frame-Options
+from app.middleware.security_headers import SecurityHeadersMiddleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# 4. Global error handler — sanitizes exceptions, never leaks internals
+from app.middleware.error_handler import ErrorHandlerMiddleware
+app.add_middleware(ErrorHandlerMiddleware)
 
 # ── Health Check ──
 from app.core.health import router as health_router
@@ -57,6 +85,10 @@ app.include_router(insightcare_router, prefix="/api/insightcare", tags=["Insight
 # ── Admin Router ──
 from app.modules.admin.router import router as admin_router
 app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+
+# ── LGPD Compliance (Data Subject Rights) ──
+from app.modules.admin.lgpd_router import router as lgpd_router
+app.include_router(lgpd_router, prefix="/api/admin/lgpd", tags=["LGPD"])
 
 # ── Auth Router ──
 from app.core.auth import router as auth_router
