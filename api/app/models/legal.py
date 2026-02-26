@@ -74,6 +74,6 @@ class LegalProvision(Base):
     legal_domain: Mapped[Optional[LegalDomain]] = mapped_column(Enum(LegalDomain), nullable=True)
     
     embedding_status: Mapped[EmbeddingStatus] = mapped_column(Enum(EmbeddingStatus), nullable=False, default=EmbeddingStatus.PENDING)
-    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(1536), nullable=True)
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768), nullable=True)
 
     version: Mapped["LegalVersion"] = relationship("LegalVersion", back_populates="provisions")

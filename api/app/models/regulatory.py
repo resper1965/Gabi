@@ -90,7 +90,7 @@ class RegulatoryProvision(Base):
     version_id: Mapped[int] = mapped_column(ForeignKey("regulatory_versions.id"))
     structure_path: Mapped[Optional[str]] = mapped_column(String(512), index=True)
     texto_chunk: Mapped[str] = mapped_column(Text)
-    embedding = mapped_column(Vector(1536), nullable=True)
+    embedding = mapped_column(Vector(768), nullable=True)
 
     # Relationships
     version: Mapped["RegulatoryVersion"] = relationship("RegulatoryVersion", back_populates="provisions")
