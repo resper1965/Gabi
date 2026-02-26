@@ -32,11 +32,12 @@ def _init_firebase():
 
     if settings.firebase_admin_service_account:
         import json
+        sa_raw = settings.firebase_admin_service_account.strip()
         try:
-            sa = json.loads(settings.firebase_admin_service_account)
+            sa = json.loads(sa_raw)
             cred = credentials.Certificate(sa)
         except (json.JSONDecodeError, ValueError):
-            cred = credentials.Certificate(settings.firebase_admin_service_account)
+            cred = credentials.Certificate(sa_raw)
     else:
         cred = credentials.ApplicationDefault()
 
