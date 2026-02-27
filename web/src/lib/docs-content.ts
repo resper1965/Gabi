@@ -7,7 +7,7 @@
 export const docsContent = {
   overview: `# Plataforma Gabi — IA Corporativa
 
-A **Gabi** é uma plataforma de Inteligência Artificial desenvolvida pela **Ness** para apoiar equipes jurídicas, financeiras, de seguros e de comunicação com agentes especializados.
+A **Gabi** é uma plataforma de Inteligência Artificial desenvolvida pela **ness.** para apoiar equipes jurídicas, financeiras, de seguros e de comunicação com agentes especializados.
 
 ---
 
@@ -38,7 +38,7 @@ Cada módulo combina três princípios:
 | --- | --- |
 | Frontend | Next.js 15 · React 19 · Tailwind v4 |
 | Backend | FastAPI · SQLAlchemy · pgvector |
-| IA | Modelos proprietários Ness |
+| IA | Modelos proprietários ness. |
 | Auth | Autenticação corporativa |
 | Infra | Google Cloud · Região Brasil (São Paulo) |
 
@@ -54,9 +54,9 @@ Cada módulo combina três princípios:
 
 ---
 
-## Sobre a Ness
+## Sobre a ness.
 
-A **Ness** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, entre em contato com a equipe de tecnologia.
+A **ness.** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, entre em contato com a equipe de tecnologia.
 `,
 
   modules: {
@@ -97,7 +97,7 @@ Exemplos de prompts:
 
 ---
 
-> Desenvolvido por **Ness** — ness.com.br
+> Desenvolvido por **ness.** — ness.com.br
 `,
 
     law: `# gabi.legal — Auditora Jurídica
@@ -134,7 +134,7 @@ Abaixo de cada resposta, a Gabi mostra as **fontes consultadas** — os document
 
 ---
 
-> Desenvolvido por **Ness** — ness.com.br
+> Desenvolvido por **ness.** — ness.com.br
 `,
 
     ntalk: `# gabi.data — CFO de Dados
@@ -173,7 +173,7 @@ Exemplos de consultas:
 
 ---
 
-> Desenvolvido por **Ness** — ness.com.br
+> Desenvolvido por **ness.** — ness.com.br
 `,
 
     insightcare: `# gabi.care — Analista de Seguros
@@ -204,7 +204,7 @@ Especialista em análise de sinistralidade, apólices e regulamentação ANS/SUS
 
 ---
 
-> Desenvolvido por **Ness** — ness.com.br
+> Desenvolvido por **ness.** — ness.com.br
 `,
   },
 
@@ -263,7 +263,7 @@ Sim. Clique no ícone de **relógio** (Histórico) no header de qualquer módulo
 
 ### Qual modelo de IA é usado?
 
-A Gabi utiliza modelos de IA proprietários, otimizados pela **Ness** para cada módulo, garantindo o melhor custo-benefício e qualidade.
+A Gabi utiliza modelos de IA proprietários, otimizados pela **ness.** para cada módulo, garantindo o melhor custo-benefício e qualidade.
 
 ---
 
@@ -275,7 +275,7 @@ Sim. Há um rate limiter de **30 requisições por minuto** por usuário, para g
 
 ### Quem desenvolveu a Gabi?
 
-A plataforma Gabi é desenvolvida e mantida pela **Ness** (ness.com.br). Para suporte técnico, entre em contato com **suporte@ness.com.br**.
+A plataforma Gabi é desenvolvida e mantida pela **ness.** (ness.com.br). Para suporte técnico, entre em contato com **suporte@ness.com.br**.
 `,
 }
 

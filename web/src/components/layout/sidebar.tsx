@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
+import { NessBrand } from "@/components/ness-brand"
 import { signOut, auth } from "@/lib/firebase"
 import {
   PenTool,
@@ -249,8 +250,8 @@ export function Sidebar() {
           </button>
         )}
 
-        {/* Environment indicator */}
-        <div className="mt-2 flex justify-center">
+        {/* Environment + ness. branding */}
+        <div className="mt-2 flex items-center justify-center gap-2">
           <span
             className="text-[0.55rem] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
@@ -259,8 +260,13 @@ export function Sidebar() {
               border: `1px solid ${ENV_LABEL === "PROD" ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)"}`,
             }}
           >
-            {ENV_LABEL === "PROD" ? "● Produção" : "● Staging"}
+            {ENV_LABEL === "PROD" ? "●" : "●"}
           </span>
+          {!collapsed && (
+            <span className="text-[0.6rem] text-slate-600">
+              por <NessBrand size="text-[0.6rem]" />
+            </span>
+          )}
         </div>
       </div>
     </aside>
