@@ -122,7 +122,7 @@ steps:
     args:
       - "-c"
       - |
-        gcloud run deploy gabi-api-staging \
+        gcloud run deploy gabi-api \
           --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${SHORT_SHA} \
           --region=${_REGION} \
           --platform=managed \
@@ -141,7 +141,7 @@ steps:
     args:
       - "run"
       - "deploy"
-      - "gabi-web-staging"
+      - "gabi-web"
       - "--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${SHORT_SHA}"
       - "--region=${_REGION}"
       - "--platform=managed"
@@ -155,7 +155,7 @@ steps:
 substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
-  _STAGING_API_URL: https://gabi-api-staging-3yxil5gluq-rj.a.run.app
+  _STAGING_API_URL: https://gabi-api-3yxil5gluq-rj.a.run.app
   _FIREBASE_API_KEY: "AIzaSyAUMsVa5PBniJzU3yB9_JB9kaMAJGPvayE"
   _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
   _FIREBASE_PROJECT_ID: "nghost-gabi"
