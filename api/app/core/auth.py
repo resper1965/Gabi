@@ -166,9 +166,25 @@ async def get_current_user(
     token = auth_header[7:]
 
     try:
-        decoded = firebase_auth.verify_id_token(token)
+        decoded = firebase_auth.verify_id_token(token, check_revoked=False)
+    except firebase_admin.auth.ExpiredIdTokenError:
+        logger.warning("Token expired for request from %s", request.headers.get("Origin", "unknown"))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expirado. Faça login novamente.",
+        )
+    except firebase_admin.auth.InvalidIdTokenError as e:
+        logger.error("Invalid token: type=%s msg=%s origin=%s token_prefix=%s",
+                      type(e).__name__, str(e),
+                      request.headers.get("Origin", "unknown"),
+                      token[:20] + "..." if len(token) > 20 else token)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado",
+        )
     except Exception as e:
-        logger.warning("Token verification failed: %s", e)
+        logger.error("Token verification UNEXPECTED error: type=%s msg=%s",
+                      type(e).__name__, str(e))
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido ou expirado",
