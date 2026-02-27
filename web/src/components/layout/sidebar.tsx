@@ -216,11 +216,15 @@ export function Sidebar() {
             </div>
           )}
           <button
-            onClick={() => signOut(auth)}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+            onClick={() => {
+              try { localStorage.removeItem("gabi_profile_cache") } catch {}
+              signOut(auth)
+            }}
+            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 flex items-center gap-1.5"
             title="Sair"
           >
             <LogOut className="w-4 h-4" />
+            {!collapsed && <span className="text-xs font-medium">Sair</span>}
           </button>
         </div>
 
