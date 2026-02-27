@@ -103,7 +103,7 @@ def upgrade() -> None:
         sa.Column('version_id', sa.Integer(), nullable=False),
         sa.Column('structure_path', sa.String(length=512), nullable=True),
         sa.Column('texto_chunk', sa.Text(), nullable=False),
-        sa.Column('embedding', pgvector.sqlalchemy.Vector(dim=1536), nullable=True),
+        sa.Column('embedding', pgvector.sqlalchemy.Vector(dim=768), nullable=True),
         sa.ForeignKeyConstraint(['version_id'], ['regulatory_versions.id'], ),
         sa.PrimaryKeyConstraint('id')
     )

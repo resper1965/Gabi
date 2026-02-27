@@ -1,139 +1,317 @@
-# gabi.
+# Gabi — Plataforma de IA Empresarial Multimodular
 
-> Plataforma de Inteligência Artificial com 4 módulos especializados.
+> **Inteligência Artificial especializada para jurídico, finanças, seguros e produção textual.**
+> Quatro módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG dinâmico e conformidade LGPD.
+
+---
+
+## Visão Geral
+
+Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo full-stack** (Python + TypeScript), desenhada para atender profissionais em setores altamente regulados. A plataforma combina:
+
+- **LLMs especializados** (Google Gemini Pro/Flash) com roteamento inteligente por módulo
+- **RAG dinâmico** com decisão automática se busca semântica é necessária
+- **Multi-Agent Debate** — agentes paralelos com síntese unificada
+- **Embeddings server-side** via Vertex AI (zero dependência local)
+- **Conformidade LGPD** com direitos do titular integrados na API
+
+---
 
 ## Módulos
 
-| Módulo | Função | AI Model |
-|--------|--------|----------|
-| **gabi.writer** | Ghost Writer — absorve estilo e escreve com fidelidade | Gemini 2.0 Flash |
-| **gabi.legal** | Auditora Jurídica — 4 agentes (auditor, pesquisadora, redatora, sentinela) | Gemini 1.5 Pro |
-| **gabi.data** | CFO de Dados — SQL em linguagem natural para MS SQL Server | Gemini 2.0 Flash |
-| **gabi.care** | Analista de Seguros — sinistralidade, apólices, ANS/SUSEP | Gemini 1.5 Pro |
+### 🖊️ gabi.writer (nGhost)
+**Ghost Writer com Style Signature**
 
-## Stack
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Absorve o estilo de escrita do usuário e produz textos com fidelidade estilística |
+| **Modelo IA** | Gemini 2.0 Flash (criatividade + baixa latência) |
+| **RAG** | Busca em documentos do usuário (`ghost_doc_chunks`) para manter consistência |
+| **Diferencial** | Style Signature — perfil de estilo extraído automaticamente de textos anteriores |
+| **Tabelas** | `ghost_knowledge_docs`, `ghost_doc_chunks`, `ghost_style_profiles` |
+
+### ⚖️ gabi.legal (Law & Comply)
+**Auditoria Jurídica Multi-Agente**
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Análise jurídica com 4 agentes especializados operando em paralelo |
+| **Modelo IA** | Gemini 1.5 Pro (contexto longo + precisão) |
+| **Agentes** | Auditora, Pesquisadora, Redatora, Sentinela |
+| **RAG** | Chunks de documentos jurídicos + insights regulatórios (BCB, CVM, Planalto) |
+| **Multi-Agent** | Debate paralelo → síntese unificada com citações |
+| **Ingestão** | Leis federais (Planalto), normativos BCB/CMN, CVM — parser estrutural |
+| **Tabelas** | `law_documents`, `law_chunks`, `legal_documents`, `legal_versions`, `legal_provisions`, `regulatory_documents`, `regulatory_versions`, `regulatory_provisions`, `regulatory_analyses` |
+
+### 📊 gabi.data (nTalkSQL)
+**CFO de Dados — SQL em Linguagem Natural**
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Conversa com bancos de dados financeiros — transforma perguntas em SQL |
+| **Modelo IA** | Gemini 2.0 Flash (geração SQL) |
+| **Conexões** | PostgreSQL (asyncpg) + SQL Server (pymssql) |
+| **Segurança** | Dicionário de negócios customizável, Golden Queries validadas, audit log |
+| **Limites** | Timeout configurável (30s), max rows (1000), query read-only |
+| **Tabelas** | `ntalk_connections`, `ntalk_business_dictionary`, `ntalk_golden_queries`, `ntalk_audit_logs` |
+
+### 🛡️ gabi.care (InsightCare)
+**Analista de Seguros com 3 Agentes**
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Análise de sinistralidade, apólices e normas ANS/SUSEP |
+| **Agentes** | 3 agentes especializados em diferentes aspectos de seguros |
+| **RAG** | Documentos de seguros, apólices, normas regulatórias |
+| **Tabelas** | `ic_documents`, `ic_chunks`, `ic_policies`, `ic_claims`, `ic_clients` |
+
+---
+
+## Arquitetura Técnica
 
 ```
-Frontend:  Next.js 16 · React 19 · Tailwind v4 · Firebase Auth
-Backend:   FastAPI · SQLAlchemy (async) · pgvector · Vertex AI
-Database:  PostgreSQL + pgvector
-Infra:     Cloud Run · Cloud SQL · Secret Manager · Artifact Registry
+┌──────────────────────────────────────────────────────┐
+│                    FRONTEND (Next.js)                 │
+│  Dashboard → 4 módulos + Admin + Chat unificado      │
+│  Firebase Auth • Role-based access • Realtime chat   │
+└──────────────────────┬───────────────────────────────┘
+                       │ HTTPS
+┌──────────────────────▼───────────────────────────────┐
+│                  API (FastAPI/Uvicorn)                │
+│                                                      │
+│  ┌─────────────────────────────────────────────────┐ │
+│  │              MIDDLEWARE STACK                    │ │
+│  │  Security Headers → Error Handler →             │ │
+│  │  Request Logging → CORS                         │ │
+│  └─────────────────────────────────────────────────┘ │
+│                                                      │
+│  ┌──────────┬──────────┬──────────┬──────────┐      │
+│  │ gabi.    │ gabi.    │ gabi.    │ gabi.    │      │
+│  │ writer   │ legal    │ data     │ care     │      │
+│  │ /ghost   │ /law     │ /ntalk   │ /insight │      │
+│  └────┬─────┴────┬─────┴────┬─────┴────┬─────┘      │
+│       │          │          │          │             │
+│  ┌────▼──────────▼──────────▼──────────▼─────┐      │
+│  │              CORE ENGINE                   │      │
+│  │  AI Service (Vertex AI Gemini)             │      │
+│  │  Dynamic RAG (intent → embed → search)     │      │
+│  │  Multi-Agent Debate (parallel → synthesis)  │      │
+│  │  Circuit Breaker (fault tolerance)          │      │
+│  │  Rate Limiter (per-user)                    │      │
+│  │  Cache (in-memory LRU)                      │      │
+│  └────┬──────────────────────┬───────────────┘      │
+│       │                      │                       │
+│  ┌────▼────┐           ┌─────▼──────┐               │
+│  │Embeddings│           │ Auth       │               │
+│  │Vertex AI │           │ Firebase   │               │
+│  │768-dim   │           │ Admin SDK  │               │
+│  └──────────┘           └────────────┘               │
+└──────────────────────┬───────────────────────────────┘
+                       │
+┌──────────────────────▼───────────────────────────────┐
+│          CLOUD SQL (PostgreSQL 15 + pgvector)        │
+│  42 tabelas • IVFFlat indexes • Alembic migrations   │
+└──────────────────────────────────────────────────────┘
 ```
 
-## Quickstart
+---
 
-### Backend
+## Stack Tecnológico
 
-```bash
-cd api
-cp .env.example .env   # preencher com valores reais
-pip install -e ".[dev]"
-alembic upgrade head
-uvicorn app.main:app --reload
+### Backend (API)
+
+| Tecnologia | Versão | Função |
+|------------|--------|--------|
+| **Python** | 3.11+ | Runtime |
+| **FastAPI** | ≥0.115 | Framework web async |
+| **Uvicorn** | ≥0.32 | ASGI server |
+| **SQLAlchemy** | ≥2.0 (asyncio) | ORM + query builder |
+| **asyncpg** | ≥0.30 | Driver PostgreSQL async |
+| **pgvector** | ≥0.3 | Extensão vetorial para embeddings |
+| **Alembic** | ≥1.14 | Schema migrations |
+| **Pydantic** | ≥2.10 | Validação de dados |
+| **Firebase Admin** | ≥6.6 | Autenticação |
+| **Vertex AI SDK** | ≥1.70 | LLM + Embeddings |
+| **pandas** | ≥2.2 | Processamento de dados |
+| **PyMuPDF** | ≥1.24 | Parsing de PDFs |
+| **python-docx** | ≥1.1 | Parsing de DOCX |
+| **openpyxl** | ≥3.1 | Parsing de Excel |
+| **pymssql** | ≥2.2 | Conexão SQL Server |
+
+### Frontend (Web)
+
+| Tecnologia | Função |
+|------------|--------|
+| **Next.js** (App Router) | Framework React SSR/CSR |
+| **TypeScript** | Type safety |
+| **Firebase Auth** | Login social (Google) + email/password |
+| **Lucide React** | Ícones |
+| **CSS Variables** | Design system customizado |
+
+### Infraestrutura (GCP)
+
+| Serviço | Função |
+|---------|--------|
+| **Cloud Run** | Hosting containerizado (API + Web) |
+| **Cloud Build** | CI/CD pipeline |
+| **Artifact Registry** | Docker image registry |
+| **Cloud SQL** | PostgreSQL 15 gerenciado + pgvector 0.8.1 |
+| **Secret Manager** | Credenciais (`database-url`, `firebase-admin-private-key`) |
+| **Vertex AI** | Gemini Pro/Flash + `text-multilingual-embedding-002` |
+| **Firebase** | Autenticação multitenant |
+
+---
+
+## Core Engine — Componentes
+
+### 🧠 AI Service (`core/ai.py`)
+- **Roteamento inteligente** por módulo: Ghost→Flash (criatividade), Law→Pro (precisão), nTalk→Flash (SQL)
+- **Global Anti-Hallucination Guardrail** — injetado em TODOS os prompts:
+  - Nunca fabrica dados factuais
+  - Diferencia FATOS de ANÁLISES
+  - Declara explicitamente quando informação não foi encontrada
+- **Streaming** — respostas token-by-token via `generate_stream()`
+- **JSON output** — `generate_json()` com parsing automático de fences
+
+### 🔍 Dynamic RAG (`core/dynamic_rag.py`)
+- **Decision engine** — Gemini Flash classifica a intenção do usuário ANTES de buscar:
+  - `needs_rag=true` → busca factual → embed query → pgvector similarity search
+  - `needs_rag=false` → follow-up conversacional → responde sem busca
+- **Economia** — salva ~200ms + custo de embedding em 40-60% das interações
+- **SQL injection prevention** — allowlist de tabelas (`ALLOWED_TABLE_PAIRS`)
+- **Ownership filter** — documentos do usuário + documentos regulatórios compartilhados
+
+### 🤖 Multi-Agent Debate (`core/multi_agent.py`)
+- Executa N agentes **em paralelo** (`asyncio.gather`)
+- Cada agente tem `system_prompt` + `module` (modelo) específicos
+- Fase de **síntese** — um agente sintetizador combina as análises
+- Detecta e destaca **conflitos** entre agentes
+- Estrutura: Resumo Executivo → Análise Combinada → Pontos de Atenção
+
+### 📐 Embeddings (`core/embeddings.py`)
+- **Vertex AI** `text-multilingual-embedding-002` (768 dimensões)
+- Batch processing — até 250 textos por chamada
+- Lazy loading — modelo carregado on-demand
+- **Cosine similarity** via operador pgvector `<=>` (IVFFlat indexes)
+
+### ⚡ Circuit Breaker (`core/circuit_breaker.py`)
+- Protege contra outages do Vertex AI
+- Estados: CLOSED → OPEN → HALF_OPEN
+- Threshold configurável de falhas consecutivas
+- Fallback gracioso com mensagem ao usuário
+
+### 🔐 Auth & Authorization (`core/auth.py`)
+- **Firebase Admin SDK** — verificação de tokens JWT
+- **Role-based access** — `superadmin`, `admin`, `user`
+- **Module-level permissions** — por módulo habilitado por usuário
+- **Auto-approve** — domínios confiáveis (`ness.com.br`, `bekaa.eu`)
+- **LGPD compliance** — SAR (Subject Access Request) endpoint
+
+### 📊 Rate Limiter (`core/rate_limit.py`)
+- Per-user rate limiting
+- Sliding window algorithm
+- Redis-backed (production) ou in-memory (development)
+
+---
+
+## Middleware Stack
+
+| Camada | Arquivo | Função |
+|--------|---------|--------|
+| **1. Security Headers** | `security_headers.py` | HSTS, CSP, X-Frame-Options, X-Content-Type-Options |
+| **2. Error Handler** | `error_handler.py` | Sanitiza exceções — nunca expõe internals |
+| **3. Request Logging** | `request_logging.py` | JSON estruturado com correlation ID (X-Request-ID) |
+| **4. CORS** | FastAPI built-in | Origins, methods, headers explícitos |
+
+---
+
+## Pipeline de Ingestão
+
+### Fontes Regulatórias
+| Fonte | Parser | Dados |
+|-------|--------|-------|
+| **Planalto** | `planalto_parser.py` + `legal_structure_parser.py` | Leis federais, decretos, MPs |
+| **BCB/CMN** | `bcb_client.py` + `normalizer.py` | Resoluções, circulares, normativos |
+| **CVM** | `seed_regulatory.py` | Feed RSS de normativos |
+
+### Fluxo de Ingestão
+```
+Fonte → Parser → Normalizer → Chunker → Embeddings (768d) → pgvector
+                                  ↓
+                          Analyzer (Gemini Pro)
+                                  ↓
+                        RegulatoryAnalysis (risco, impacto)
 ```
 
-### Frontend
+---
 
-```bash
-cd web
-cp env.example .env.local   # preencher Firebase keys
-npm install
-npm run dev
+## Banco de Dados
+
+- **PostgreSQL 15** (Cloud SQL, `southamerica-east1`)
+- **pgvector 0.8.1** — busca vetorial com IVFFlat indexes
+- **42 tabelas** gerenciadas por 9 Alembic migrations
+- **768 dimensões** — Vertex AI `text-multilingual-embedding-002`
+
+### Índices de Performance
+- **IVFFlat** em todas as tabelas de chunks (cosine similarity)
+- **B-tree** em user_id, email, firebase_uid, session_id, created_at
+- **GIN/GIST** implícitos via pgvector
+
+---
+
+## Deploy & CI/CD
+
+```
+git push → Cloud Build → Docker build → Artifact Registry → Cloud Run deploy
 ```
 
-### Deploy GCP
+| Ambiente | Trigger | Arquivo | Config |
+|----------|---------|---------|--------|
+| **Dev** | Manual (`gcloud builds submit`) | `cloudbuild.yaml` | 2 CPU, 2GB RAM, min=1 |
+| **Staging** | Branch `main` | `cloudbuild-staging.yaml` | 1 CPU, 1GB RAM, min=0 |
+| **Production** | Tag `v*` | `cloudbuild-prod.yaml` | 2 CPU, 2GB RAM, min=1, cpu-boost |
 
-```bash
-export GCP_PROJECT_ID=your-project
-bash scripts/deploy.sh
-```
+### Serviços Cloud Run
+| Serviço | URL | Port |
+|---------|-----|------|
+| `gabi-api` | `gabi-api-3yxil5gluq-rj.a.run.app` | 8080 |
+| `gabi-web` | `gabi-web-3yxil5gluq-rj.a.run.app` | 3000 |
 
-### Ingestão Multi-Agência (Compliance-Grade)
+---
 
-Para manter o acervo regulatório das 8 agências atualizado, configure o cron no servidor para rodar:
+## Segurança
 
-```bash
-# Ingestão unificada para todas as agências (BACEN, CMN, CVM, SUSEP, ANS, ANPD, ANEEL)
-# Roda todos os scripts na ordem correta
-uv run python scripts/ingest_all_agencies.py
+- **LGPD** — endpoint SAR (`/api/admin/lgpd`) para direitos do titular
+- **Anti-hallucination** — guardrail global injetado em todos os prompts
+- **SQL injection** — allowlist de tabelas no Dynamic RAG
+- **Secret Manager** — credenciais nunca em código
+- **Security headers** — HSTS, CSP, X-Frame-Options
+- **Rate limiting** — proteção contra abuso por usuário
+- **Circuit breaker** — resiliência contra falhas de IA
+- **Error sanitization** — exceções nunca expõem internals
 
-# Scripts individuais:
-uv run python scripts/ingest_bcb_rss.py
-uv run python scripts/ingest_bcb_normativos.py
-uv run python scripts/ingest_cmn_normativos.py
-uv run python scripts/ingest_susep.py
-uv run python scripts/ingest_ans.py
-uv run python scripts/ingest_anpd.py
-uv run python scripts/ingest_aneel.py
-```
+---
 
-### Ingestão Base de Conhecimento Jurídica (BKJ) - Agente Jurídico
-
-Para alimentar o motor de RAG e a matriz hierárquica (Livro > Título > Artigo > Parágrafo > Inciso) das Leis Federais consolidadas através do Planalto:
-
-```bash
-# Ingestão de Códigos Fundamentais (Civil, Penal, Processo Civil, CDC, LGPD)
-uv run python scripts/ingest_laws_core.py
-
-# Ingestão de Leis Financeiras e Sancionadoras (Anticorrupção, Lavagem, Crimes SFN)
-# Controlado via flag ENABLE_FINANCIAL=true no .env
-uv run python scripts/ingest_laws_financial.py
-```
-
-Certifique-se de configurar as variáveis no seu `.env` conforme o arquivo `.env.example`.
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/health` | Liveness probe |
-| `GET` | `/health/ready` | Readiness (DB, Vertex, Firebase, embeddings) |
-| `POST` | `/api/ghost/generate` | Gerar texto com estilo |
-| `POST` | `/api/ghost/generate-stream` | Streaming SSE — gerar texto em tempo real |
-| `POST` | `/api/ghost/upload` | Upload de documentos de estilo/conteúdo |
-| `POST` | `/api/law/agent` | Invocar agente jurídico |
-| `POST` | `/api/law/upload` | Upload de documentos legais |
-| `POST` | `/api/ntalk/ask` | Perguntar em linguagem natural |
-| `POST` | `/api/ntalk/connections` | Registrar conexão MS SQL |
-| `POST` | `/api/insightcare/chat` | Chat com agente de seguros |
-| `POST` | `/api/insightcare/upload` | Upload de docs/XLSX |
-| `GET` | `/api/admin/users` | Listar usuários |
-| `GET` | `/api/admin/stats` | Estatísticas do sistema |
-| `GET` | `/api/admin/analytics` | Analytics de uso (7 dias) |
-| `GET` | `/api/chat/sessions` | Listar sessões de chat |
-| `GET` | `/api/chat/sessions/:id/messages` | Mensagens de uma sessão |
-| `GET` | `/api/chat/sessions/:id/export` | Exportar sessão como markdown |
-| `DELETE` | `/api/chat/sessions/:id` | Deletar sessão |
-| `POST` | `/api/auth/me` | Info do usuário autenticado |
-
-## Arquitetura
+## Estrutura do Repositório
 
 ```
 Gabi/
-├── api/                     # FastAPI backend
+├── api/                          # Backend Python
 │   ├── app/
-│   │   ├── core/            # ai, auth, embeddings, ingest, health, rate_limit, memory, analytics
-│   │   ├── models/          # SQLAlchemy: user, ghost, law, ntalk, insightcare, analytics
-│   │   ├── modules/         # Routers: ghost, law, ntalk, insightcare, admin, chat
-│   │   ├── config.py
-│   │   ├── database.py
-│   │   └── main.py
-│   ├── alembic/             # Migrations (5 revisions)
-│   ├── tests/               # pytest (25 tests)
+│   │   ├── core/                 # Engine: AI, RAG, embeddings, auth
+│   │   ├── models/               # SQLAlchemy models (11 files)
+│   │   ├── modules/              # Routers por módulo (6 modules)
+│   │   ├── services/             # Ingestão, parsing, análise
+│   │   └── middleware/           # Security, logging, errors
+│   ├── alembic/                  # Database migrations (9 versions)
 │   ├── Dockerfile
-│   └── entrypoint.sh        # alembic upgrade + uvicorn
-├── web/                     # Next.js frontend
-│   ├── src/
-│   │   ├── app/             # Pages: ghost, law, ntalk, insightcare, admin, login
-│   │   ├── components/      # sidebar, chat-panel, upload-button, chat-history, knowledge-panel
-│   │   ├── hooks/           # use-keyboard-shortcuts
-│   │   └── lib/             # api.ts, firebase.ts, i18n.ts
-│   └── Dockerfile
-├── packages/core/           # Shared TS utilities
-├── scripts/deploy.sh
-└── cloudbuild.yaml
+│   └── pyproject.toml
+├── web/                          # Frontend Next.js
+│   └── src/
+│       ├── app/                  # Pages (ghost, law, ntalk, insightcare, admin)
+│       └── components/           # Shared UI (auth, chat, sidebar)
+├── scripts/                      # DB indexes, seeds
+├── cloudbuild.yaml               # CI/CD principal
+├── cloudbuild-staging.yaml
+└── cloudbuild-prod.yaml
 ```
-
-## License
-
-Proprietary — ness.

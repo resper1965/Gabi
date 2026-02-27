@@ -19,9 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # 1. ENUMS
-    op.execute("CREATE TYPE legaldomain AS ENUM ('CIVIL', 'PENAL', 'CONSUMIDOR', 'ADMINISTRATIVO', 'SANCIONADOR', 'PROCESSUAL')")
-    op.execute("CREATE TYPE embeddingstatus AS ENUM ('PENDING', 'SKIPPED', 'READY')")
+    # Enums are auto-created by sa.Enum() in create_table below
 
     # 2. TABLES
     op.create_table(
@@ -84,7 +82,7 @@ def upgrade() -> None:
         sa.Column('topics', sa.JSON(), nullable=True),
         sa.Column('legal_domain', sa.Enum('CIVIL', 'PENAL', 'CONSUMIDOR', 'ADMINISTRATIVO', 'SANCIONADOR', 'PROCESSUAL', name='legaldomain'), nullable=True),
         sa.Column('embedding_status', sa.Enum('PENDING', 'SKIPPED', 'READY', name='embeddingstatus'), nullable=False, server_default='PENDING'),
-        sa.Column('embedding', pgvector.sqlalchemy.Vector(dim=1536), nullable=True),
+        sa.Column('embedding', pgvector.sqlalchemy.Vector(dim=768), nullable=True),
         sa.ForeignKeyConstraint(['doc_id'], ['legal_documents.id'], ),
         sa.ForeignKeyConstraint(['version_id'], ['legal_versions.id'], ),
         sa.PrimaryKeyConstraint('id')
