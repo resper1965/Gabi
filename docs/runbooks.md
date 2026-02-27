@@ -35,12 +35,12 @@ Procedimentos operacionais para incidentes e manutenção em produção.
 ### Restore de Backup
 ```bash
 # Listar backups disponíveis
-gcloud sql backups list --instance=gabi-db --project=$GCP_PROJECT_ID
+gcloud sql backups list --instance=nghost-db --project=nghost-gabi
 
 # Restore para novo instance (seguro)
-gcloud sql instances clone gabi-db gabi-db-restored \
+gcloud sql instances clone nghost-db nghost-db-restored \
   --point-in-time="2026-02-26T10:00:00Z" \
-  --project=$GCP_PROJECT_ID
+  --project=nghost-gabi
 
 # Após validar, swap DNS ou atualizar DATABASE_URL
 ```
@@ -48,7 +48,7 @@ gcloud sql instances clone gabi-db gabi-db-restored \
 ### Emergência: Conexão direta
 ```bash
 # Cloud SQL Proxy
-gcloud sql connect gabi-db --user=postgres --project=$GCP_PROJECT_ID
+gcloud sql connect nghost-db --user=postgres --project=nghost-gabi
 ```
 
 ---
@@ -58,17 +58,17 @@ gcloud sql connect gabi-db --user=postgres --project=$GCP_PROJECT_ID
 ### Cloud Run Rollback (imediato)
 ```bash
 # Listar revisões
-gcloud run revisions list --service=gabi-api --region=us-central1
+gcloud run revisions list --service=gabi-api --region=southamerica-east1
 
 # Rollback para revisão anterior
 gcloud run services update-traffic gabi-api \
   --to-revisions=gabi-api-<REVISION>=100 \
-  --region=us-central1
+  --region=southamerica-east1
 
 # Rollback web
 gcloud run services update-traffic gabi-web \
   --to-revisions=gabi-web-<REVISION>=100 \
-  --region=us-central1
+  --region=southamerica-east1
 ```
 
 ### Rollback de Migração
@@ -95,12 +95,12 @@ gcloud run services update gabi-api \
   --max-instances=20 \
   --memory=4Gi \
   --cpu=4 \
-  --region=us-central1
+  --region=southamerica-east1
 
 # Escalar Web
 gcloud run services update gabi-web \
   --max-instances=10 \
-  --region=us-central1
+  --region=southamerica-east1
 ```
 
 ---
@@ -141,3 +141,29 @@ gcloud run services update gabi-web \
 6. **Monitor** — Verificar latência e qualidade por 48h
 
 > ⚠️ Mudança de dimensão (ex: 768 → 1024) requer migration Alembic para alterar `Vector(N)` columns.
+
+---
+
+## 7. LGPD Operations
+
+### Exportar dados de um titular
+```bash
+# Via API (requer token de admin/superadmin)
+curl -H "Authorization: Bearer $TOKEN" \
+  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/export
+```
+
+### Purge completo de dados (irreversível)
+```bash
+# Apenas superadmin pode executar
+curl -X DELETE -H "Authorization: Bearer $TOKEN" \
+  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/purge
+```
+
+### Consultar audit log
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/audit-log?limit=50
+```
+
+> ⚠️ O purge é **irreversível**. Sempre exporte os dados antes de purgar.

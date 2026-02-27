@@ -38,6 +38,18 @@ steps:
       - "."
     waitFor: ["-"] # parallel with api build
 
+  # ── Run Tests ──
+  - id: "test-api"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        cd api && \
+        pip install -q -e '.[dev]' 2>/dev/null && \
+        python -m pytest tests/ --tb=short -q --no-header 2>&1 | tail -20
+    waitFor: ["-"] # parallel with builds
+
   # ── Push Images ──
   - id: "push-api"
     name: "gcr.io/cloud-builders/docker"
