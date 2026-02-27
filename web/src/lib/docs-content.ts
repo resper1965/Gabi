@@ -5,9 +5,9 @@
  */
 
 export const docsContent = {
-  overview: `# Plataforma Gabi — IA Corporativa
+  overview: `# Plataforma Gabi. — IA Corporativa
 
-A **Gabi** é uma plataforma de Inteligência Artificial desenvolvida pela **ness.** para apoiar equipes jurídicas, financeiras, de seguros e de comunicação com agentes especializados.
+A **Gabi.** é uma plataforma de Inteligência Artificial desenvolvida pela **ness.** para apoiar equipes jurídicas, financeiras, de seguros e de comunicação com agentes especializados.
 
 ---
 
@@ -25,7 +25,7 @@ Cada módulo combina três princípios:
 
 | Módulo | O que faz |
 | --- | --- |
-| **gabi.writer** | Ghost writer que absorve seu estilo e escreve por você |
+| **ness.AI** | IA escritora que absorve seu estilo e escreve por você |
 | **gabi.legal** | 4 agentes jurídicos: auditora, pesquisadora, redatora, sentinela |
 | **gabi.data** | Converse com bancos de dados em linguagem natural |
 | **gabi.care** | Análise de sinistralidade, apólices e normas ANS/SUSEP |
@@ -60,9 +60,9 @@ A **ness.** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, en
 `,
 
   modules: {
-    ghost: `# gabi.writer — Ghost Writer
+    ghost: `# ness.AI — IA Escritora
 
-Sua escritora IA que absorve estilos de escrita e produz textos fiéis ao tom original.
+Sua IA escritora que absorve estilos de escrita e produz textos fiéis ao tom original.
 
 ---
 
@@ -287,7 +287,7 @@ export function getModuleDocs(module: string): string {
 /** Get all section keys for navigation */
 export const docsSections = [
   { id: "overview", label: "Visão Geral", icon: "BookOpen" },
-  { id: "ghost", label: "gabi.writer", icon: "PenTool" },
+  { id: "ghost", label: "ness.AI", icon: "PenTool" },
   { id: "law", label: "gabi.legal", icon: "Scale" },
   { id: "ntalk", label: "gabi.data", icon: "Database" },
   { id: "insightcare", label: "gabi.care", icon: "ShieldCheck" },

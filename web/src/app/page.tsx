@@ -9,8 +9,8 @@ import { useAuth } from "@/components/auth-provider"
 const allModules = [
   {
     key: "ghost",
-    name: "gabi.writer",
-    tagline: "Sua Ghost Writer",
+    name: "ness.AI",
+    tagline: "Sua IA Escritora",
     description: "Absorve estilo e escreve com fidelidade — Style Signature + RAG",
     icon: PenTool,
     href: "/ghost",
@@ -106,7 +106,7 @@ export default function DashboardPage() {
             {getGreeting()}, {firstName}
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
-            Plataforma Gabi — Escolha um módulo para começar
+            Plataforma Gabi. — Escolha um módulo para começar
           </p>
         </div>
       </div>

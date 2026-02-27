@@ -15,7 +15,7 @@ import { docsContent } from "@/lib/docs-content"
 
 const sections = [
   { id: "overview", label: "Visão Geral", icon: BookOpen },
-  { id: "ghost", label: "gabi.writer", icon: PenTool },
+  { id: "ghost", label: "ness.AI", icon: PenTool },
   { id: "law", label: "gabi.legal", icon: Scale },
   { id: "ntalk", label: "gabi.data", icon: Database },
   { id: "insightcare", label: "gabi.care", icon: ShieldCheck },

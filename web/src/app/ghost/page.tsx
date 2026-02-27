@@ -105,8 +105,8 @@ export default function GhostPage() {
               <PenTool className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold">gabi.writer</h1>
-              <p className="text-xs text-zinc-500">Sua Ghost Writer</p>
+              <h1 className="text-lg font-semibold">ness.AI</h1>
+              <p className="text-xs text-zinc-500">Sua IA Escritora</p>
             </div>
           </div>
 
