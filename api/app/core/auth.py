@@ -22,6 +22,10 @@ logger = logging.getLogger("gabi.auth")
 
 ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
 
+# Startup: log admin config for debugging
+logger.info("Auth config: admin_emails=%s (type=%s), auto_approve_domains=%s",
+            settings.admin_emails, type(settings.admin_emails).__name__, settings.auto_approve_domains)
+
 _firebase_app = None
 
 
@@ -129,7 +133,8 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
         if email.lower() in [e.lower() for e in settings.admin_emails]:
-            if user.role != "superadmin" or user.status != "approved" or user.allowed_modules != ALL_MODULES:
+            logger.info("SUPERADMIN match for %s — promoting", email)
+            if user.role != "superadmin" or user.status != "approved" or set(user.allowed_modules or []) != set(ALL_MODULES):
                 user.role = "superadmin"
                 user.status = "approved"
                 user.allowed_modules = ALL_MODULES
@@ -143,7 +148,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         if changed:
             await db.commit()
 
-    logger.debug("User %s: role=%s status=%s", email, user.role, user.status)
+    logger.info("User %s: role=%s status=%s modules=%s", email, user.role, user.status, user.allowed_modules)
     return user
 
 
