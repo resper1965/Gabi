@@ -11,6 +11,49 @@ steps:
         pytest --tb=short -q --no-header
     waitFor: ["-"]
 
+  # ── SSDLC: SAST (Static Application Security Testing) ──
+  - id: "sast-bandit"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install bandit --quiet
+        echo "━━━ SAST: Bandit Security Scan ━━━"
+        bandit -r api/app/ -ll -ii --skip B101 -f json -o /workspace/bandit-report.json || true
+        bandit -r api/app/ -ll -ii --skip B101
+    waitFor: ["-"]
+
+  # ── SSDLC: SCA (Software Composition Analysis) ──
+  - id: "sca-audit"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install pip-audit --quiet
+        echo "━━━ SCA: Dependency Vulnerability Scan ━━━"
+        pip-audit --requirement api/requirements.txt --skip-editable --output /workspace/sca-report.json --format json || true
+        pip-audit --requirement api/requirements.txt --skip-editable
+    waitFor: ["-"]
+
+  # ── SSDLC: Secrets Scan ──
+  - id: "secrets-scan"
+    name: "zricethezav/gitleaks:latest"
+    entrypoint: gitleaks
+    args:
+      [
+        "detect",
+        "--source",
+        ".",
+        "--no-banner",
+        "--report-path",
+        "/workspace/gitleaks-report.json",
+        "--report-format",
+        "json",
+      ]
+    waitFor: ["-"]
+
   # ── Build API ──
   - id: "build-api"
     name: "gcr.io/cloud-builders/docker"
