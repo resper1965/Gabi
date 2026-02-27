@@ -1,175 +1,282 @@
 /**
- * Gabi Hub — Docs Content
- * All documentation in markdown, organized by section.
+ * Gabi Platform — Documentation Content
+ * All user-facing docs in markdown, organized by section.
+ * Produced by Ness (ness.com.br)
  */
 
 export const docsContent = {
-  overview: `# Bem-vindo à Gabi
+  overview: `# Plataforma Gabi — IA Corporativa
 
-**Gabi** é uma plataforma de Inteligência Artificial com 4 módulos especializados, cada um projetado para um domínio específico de trabalho.
+A **Gabi** é uma plataforma de Inteligência Artificial desenvolvida pela **Ness** para apoiar equipes jurídicas, financeiras, de seguros e de comunicação com agentes especializados.
+
+---
 
 ## Como funciona
 
-Cada módulo combina:
-- **RAG (Retrieval-Augmented Generation)** — busca em documentos reais antes de responder
-- **Guardrails anti-alucinação** — a IA nunca inventa dados; se não sabe, diz que não sabe
-- **Memória de conversa** — mantém contexto ao longo do chat
+Cada módulo combina três princípios:
 
-## Stack
+- **RAG (Retrieval-Augmented Generation)** — a IA busca em seus documentos reais antes de responder, garantindo respostas fundamentadas.
+- **Guardrails anti-alucinação** — se a informação não está na base, a IA avisa. Ela **nunca inventa** dados.
+- **Memória de conversa** — mantém o contexto ao longo do diálogo para respostas coerentes.
+
+---
+
+## Módulos disponíveis
+
+| Módulo | O que faz |
+| --- | --- |
+| **gabi.writer** | Ghost writer que absorve seu estilo e escreve por você |
+| **gabi.legal** | 4 agentes jurídicos: auditora, pesquisadora, redatora, sentinela |
+| **gabi.data** | Converse com bancos de dados em linguagem natural |
+| **gabi.care** | Análise de sinistralidade, apólices e normas ANS/SUSEP |
+
+---
+
+## Stack tecnológico
 
 | Camada | Tecnologia |
 | --- | --- |
-| Frontend | Next.js · React 19 · Tailwind v4 |
-| Backend | FastAPI · SQLAlchemy + pgvector |
-| AI | Google Vertex AI (Gemini) |
-| Embeddings | BAAI/bge-m3 (local, custo zero) |
+| Frontend | Next.js 15 · React 19 · Tailwind v4 |
+| Backend | FastAPI · SQLAlchemy · pgvector |
+| IA | Google Vertex AI (Gemini 2.0) |
+| Embeddings | BAAI/bge-m3 (custo zero) |
 | Auth | Firebase Authentication |
-| Infra | Google Cloud Run + Cloud SQL |
+| Infra | Google Cloud Run · Cloud SQL · GCP São Paulo |
+
+---
 
 ## Primeiros passos
 
-1. Faça login com seu email corporativo
-2. Escolha um módulo na sidebar
-3. Comece a conversar!
+1. Faça login com seu email corporativo (**@ness.com.br**)
+2. Escolha um módulo no painel principal
+3. Comece a conversar com a IA
 
-> **Dica:** Use \`⌘+Enter\` para enviar mensagens rapidamente.
+> **Dica:** Use \`Ctrl+Enter\` (ou \`⌘+Enter\` no Mac) para enviar mensagens rapidamente.
+
+---
+
+## Sobre a Ness
+
+A **Ness** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, entre em contato com a equipe de tecnologia em **suporte@ness.com.br**.
 `,
 
   modules: {
-    ghost: `## gabi.writer — Ghost Writer
+    ghost: `# gabi.writer — Ghost Writer
 
 Sua escritora IA que absorve estilos de escrita e produz textos fiéis ao tom original.
 
-### Como usar
+---
 
-1. **Faça upload de documentos de referência**
-   - Clique no ícone ⚙️ no canto superior direito
-   - Arraste PDFs, DOCX ou TXT com exemplos do estilo desejado
-   - A IA analisa e extrai a "assinatura de estilo"
+## Como usar
 
-2. **Escolha um perfil de escrita**
-   - Cada perfil representa um estilo diferente
-   - Troque entre perfis no painel de conhecimento
+### 1. Envie documentos de referência
 
-3. **Peça para escrever**
-   - \`"Escreva um email para o cliente sobre o atraso na entrega"\`
-   - \`"Redija um post para LinkedIn sobre inovação"\`
-   - \`"Adapte este texto para tom mais formal"\`
+- Clique no ícone de **engrenagem** no canto superior direito
+- Arraste PDFs, DOCX ou TXT com exemplos do estilo desejado
+- A IA analisa e extrai a "assinatura de estilo" automaticamente
 
-### Dicas
+### 2. Escolha um perfil de escrita
 
-- Quanto mais documentos de referência você enviar, melhor a IA captura o estilo
-- Use o **streaming** para ver a resposta sendo gerada em tempo real
-- Clique no botão **Copiar** nos blocos de código para copiar trechos
+- Cada perfil representa um estilo ou autor diferente
+- Troque entre perfis no painel de conhecimento
+
+### 3. Peça para escrever
+
+Exemplos de prompts:
+
+- \`"Escreva um email para o cliente sobre o atraso na entrega"\`
+- \`"Redija um post para LinkedIn sobre inovação"\`
+- \`"Adapte este texto para tom mais formal"\`
+
+---
+
+## Dicas
+
+- Quanto mais documentos de referência você enviar, mais fiel será o estilo
+- Use o **streaming** para ver a resposta em tempo real
+- Clique em **Copiar** nos blocos de código para copiar trechos
+
+---
+
+> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
 `,
 
-    law: `## gabi.legal — Auditora Jurídica
+    law: `# gabi.legal — Auditora Jurídica
 
-Sistema multi-agente com 4 especialistas para análise jurídica.
+Sistema multi-agente com 4 especialistas para análise jurídica corporativa.
 
-### Agentes disponíveis
+---
 
-| Agente | Função |
+## Agentes disponíveis
+
+| Agente | Especialidade |
 | --- | --- |
-| **Auditora** | Analisa documentos e identifica riscos |
-| **Pesquisadora** | Busca jurisprudência e legislação |
-| **Redatora** | Gera pareceres e minutas |
-| **Sentinela** | Monitora prazos e obrigações |
+| **Auditora** | Analisa documentos e identifica riscos e cláusulas críticas |
+| **Pesquisadora** | Busca jurisprudência, legislação e regulamentação |
+| **Redatora** | Gera pareceres, minutas e documentos jurídicos |
+| **Sentinela** | Monitora prazos, obrigações e alertas regulatórios |
 
-### Como usar
+---
 
-1. **Faça upload de documentos legais** (contratos, regulamentos, etc.)
+## Como usar
+
+1. **Faça upload de documentos legais** — contratos, regulamentos, normas
 2. **Pergunte em linguagem natural:**
+
    - \`"Quais são os riscos neste contrato?"\`
    - \`"Existe cláusula de rescisão antecipada?"\`
    - \`"Redija um parecer sobre esta situação"\`
 
-### Fontes RAG
+---
 
-Abaixo de cada resposta, a Gabi mostra as **fontes consultadas** — os documentos reais que fundamentaram a análise. Isso garante rastreabilidade.
+## Fontes e rastreabilidade
+
+Abaixo de cada resposta, a Gabi mostra as **fontes consultadas** — os documentos reais que fundamentaram a análise. Isso garante rastreabilidade total e conformidade.
+
+---
+
+> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
 `,
 
-    ntalk: `## gabi.data — CFO de Dados
+    ntalk: `# gabi.data — CFO de Dados
 
 Converse com seus bancos de dados usando linguagem natural. A IA traduz para SQL e executa com segurança.
 
-### Como conectar
+---
 
-1. Acesse a página do gabi.data
-2. Registre uma conexão MS SQL Server:
+## Como conectar
+
+1. Acesse a página do **gabi.data**
+2. Registre uma conexão ao banco de dados:
    - Host, porta, banco, usuário e senha
    - A conexão é criptografada e isolada por tenant
 
-### Como perguntar
+---
+
+## Como perguntar
+
+Exemplos de consultas:
 
 - \`"Qual foi o faturamento do mês passado?"\`
 - \`"Top 10 clientes por receita em 2024"\`
 - \`"Compare vendas Q1 vs Q2 por região"\`
 
-### Segurança
+---
 
-- Queries são executadas como **READ-ONLY** (SELECT apenas)
-- Limite de 1000 linhas por consulta
-- Timeout de 30 segundos
-- A IA **nunca** executa DELETE, UPDATE ou DROP
+## Segurança
+
+| Regra | Detalhe |
+| --- | --- |
+| Modo leitura | Apenas \`SELECT\` — nunca executa \`DELETE\`, \`UPDATE\` ou \`DROP\` |
+| Limite de linhas | 1.000 linhas por consulta |
+| Timeout | 30 segundos por query |
+| Isolamento | Cada tenant tem conexão separada |
+
+---
+
+> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
 `,
 
-    insightcare: `## gabi.care — Analista de Seguros
+    insightcare: `# gabi.care — Analista de Seguros
 
 Especialista em análise de sinistralidade, apólices e regulamentação ANS/SUSEP.
 
-### Como usar
+---
+
+## Como usar
 
 1. **Faça upload de planilhas** (XLSX) com dados de sinistralidade
 2. **Faça upload de PDFs** com apólices ou regulamentos
 3. **Pergunte:**
+
    - \`"Qual a taxa de sinistralidade por faixa etária?"\`
    - \`"Compare custos hospitalares vs ambulatoriais"\`
    - \`"Quais cláusulas da ANS se aplicam?"\`
 
-### Formatos aceitos
+---
+
+## Formatos aceitos
 
 | Formato | Uso |
 | --- | --- |
-| XLSX | Dados tabulares (sinistros, apólices) |
-| PDF | Documentos (regulamentos, contratos) |
-| DOCX | Pareceres e relatórios |
+| XLSX | Dados tabulares (sinistros, apólices, financeiro) |
+| PDF | Documentos (regulamentos, contratos, apólices) |
+| DOCX | Pareceres e relatórios internos |
+
+---
+
+> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
 `,
   },
 
-  shortcuts: `## Atalhos de Teclado
+  shortcuts: `# Atalhos de Teclado
 
 | Atalho | Ação |
 | --- | --- |
-| \`⌘ + Enter\` | Enviar mensagem |
+| \`Ctrl + Enter\` | Enviar mensagem |
 | \`Escape\` | Limpar campo de texto |
-| \`⌘ + K\` | Busca rápida (em breve) |
+| \`Ctrl + K\` | Busca rápida (em breve) |
 
-> No Windows/Linux, substitua \`⌘\` por \`Ctrl\`.
+> No Mac, substitua \`Ctrl\` por \`⌘\`.
+
+---
+
+## Navegação
+
+- Use a **sidebar** para trocar entre módulos
+- Clique no ícone de **relógio** no header para ver o histórico de conversas
+- Clique no **avatar** no rodapé da sidebar para ver suas informações
 `,
 
-  faq: `## Perguntas Frequentes
+  faq: `# Perguntas Frequentes
+
+---
 
 ### Preciso instalar algo?
-Não. A Gabi roda 100% no navegador. Basta acessar e fazer login.
+
+Não. A Gabi roda 100% no navegador. Basta acessar o link e fazer login com seu email corporativo.
+
+---
 
 ### A IA inventa informações?
+
 Não. A Gabi possui **guardrails anti-alucinação**. Se a informação não está na base de documentos, ela avisa explicitamente. Todas as respostas incluem as fontes consultadas.
 
+---
+
 ### Meus dados são seguros?
-Sim. Os dados são armazenados em PostgreSQL dentro do Google Cloud (região São Paulo). A autenticação usa Firebase com verificação de domínio, e cada tenant tem isolamento completo.
+
+Sim. Os dados são armazenados em **PostgreSQL** dentro do **Google Cloud** (região São Paulo). A autenticação usa **Firebase** com verificação de domínio, e cada tenant tem **isolamento completo**.
+
+---
 
 ### Quais formatos de arquivo posso enviar?
+
 PDF, DOCX, TXT e XLSX (para dados tabulares).
 
+---
+
 ### Posso exportar conversas?
-Sim! Clique no ícone 🕒 (Histórico) no header de qualquer módulo, selecione uma conversa e clique em "Exportar .md". O download será feito como arquivo Markdown.
+
+Sim. Clique no ícone de **relógio** (Histórico) no header de qualquer módulo, selecione uma conversa e clique em **"Exportar .md"**. O download será feito como arquivo Markdown.
+
+---
 
 ### Qual modelo de IA é usado?
-A Gabi usa **Google Gemini** (via Vertex AI), com modelos diferentes por módulo para otimizar custo e qualidade.
+
+A Gabi usa **Google Gemini 2.0** (via Vertex AI), com modelos otimizados por módulo para melhor custo-benefício.
+
+---
 
 ### Existe limite de uso?
-Sim, há um rate limiter de 30 requisições por minuto por usuário, para garantir estabilidade.
+
+Sim. Há um rate limiter de **30 requisições por minuto** por usuário, para garantir estabilidade para todos.
+
+---
+
+### Quem desenvolveu a Gabi?
+
+A plataforma Gabi é desenvolvida e mantida pela **Ness** (ness.com.br). Para suporte técnico, entre em contato com **suporte@ness.com.br**.
 `,
 }
 
