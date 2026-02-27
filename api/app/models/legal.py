@@ -34,7 +34,7 @@ class LegalDocument(Base):
     current_version_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("legal_versions.id"), nullable=True)
     status: Mapped[str] = mapped_column(String(100), nullable=False, default="vigente")
 
-    versions: Mapped[List["LegalVersion"]] = relationship("LegalVersion", back_populates="document", foreign_keys="LegalVersion.document_id")
+    versions: Mapped[List["LegalVersion"]] = relationship("LegalVersion", back_populates="document", foreign_keys="LegalVersion.doc_id")
     # current_version is handled dynamically or via foreign key constraints carefully
 
 

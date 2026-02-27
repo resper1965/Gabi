@@ -8,15 +8,15 @@ import hashlib
 from functools import lru_cache
 
 import numpy as np
-from google.cloud import aiplatform
-from vertexai.language_models import TextEmbeddingModel
 
 _model = None
 
 
 def _get_model():
+    """Lazy-load Vertex AI model to avoid import-time failures in testing."""
     global _model
     if _model is None:
+        from vertexai.language_models import TextEmbeddingModel
         _model = TextEmbeddingModel.from_pretrained("text-multilingual-embedding-002")
     return _model
 

@@ -65,16 +65,20 @@ class TestShouldRetrieve:
     """Test intent detection for RAG."""
 
     @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
     @patch("app.core.dynamic_rag.generate")
-    async def test_factual_question_needs_rag(self, mock_generate):
-        mock_generate.return_value = '{"needs_rag": true, "refined_query": "resolução BCB 355", "reason": "factual"}'
+    async def test_factual_question_needs_rag(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {"needs_rag": True, "refined_query": "resolução BCB 355", "reason": "factual"}
         result = await should_retrieve("Quais as exigências da resolução BCB 355?")
         assert result["needs_rag"] is True
 
     @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
     @patch("app.core.dynamic_rag.generate")
-    async def test_greeting_no_rag(self, mock_generate):
-        mock_generate.return_value = '{"needs_rag": false, "refined_query": "", "reason": "greeting"}'
+    async def test_greeting_no_rag(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {"needs_rag": False, "refined_query": "", "reason": "greeting"}
         result = await should_retrieve("Olá, tudo bem?")
         assert result["needs_rag"] is False
 

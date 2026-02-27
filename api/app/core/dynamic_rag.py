@@ -22,7 +22,7 @@ ALLOWED_TABLE_PAIRS = {
 
 INTENT_PROMPT = """Analise esta pergunta do usuário e decida se precisa buscar documentos.
 
-RESPONDA EM JSON: {"needs_rag": true/false, "refined_query": "...", "reason": "..."}
+RESPONDA EM JSON: {{"needs_rag": true/false, "refined_query": "...", "reason": "..."}}
 
 Regras:
 - needs_rag=true → pergunta factual sobre documentos, contratos, leis, dados, apólices

@@ -15,7 +15,9 @@ class TestEmbed:
     def test_embed_returns_list_of_floats(self, mock_get_model):
         """embed() should return a list of floats."""
         mock_model = MagicMock()
-        mock_model.encode.return_value = np.array([0.1, 0.2, 0.3])
+        mock_embedding = MagicMock()
+        mock_embedding.values = [0.1, 0.2, 0.3]
+        mock_model.get_embeddings.return_value = [mock_embedding]
         mock_get_model.return_value = mock_model
 
         # Clear cache for clean test
@@ -33,7 +35,9 @@ class TestEmbed:
     def test_embed_cache_hit(self, mock_get_model):
         """Identical texts should hit cache, model called only once."""
         mock_model = MagicMock()
-        mock_model.encode.return_value = np.array([0.1, 0.2, 0.3])
+        mock_embedding = MagicMock()
+        mock_embedding.values = [0.1, 0.2, 0.3]
+        mock_model.get_embeddings.return_value = [mock_embedding]
         mock_get_model.return_value = mock_model
 
         from app.core.embeddings import _embed_cached, embed
@@ -44,16 +48,17 @@ class TestEmbed:
 
         assert result1 == result2
         # Model should only be called once (second call is cached)
-        assert mock_model.encode.call_count == 1
+        assert mock_model.get_embeddings.call_count == 1
 
     @patch("app.core.embeddings._get_model")
     def test_embed_cache_miss(self, mock_get_model):
         """Different texts should miss cache, model called for each."""
         mock_model = MagicMock()
-        mock_model.encode.side_effect = [
-            np.array([0.1, 0.2, 0.3]),
-            np.array([0.4, 0.5, 0.6]),
-        ]
+        emb_a = MagicMock()
+        emb_a.values = [0.1, 0.2, 0.3]
+        emb_b = MagicMock()
+        emb_b.values = [0.4, 0.5, 0.6]
+        mock_model.get_embeddings.side_effect = [[emb_a], [emb_b]]
         mock_get_model.return_value = mock_model
 
         from app.core.embeddings import _embed_cached, embed
@@ -63,7 +68,7 @@ class TestEmbed:
         result2 = embed("text B")
 
         assert result1 != result2
-        assert mock_model.encode.call_count == 2
+        assert mock_model.get_embeddings.call_count == 2
 
 
 class TestEmbedBatch:
@@ -73,12 +78,14 @@ class TestEmbedBatch:
     def test_embed_batch_returns_list_of_lists(self, mock_get_model):
         """embed_batch() should return a list of embedding lists."""
         mock_model = MagicMock()
-        mock_model.encode.return_value = np.array([0.1, 0.2, 0.3])
+        emb1 = MagicMock()
+        emb1.values = [0.1, 0.2, 0.3]
+        emb2 = MagicMock()
+        emb2.values = [0.4, 0.5, 0.6]
+        mock_model.get_embeddings.return_value = [emb1, emb2]
         mock_get_model.return_value = mock_model
 
-        from app.core.embeddings import _embed_cached, embed_batch
-        _embed_cached.cache_clear()
-
+        from app.core.embeddings import embed_batch
         result = embed_batch(["text 1", "text 2"])
 
         assert isinstance(result, list)

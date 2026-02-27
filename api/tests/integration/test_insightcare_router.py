@@ -19,11 +19,11 @@ class TestInsightCareAgents:
 
     def test_valid_agents(self):
         """InsightCare has 3 valid agents."""
-        from app.modules.insightcare.router import AGENT_PROMPTS
-        assert "policy_analyst" in AGENT_PROMPTS
-        assert "claims_analyst" in AGENT_PROMPTS
-        assert "regulatory_consultant" in AGENT_PROMPTS
-        assert len(AGENT_PROMPTS) == 3
+        from app.modules.insightcare.router import AGENTS
+        assert "policy_analyst" in AGENTS
+        assert "claims_analyst" in AGENTS
+        assert "regulatory_consultant" in AGENTS
+        assert len(AGENTS) == 3
 
     @pytest.mark.asyncio
     async def test_policy_analyst_uses_rag(self, mock_db, mock_user, mock_vertex_ai):
@@ -34,15 +34,15 @@ class TestInsightCareAgents:
     @pytest.mark.asyncio
     async def test_claims_analyst_prompt_includes_actuarial(self):
         """Claims analyst prompt includes actuarial terminology."""
-        from app.modules.insightcare.router import AGENT_PROMPTS
-        prompt = AGENT_PROMPTS["claims_analyst"]
+        from app.modules.insightcare.router import AGENTS
+        prompt = AGENTS["claims_analyst"]
         assert "sinistralidade" in prompt.lower() or "sinistro" in prompt.lower()
 
     @pytest.mark.asyncio
     async def test_regulatory_consultant_cites_norms(self):
         """Regulatory consultant prompt requires norm citations."""
-        from app.modules.insightcare.router import AGENT_PROMPTS
-        prompt = AGENT_PROMPTS["regulatory_consultant"]
+        from app.modules.insightcare.router import AGENTS
+        prompt = AGENTS["regulatory_consultant"]
         assert "RN" in prompt or "ANS" in prompt or "SUSEP" in prompt
 
 
