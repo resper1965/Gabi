@@ -26,33 +26,60 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+const PROFILE_CACHE_KEY = "gabi_profile_cache"
+const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+
+function getCachedProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_CACHE_KEY)
+    if (!raw) return null
+    const { profile, timestamp } = JSON.parse(raw)
+    if (Date.now() - timestamp > CACHE_TTL_MS) {
+      localStorage.removeItem(PROFILE_CACHE_KEY)
+      return null
+    }
+    return profile
+  } catch {
+    return null
+  }
+}
+
+function setCachedProfile(profile: UserProfile | null) {
+  try {
+    if (profile) {
+      localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify({ profile, timestamp: Date.now() }))
+    } else {
+      localStorage.removeItem(PROFILE_CACHE_KEY)
+    }
+  } catch {
+    // localStorage not available
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Initialize with cached profile for instant render
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(() => getCachedProfile())
+
+  // If we have a cached profile, don't block the UI
+  const hasCache = profile !== null
 
   const fetchProfile = useCallback(async (firebaseUser: User) => {
-    console.log("AuthProvider: Fetching profile for", firebaseUser.email)
     try {
       const token = await firebaseUser.getIdToken()
-      console.log("AuthProvider: Token acquired (length):", token.length)
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
+      const timeoutId = setTimeout(() => controller.abort(), 8000)
       try {
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal,
         })
         clearTimeout(timeoutId)
-        console.log("AuthProvider: API response status:", res.status)
         if (res.ok) {
           const data = await res.json()
-          console.log("AuthProvider: Profile fetched successfully, role:", data.role)
           setProfile(data)
-        } else {
-          const errorText = await res.text()
-          console.error("AuthProvider: API error response:", errorText)
+          setCachedProfile(data)
         }
       } catch (err) {
         clearTimeout(timeoutId)
@@ -64,11 +91,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    // Safety timeout: if Firebase auth never fires, stop the spinner after 15 seconds
+    // If we have a cached profile, stop the loading spinner immediately
+    if (hasCache) {
+      setLoading(false)
+    }
+
+    // Safety timeout: reduced from 15s to 8s
     const safetyTimeout = setTimeout(() => {
       setLoading(false)
       console.warn("AuthProvider: Safety timeout reached — auth state never fired")
-    }, 15000)
+    }, 8000)
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       clearTimeout(safetyTimeout)
@@ -77,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await fetchProfile(firebaseUser)
       } else {
         setProfile(null)
+        setCachedProfile(null)
       }
       setLoading(false)
     })
@@ -84,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(safetyTimeout)
       unsubscribe()
     }
-  }, [fetchProfile])
+  }, [fetchProfile, hasCache])
 
   return (
     <AuthContext.Provider value={{ user, loading, profile }}>
