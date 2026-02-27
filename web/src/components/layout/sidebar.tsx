@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   LogOut,
   ChevronLeft,
+  ChevronRight,
   Settings,
   BookOpen,
   Sparkles,
@@ -25,6 +26,10 @@ const modules = [
   { key: "insightcare", label: "gabi.care", icon: ShieldCheck, href: "/insightcare", accent: "var(--color-mod-insightcare)" },
 ]
 
+const ENV_LABEL = process.env.NEXT_PUBLIC_ENV || (
+  typeof window !== "undefined" && window.location.hostname.includes("staging") ? "STAGING" : "PROD"
+)
+
 export function Sidebar() {
   const pathname = usePathname()
   const { user, profile } = useAuth()
@@ -36,17 +41,28 @@ export function Sidebar() {
     (m) => isSuperadmin || allowedModules.includes(m.key)
   )
 
-  const initials = user?.email?.slice(0, 2).toUpperCase() || "?"
+  const displayName = profile?.name || user?.displayName || user?.email?.split("@")[0] || "Usuário"
+  const avatarUrl = profile?.picture || user?.photoURL || null
+  const initials = displayName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+  const roleLabel = profile?.role === "superadmin" ? "Super Admin" : profile?.role === "admin" ? "Admin" : "Usuário"
+  const roleColor = profile?.role === "superadmin" ? "#10b981" : profile?.role === "admin" ? "#f59e0b" : "#64748b"
 
   return (
     <aside
       className={`${
-        collapsed ? "w-[70px]" : "w-[240px]"
-      } h-screen flex flex-col glass-panel transition-all duration-300 z-50`}
-      style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}
+        collapsed ? "w-[72px]" : "w-[250px]"
+      } h-screen flex flex-col transition-all duration-300 z-50 relative`}
+      style={{
+        background: "var(--color-surface-glass)",
+        backdropFilter: "blur(12px)",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      {/* Brand & Logo */}
-      <div className="p-4 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      {/* ── Brand Header ── */}
+      <div
+        className="p-4 flex items-center gap-3 shrink-0"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      >
         <div className="relative shrink-0">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg overflow-hidden">
             <img
@@ -57,186 +73,248 @@ export function Sidebar() {
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0a0a]" />
         </div>
-        
+
         {!collapsed && (
-          <div className="flex flex-col">
+          <div className="flex flex-col min-w-0">
             <span
               className="text-lg text-white font-semibold leading-none"
               style={{ fontFamily: "Montserrat, sans-serif" }}
             >
               Gabi<span style={{ color: "var(--color-gabi-primary)" }}>.</span>
             </span>
-            <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter mt-1">
-              Ghost Writer AI
+            <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-1">
+              IA Corporativa
             </span>
           </div>
         )}
-        
+
         {!collapsed && (
           <button
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() => setCollapsed(true)}
             className="ml-auto p-1.5 rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
+            title="Recolher sidebar"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Core Navigation */}
-      <div className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
-        <Link
+      {/* ── Expand button (collapsed state) ── */}
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-[var(--color-surface-card)] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-emerald-500/50 transition-all shadow-lg z-50"
+          title="Expandir sidebar"
+        >
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      )}
+
+      {/* ── Navigation ── */}
+      <div className="flex-1 p-3 space-y-0.5 overflow-y-auto custom-scrollbar">
+        {/* Dashboard */}
+        <NavItem
           href="/"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-            pathname === "/"
-              ? "bg-white/5 text-white shadow-inner"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-          }`}
-        >
-          <LayoutDashboard className={`w-5 h-5 shrink-0 ${pathname === "/" ? "text-[var(--color-gabi-primary)]" : ""}`} />
-          {!collapsed && <span className="text-sm font-medium tracking-tight">Painel Principal</span>}
-        </Link>
+          icon={LayoutDashboard}
+          label="Painel Principal"
+          isActive={pathname === "/"}
+          activeColor="var(--color-gabi-primary)"
+          collapsed={collapsed}
+        />
 
-        <Link
+        {/* Insights */}
+        <NavItem
           href="/law/insights"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-            pathname === "/law/insights"
-              ? "bg-white/5 text-white"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-          }`}
-        >
-          <Sparkles className={`w-5 h-5 shrink-0 ${pathname === "/law/insights" ? "text-amber-400" : ""}`} />
-          {!collapsed && <span className="text-sm font-medium tracking-tight">Insights Jurídicos</span>}
-        </Link>
+          icon={Sparkles}
+          label="Insights Jurídicos"
+          isActive={pathname === "/law/insights"}
+          activeColor="#f59e0b"
+          collapsed={collapsed}
+        />
 
-        <Link
+        <NavItem
           href="/insightcare/insights"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-            pathname === "/insightcare/insights"
-              ? "bg-white/5 text-white"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-          }`}
-        >
-          <Sparkles className={`w-5 h-5 shrink-0 ${pathname === "/insightcare/insights" ? "text-emerald-400" : ""}`} />
-          {!collapsed && <span className="text-sm font-medium tracking-tight">Insights Seguros</span>}
-        </Link>
+          icon={Sparkles}
+          label="Insights Seguros"
+          isActive={pathname === "/insightcare/insights"}
+          activeColor="#10b981"
+          collapsed={collapsed}
+        />
 
-        {/* Section: Modules */}
-        {!collapsed && (
-          <div className="pt-6 pb-2 px-3">
-            <span className="text-[0.65rem] font-bold text-slate-600 uppercase tracking-widest">
-              Inteligência
-            </span>
-          </div>
-        )}
-        {collapsed && <div className="pt-4" />}
+        {/* Section: Módulos de IA */}
+        <SectionHeader label="Inteligência" collapsed={collapsed} />
 
-        {visibleModules.map((mod) => {
-          const isActive = pathname.startsWith(mod.href)
-          return (
-            <Link
-              key={mod.key}
-              href={mod.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-                isActive
-                  ? "bg-white/5 text-white "
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <mod.icon
-                className="w-5 h-5 shrink-0 transition-colors"
-                style={{ color: isActive ? mod.accent : undefined }}
-              />
-              {!collapsed && (
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium tracking-tight">{mod.label}</span>
-                </div>
-              )}
-            </Link>
-          )
-        })}
+        {visibleModules.map((mod) => (
+          <NavItem
+            key={mod.key}
+            href={mod.href}
+            icon={mod.icon}
+            label={mod.label}
+            isActive={pathname.startsWith(mod.href)}
+            activeColor={mod.accent}
+            collapsed={collapsed}
+          />
+        ))}
 
-        {/* Section: System & Help */}
-        {!collapsed && (
-          <div className="pt-6 pb-2 px-3">
-            <span className="text-[0.65rem] font-bold text-slate-600 uppercase tracking-widest">
-              Suporte
-            </span>
-          </div>
-        )}
-        {collapsed && <div className="pt-4" />}
+        {/* Section: Suporte */}
+        <SectionHeader label="Suporte" collapsed={collapsed} />
 
-        <Link
+        <NavItem
           href="/docs"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-            pathname === "/docs"
-              ? "bg-white/5 text-white"
-              : "text-slate-400 hover:text-white hover:bg-white/5"
-          }`}
-        >
-          <BookOpen className={`w-5 h-5 shrink-0 ${pathname === "/docs" ? "text-emerald-400" : ""}`} />
-          {!collapsed && <span className="text-sm font-medium tracking-tight">Documentação</span>}
-        </Link>
+          icon={BookOpen}
+          label="Documentação"
+          isActive={pathname === "/docs"}
+          activeColor="#10b981"
+          collapsed={collapsed}
+        />
 
         {(profile?.role === "admin" || profile?.role === "superadmin") && (
-          <Link
+          <NavItem
             href="/admin"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
-              pathname === "/admin"
-                ? "bg-white/5 text-white"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            <Settings className={`w-5 h-5 shrink-0 ${pathname === "/admin" ? "text-rose-400" : ""}`} />
-            {!collapsed && <span className="text-sm font-medium tracking-tight">Configurações</span>}
-          </Link>
+            icon={Settings}
+            label="Administração"
+            isActive={pathname === "/admin"}
+            activeColor="#f43f5e"
+            collapsed={collapsed}
+          />
         )}
       </div>
 
-      {/* User Session Block */}
-      <div className="p-3 mt-auto" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="flex items-center gap-3 p-2 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-          <div
-            className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center text-[0.7rem] font-bold"
-            style={{
-              background: "linear-gradient(135deg, rgba(0,173,232,0.2), rgba(0,173,232,0.05))",
-              color: "var(--color-gabi-primary)",
-              border: "1px solid rgba(0,173,232,0.2)",
-            }}
-          >
-            {initials}
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-white font-medium truncate leading-none mb-1">
-                {user?.email?.split('@')[0] || "Usuário"}
-              </p>
-              <p className="text-[0.65rem] text-slate-500 font-semibold uppercase tracking-wider">
-                {profile?.role || "Acesso Básico"}
-              </p>
+      {/* ── User Block ── */}
+      <div className="p-3 mt-auto shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className={`flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.05] ${collapsed ? "justify-center" : ""}`}>
+          {/* Avatar */}
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={displayName}
+              className="w-9 h-9 rounded-lg shrink-0 object-cover border border-white/10"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div
+              className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center text-[0.7rem] font-bold"
+              style={{
+                background: `linear-gradient(135deg, ${roleColor}33, ${roleColor}15)`,
+                color: roleColor,
+                border: `1px solid ${roleColor}33`,
+              }}
+            >
+              {initials}
             </div>
           )}
+
+          {!collapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white font-medium truncate leading-tight">
+                {displayName}
+              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ background: roleColor }}
+                />
+                <span className="text-[0.6rem] font-semibold uppercase tracking-wider" style={{ color: roleColor }}>
+                  {roleLabel}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {!collapsed && (
+            <button
+              onClick={() => {
+                try { localStorage.removeItem("gabi_profile_cache") } catch {}
+                signOut(auth)
+              }}
+              className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 shrink-0"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Collapsed: logout below */}
+        {collapsed && (
           <button
             onClick={() => {
               try { localStorage.removeItem("gabi_profile_cache") } catch {}
               signOut(auth)
             }}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 flex items-center gap-1.5"
+            className="w-full mt-2 p-1.5 flex justify-center rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
             title="Sair"
           >
             <LogOut className="w-4 h-4" />
-            {!collapsed && <span className="text-xs font-medium">Sair</span>}
           </button>
-        </div>
-
-        {collapsed && (
-           <button
-           onClick={() => setCollapsed(!collapsed)}
-           className="w-full mt-3 p-1.5 flex justify-center rounded-lg text-slate-500 hover:text-white hover:bg-white/5 transition-all"
-         >
-           <ChevronLeft className="w-4 h-4 rotate-180" />
-         </button>
         )}
+
+        {/* Environment indicator */}
+        <div className="mt-2 flex justify-center">
+          <span
+            className="text-[0.55rem] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+            style={{
+              background: ENV_LABEL === "PROD" ? "rgba(16,185,129,0.1)" : "rgba(245,158,11,0.1)",
+              color: ENV_LABEL === "PROD" ? "#10b981" : "#f59e0b",
+              border: `1px solid ${ENV_LABEL === "PROD" ? "rgba(16,185,129,0.2)" : "rgba(245,158,11,0.2)"}`,
+            }}
+          >
+            {ENV_LABEL === "PROD" ? "● Produção" : "● Staging"}
+          </span>
+        </div>
       </div>
     </aside>
+  )
+}
+
+/* ── Reusable Nav Item ── */
+function NavItem({
+  href,
+  icon: Icon,
+  label,
+  isActive,
+  activeColor,
+  collapsed,
+}: {
+  href: string
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
+  label: string
+  isActive: boolean
+  activeColor: string
+  collapsed: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+        isActive
+          ? "bg-white/5 text-white shadow-inner"
+          : "text-slate-400 hover:text-white hover:bg-white/5"
+      } ${collapsed ? "justify-center" : ""}`}
+      title={collapsed ? label : undefined}
+    >
+      <Icon
+        className="w-5 h-5 shrink-0 transition-colors"
+        style={{ color: isActive ? activeColor : undefined }}
+      />
+      {!collapsed && (
+        <span className="text-sm font-medium tracking-tight truncate">{label}</span>
+      )}
+    </Link>
+  )
+}
+
+/* ── Section Header ── */
+function SectionHeader({ label, collapsed }: { label: string; collapsed: boolean }) {
+  if (collapsed) return <div className="pt-3" />
+  return (
+    <div className="pt-5 pb-1.5 px-3">
+      <div className="flex items-center gap-2">
+        <span className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest">
+          {label}
+        </span>
+        <div className="flex-1 h-px bg-white/5" />
+      </div>
+    </div>
   )
 }
