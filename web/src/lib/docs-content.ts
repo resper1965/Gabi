@@ -38,10 +38,9 @@ Cada módulo combina três princípios:
 | --- | --- |
 | Frontend | Next.js 15 · React 19 · Tailwind v4 |
 | Backend | FastAPI · SQLAlchemy · pgvector |
-| IA | Google Vertex AI (Gemini 2.0) |
-| Embeddings | BAAI/bge-m3 (custo zero) |
-| Auth | Firebase Authentication |
-| Infra | Google Cloud Run · Cloud SQL · GCP São Paulo |
+| IA | Modelos proprietários Ness |
+| Auth | Autenticação corporativa |
+| Infra | Google Cloud · Região Brasil (São Paulo) |
 
 ---
 
@@ -57,7 +56,7 @@ Cada módulo combina três princípios:
 
 ## Sobre a Ness
 
-A **Ness** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, entre em contato com a equipe de tecnologia em **suporte@ness.com.br**.
+A **Ness** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, entre em contato com a equipe de tecnologia.
 `,
 
   modules: {
@@ -98,7 +97,7 @@ Exemplos de prompts:
 
 ---
 
-> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
+> Desenvolvido por **Ness** — ness.com.br
 `,
 
     law: `# gabi.legal — Auditora Jurídica
@@ -135,7 +134,7 @@ Abaixo de cada resposta, a Gabi mostra as **fontes consultadas** — os document
 
 ---
 
-> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
+> Desenvolvido por **Ness** — ness.com.br
 `,
 
     ntalk: `# gabi.data — CFO de Dados
@@ -174,7 +173,7 @@ Exemplos de consultas:
 
 ---
 
-> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
+> Desenvolvido por **Ness** — ness.com.br
 `,
 
     insightcare: `# gabi.care — Analista de Seguros
@@ -205,7 +204,7 @@ Especialista em análise de sinistralidade, apólices e regulamentação ANS/SUS
 
 ---
 
-> Desenvolvido por **Ness** · Modelo: Google Gemini via Vertex AI
+> Desenvolvido por **Ness** — ness.com.br
 `,
   },
 
@@ -264,7 +263,7 @@ Sim. Clique no ícone de **relógio** (Histórico) no header de qualquer módulo
 
 ### Qual modelo de IA é usado?
 
-A Gabi usa **Google Gemini 2.0** (via Vertex AI), com modelos otimizados por módulo para melhor custo-benefício.
+A Gabi utiliza modelos de IA proprietários, otimizados pela **Ness** para cada módulo, garantindo o melhor custo-benefício e qualidade.
 
 ---
 
