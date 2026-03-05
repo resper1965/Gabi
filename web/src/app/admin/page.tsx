@@ -186,7 +186,7 @@ export default function AdminPage() {
           ].map((card) => (
             <div
               key={card.label}
-              className="rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border p-4"
+              className="rounded-soft bg-surface-card tech-border p-4"
             >
               <div className="flex items-center gap-2 mb-2">
                 <card.icon className="w-4 h-4" style={{ color: card.color }} />
@@ -339,7 +339,7 @@ export default function AdminPage() {
 
       {/* Ingestion Pipeline Trigger */}
       {profile?.role === "superadmin" && (
-        <div className="mb-6 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border p-5">
+        <div className="mb-6 rounded-soft bg-surface-card tech-border p-5">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Database className="w-4 h-4 text-emerald-400" />
@@ -396,7 +396,7 @@ export default function AdminPage() {
       )}
 
       {/* Users Table */}
-      <div className="rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border overflow-hidden">
+      <div className="rounded-soft bg-surface-card tech-border overflow-hidden">
         <table className="data-grid">
           <thead>
             <tr>
@@ -487,7 +487,7 @@ export default function AdminPage() {
                             <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                           </button>
                           {isExpanded && (
-                            <div className="absolute top-7 right-0 z-10 bg-[var(--color-surface-card)] tech-border rounded-lg shadow-xl p-2 min-w-[120px]">
+                            <div className="absolute top-7 right-0 z-10 bg-surface-card tech-border rounded-lg shadow-xl p-2 min-w-[120px]">
                               {ALL_MODULES.filter(m => !(u.allowed_modules || []).includes(m)).map((mod) => (
                                 <button
                                   key={mod}

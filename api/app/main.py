@@ -81,9 +81,20 @@ app.include_router(ghost_router, prefix="/api/ghost", tags=["nGhost"])
 app.include_router(law_router, prefix="/api/law", tags=["Law & Comply"])
 app.include_router(ntalk_router, prefix="/api/ntalk", tags=["nTalkSQL"])
 
-# Backward compat: /api/insightcare/* → same law router
-# Old frontend calls still work during transition
-app.include_router(law_router, prefix="/api/insightcare", tags=["InsightCare (legacy)"])
+# Backward compat: /api/insightcare/* → law router (DEPRECATED — remove after 2026-06-01)
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class _DeprecationMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/api/insightcare"):
+            response.headers["Deprecation"] = "true"
+            response.headers["Sunset"] = "2026-06-01"
+            response.headers["Link"] = '</api/law>; rel="successor-version"'
+        return response
+
+app.add_middleware(_DeprecationMiddleware)
+app.include_router(law_router, prefix="/api/insightcare", tags=["InsightCare (deprecated)"])
 
 # ── Admin Router ──
 from app.modules.admin.router import router as admin_router

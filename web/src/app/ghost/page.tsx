@@ -101,7 +101,7 @@ export default function GhostPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[var(--radius-tech)] flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
+            <div className="w-8 h-8 rounded-tech flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
               <PenTool className="w-4 h-4 text-white" />
             </div>
             <div>

@@ -262,7 +262,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Divider ── */}
-      <div className="max-w-4xl mx-auto h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+      <div className="max-w-4xl mx-auto h-px bg-linear-to-r from-transparent via-emerald-500/20 to-transparent" />
 
       {/* ── Target Markets ── */}
       <section className="max-w-5xl mx-auto px-6 py-24">

@@ -102,7 +102,7 @@ export function Sidebar() {
       {collapsed && (
         <button
           onClick={() => setCollapsed(false)}
-          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-[var(--color-surface-card)] border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-emerald-500/50 transition-all shadow-lg z-50"
+          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-surface-card border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-emerald-500/50 transition-all shadow-lg z-50"
           title="Expandir sidebar"
         >
           <ChevronRight className="w-3 h-3" />
@@ -172,7 +172,7 @@ export function Sidebar() {
 
       {/* ── User Block ── */}
       <div className="p-3 mt-auto shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className={`flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.05] ${collapsed ? "justify-center" : ""}`}>
+        <div className={`flex items-center gap-3 p-2.5 rounded-xl bg-white/3 border border-white/5 ${collapsed ? "justify-center" : ""}`}>
           {/* Avatar */}
           {avatarUrl ? (
             <img
