@@ -1,5 +1,8 @@
+import logging
 from typing import List, Optional
 from datetime import datetime, timezone
+
+logger = logging.getLogger("gabi.db_ingest")
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -126,7 +129,7 @@ class DBIngester:
             self.session.add(analysis)
         except Exception as e:
             # We don't want to fail the whole ingestion if AI fails
-            print(f"AI Analysis failed for version {version_id}: {e}")
+            logger.warning("AI Analysis failed for version %s: %s", version_id, e, exc_info=True)
 
     def _add_provisions(self, version_id: int, provisions: List[ProvisionSchema]):
         for prov in provisions:

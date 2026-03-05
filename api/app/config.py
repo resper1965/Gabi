@@ -17,9 +17,6 @@ class Settings(BaseSettings):
     model_law: str = "gemini-1.5-pro"            # Long context + precision
     model_ntalk: str = "gemini-2.0-flash-001"   # SQL generation
 
-    # Embeddings
-    embedding_model_name: str = "BAAI/bge-m3"
-
     # Firebase Auth
     firebase_project_id: str = ""
     firebase_admin_service_account: str = ""  # JSON string or path

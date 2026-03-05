@@ -1,0 +1,85 @@
+RESOLUÇÃO CD/ANPD Nº 4, DE 24 DE FEVEREIRO DE 2023
+
+Aprova o Regulamento de Dosimetria e Aplicação de Sanções Administrativas.
+
+O CONSELHO DIRETOR DA AUTORIDADE NACIONAL DE PROTEÇÃO DE DADOS (ANPD), no uso das atribuições que lhe confere o art. 55-J da Lei nº 13.709, de 14 de agosto de 2018,
+
+RESOLVE:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Este Regulamento estabelece os parâmetros e os critérios para aplicação de sanções administrativas pela ANPD, bem como as formas e dosimetrias para o cálculo do valor-base das sanções de multa.
+
+Art. 2º As infrações às normas previstas na LGPD sujeitam o infrator às seguintes sanções administrativas:
+I - advertência, com indicação de prazo para adoção de medidas corretivas;
+II - multa simples, de até 2% (dois por cento) do faturamento da pessoa jurídica de direito privado, grupo ou conglomerado no Brasil, no seu último exercício, excluídos os tributos, limitada, no total, a R$ 50.000.000,00 (cinquenta milhões de reais) por infração;
+III - multa diária, observado o limite total a que se refere o inciso II;
+IV - publicização da infração, após devidamente apurada e confirmada a sua ocorrência;
+V - bloqueio dos dados pessoais a que se refere a infração, até a sua regularização;
+VI - eliminação dos dados pessoais a que se refere a infração;
+VII - suspensão parcial do funcionamento do banco de dados a que se refere a infração, pelo período máximo de 6 (seis) meses, prorrogável por igual período, até a regularização da atividade de tratamento pelo controlador;
+VIII - suspensão do exercício da atividade de tratamento dos dados pessoais a que se refere a infração, pelo período máximo de 6 (seis) meses, prorrogável por igual período;
+IX - proibição parcial ou total do exercício de atividades relacionadas a tratamento de dados.
+
+CAPÍTULO II - CLASSIFICAÇÃO DAS INFRAÇÕES
+
+Art. 3º As infrações previstas na LGPD são classificadas em:
+I - leve;
+II - média;
+III - grave.
+
+Art. 4º Consideram-se infrações leves as condutas que não se enquadrem como média ou grave.
+
+Art. 5º Consideram-se infrações médias as condutas que possam afetar significativamente interesses e direitos fundamentais dos titulares de dados pessoais, caracterizadas nas seguintes situações:
+I - quando houver impedimento ao exercício de direitos dos titulares, exceto por falta de previsão legal;
+II - quando envolver tratamento de dados pessoais sem a devida fundamentação em base legal;
+III - quando resultar em dano aos titulares, observada a gravidade da conduta.
+
+Art. 6º Consideram-se infrações graves as condutas que constituam infração média cumulada com ao menos uma das seguintes circunstâncias:
+I - envolver tratamento de dados pessoais em larga escala, conforme previsto no art. 46, § 1º, da LGPD;
+II - o infrator auferir ou pretender auferir vantagem econômica em decorrência da infração;
+III - a infração implicar risco à vida dos titulares;
+IV - a infração envolver tratamento de dados sensíveis ou de dados pessoais de crianças, adolescentes ou de idosos;
+V - o infrator realizar tratamento de dados pessoais sem amparo em base legal;
+VI - o infrator realizar tratamento com efeitos discriminatórios ilícitos ou abusivos;
+VII - haver adoção sistemática de práticas irregulares pelo infrator;
+VIII - a infração constituir obstrução à atividade de fiscalização.
+
+CAPÍTULO III - DOSIMETRIA DAS SANÇÕES DE MULTA
+
+Art. 7º O valor-base da multa simples será definido a partir da classificação da infração:
+I - infrações leves: de 0,08% (oito centésimos por cento) a 0,16% (dezesseis centésimos por cento) do faturamento bruto, limitado a R$ 8.000.000,00 (oito milhões de reais);
+II - infrações médias: de 0,16% (dezesseis centésimos por cento) a 0,24% (vinte e quatro centésimos por cento) do faturamento bruto, limitado a R$ 12.000.000,00 (doze milhões de reais);
+III - infrações graves: de 0,24% (vinte e quatro centésimos por cento) a 2% (dois por cento) do faturamento bruto, limitado a R$ 50.000.000,00 (cinquenta milhões de reais).
+
+Art. 8º Na aplicação e dosimetria das sanções, deverão ser consideradas, entre outras, as seguintes circunstâncias:
+I - a gravidade e a natureza das infrações e dos direitos pessoais afetados;
+II - a boa-fé do infrator;
+III - a vantagem auferida ou pretendida pelo infrator;
+IV - a condição econômica do infrator;
+V - a reincidência;
+VI - o grau do dano;
+VII - a cooperação do infrator;
+VIII - a adoção reiterada e demonstrada de mecanismos e procedimentos internos capazes de minimizar o dano, voltados ao tratamento seguro e adequado de dados;
+IX - a adoção de política de boas práticas e governança;
+X - a pronta adoção de medidas corretivas;
+XI - a proporcionalidade entre a gravidade da falta e a intensidade da sanção.
+
+CAPÍTULO IV - CIRCUNSTÂNCIAS ATENUANTES E AGRAVANTES
+
+Art. 9º São circunstâncias atenuantes:
+I - a não consumação da infração;
+II - a cessação das práticas infratoras antes da instauração de processo administrativo;
+III - a adoção de medidas preventivas antes da infração;
+IV - a cooperação do infrator;
+V - a implementação de programa de privacidade e proteção de dados pessoais.
+
+Art. 10. São circunstâncias agravantes:
+I - a continuidade da prática infrativa;
+II - a reincidência específica;
+III - o descumprimento de medida preventiva ou corretiva da ANPD;
+IV - a obstrução à atividade de fiscalização;
+V - a obtenção de vantagem ilícita;
+VI - a ausência de medidas para mitigar os efeitos da infração.
+
+Art. 11. Este Regulamento entra em vigor na data de sua publicação.

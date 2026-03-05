@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState, createContext, useContext, useCallback, type ReactNode } from "react"
-import { auth, onAuthStateChanged, type User } from "@/lib/firebase"
+import { useEffect, useState, createContext, useContext, useCallback, useRef, type ReactNode } from "react"
+import { auth, type User } from "@/lib/firebase"
 
 interface UserProfile {
   uid: string
@@ -90,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const refreshInterval = useRef<ReturnType<typeof setInterval> | null>(null)
+
   useEffect(() => {
     // If we have a cached profile, stop the loading spinner immediately
     if (hasCache) {
@@ -102,20 +104,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.warn("AuthProvider: Safety timeout reached — auth state never fired")
     }, 8000)
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    // Use onIdTokenChanged to detect token refreshes (covers both auth state + token changes)
+    const unsubscribe = auth.onIdTokenChanged(async (firebaseUser) => {
       clearTimeout(safetyTimeout)
       setUser(firebaseUser)
       if (firebaseUser) {
         await fetchProfile(firebaseUser)
+
+        // Set up periodic token refresh (every 50 min, Firebase tokens expire at 60 min)
+        if (!refreshInterval.current) {
+          refreshInterval.current = setInterval(async () => {
+            try {
+              await firebaseUser.getIdToken(true) // Force refresh
+            } catch (err) {
+              console.warn("AuthProvider: Token refresh failed:", err)
+            }
+          }, 50 * 60 * 1000)
+        }
       } else {
         setProfile(null)
         setCachedProfile(null)
+        if (refreshInterval.current) {
+          clearInterval(refreshInterval.current)
+          refreshInterval.current = null
+        }
       }
       setLoading(false)
     })
     return () => {
       clearTimeout(safetyTimeout)
       unsubscribe()
+      if (refreshInterval.current) {
+        clearInterval(refreshInterval.current)
+        refreshInterval.current = null
+      }
     }
   }, [fetchProfile, hasCache])
 

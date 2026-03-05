@@ -1,0 +1,47 @@
+RESOLUÇÃO NORMATIVA ANEEL Nº 920, DE 23 DE FEVEREIRO DE 2021
+
+Regulamenta os procedimentos e as condições de fornecimento, contratação, faturamento e prestação do serviço de energia elétrica por meio de pré-pagamento.
+
+RESOLUÇÃO NORMATIVA ANEEL Nº 414, DE 9 DE SETEMBRO DE 2010 (Parcialmente consolidada na REN 1.000/2021)
+
+Estabelece as Condições Gerais de Fornecimento de Energia Elétrica de forma atualizada e consolidada.
+
+BANDEIRAS TARIFÁRIAS (Consolidadas na REN 1.000/2021)
+
+Art. 1º O sistema de bandeiras tarifárias indica o custo da geração de energia vigente, sinalizando se haverá ou não acréscimo no valor da energia a ser repassado ao consumidor na tarifa.
+
+Art. 2º As bandeiras tarifárias são classificadas em:
+I - Bandeira verde: condições favoráveis de geração de energia, sem acréscimo na tarifa;
+II - Bandeira amarela: condições de geração menos favoráveis, com acréscimo moderado na tarifa;
+III - Bandeira vermelha, patamar 1: condições mais custosas de geração, com acréscimo na tarifa;
+IV - Bandeira vermelha, patamar 2: condições ainda mais custosas de geração, com acréscimo mais elevado na tarifa;
+V - Bandeira de escassez hídrica: condição excepcional de escassez de recursos hídricos para geração de energia elétrica, com acréscimo significativo na tarifa.
+
+Art. 3º Os valores de acréscimo por bandeira tarifária, para cada 100 kWh consumidos, são definidos anualmente pela ANEEL por meio de despacho específico.
+
+TARIFA BRANCA (Consolidada na REN 1.000/2021)
+
+Art. 4º A Tarifa Branca é uma modalidade tarifária que sinaliza ao consumidor a variação do valor da energia conforme o dia e o horário do consumo.
+
+Art. 5º A Tarifa Branca possui três postos tarifários:
+I - Fora de ponta: horários em que a demanda de energia é menor; a tarifa é mais barata;
+II - Intermediário: horários de transição entre os postos fora de ponta e de ponta; a tarifa tem valor intermediário;
+III - Ponta: horários em que a demanda de energia é maior; a tarifa é mais cara (geralmente entre 17h30 e 20h30 em dias úteis).
+
+Art. 6º A adesão à Tarifa Branca é voluntária e está disponível para consumidores atendidos em baixa tensão (grupo B), exceto:
+I - subclasse residencial baixa renda com consumo mensal inferior ou igual a 500 kWh;
+II - iluminação pública;
+III - unidades consumidoras no sistema de pré-pagamento.
+
+QUALIDADE DO FORNECIMENTO
+
+Art. 7º A distribuidora deve observar os Procedimentos de Distribuição (PRODIST), módulo 8, que estabelece os indicadores e limites de qualidade do produto (tensão) e do serviço (continuidade).
+
+Art. 8º Os indicadores individuais de continuidade são:
+I - DIC (Duração de Interrupção Individual por Unidade Consumidora): duração máxima, em horas, que uma unidade pode ficar sem energia em um período;
+II - FIC (Frequência de Interrupção Individual por Unidade Consumidora): número máximo de interrupções que uma unidade pode sofrer em um período;
+III - DMIC (Duração Máxima de Interrupção Contínua por Unidade Consumidora): duração máxima, em horas, de uma única interrupção.
+
+Art. 9º A violação dos indicadores individuais gera compensação automática ao consumidor, que deve ser creditada na fatura subsequente.
+
+Art. 10. O consumidor pode solicitar indenização por danos a equipamentos elétricos causados por perturbações no sistema elétrico (variação de tensão, interrupções), no prazo de até 5 anos da ocorrência.

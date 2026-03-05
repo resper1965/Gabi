@@ -76,12 +76,12 @@ async def cache_get(key: str) -> Any | None:
     if r and redis_breaker.can_execute():
         try:
             data = r.get(f"gabi:{key}")
-            redis_breaker.record_success()
+            await redis_breaker.record_success()
             if data:
                 return json.loads(data)
             return None
         except Exception as e:
-            redis_breaker.record_failure()
+            await redis_breaker.record_failure()
             logger.warning("Cache get failed: %s", e)
     return _memory_get(f"gabi:{key}")
 
@@ -92,10 +92,10 @@ async def cache_set(key: str, value: Any, ttl: int = 300) -> None:
     if r and redis_breaker.can_execute():
         try:
             r.setex(f"gabi:{key}", ttl, json.dumps(value, default=str))
-            redis_breaker.record_success()
+            await redis_breaker.record_success()
             return
         except Exception as e:
-            redis_breaker.record_failure()
+            await redis_breaker.record_failure()
             logger.warning("Cache set failed: %s", e)
     _memory_set(f"gabi:{key}", value, ttl)
 

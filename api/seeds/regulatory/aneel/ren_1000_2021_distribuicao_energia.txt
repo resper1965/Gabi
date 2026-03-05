@@ -1,0 +1,98 @@
+RESOLUÇÃO NORMATIVA ANEEL Nº 1.000, DE 7 DE DEZEMBRO DE 2021
+
+Estabelece as Regras de Prestação do Serviço Público de Distribuição de Energia Elétrica.
+
+A DIRETORIA DA AGÊNCIA NACIONAL DE ENERGIA ELÉTRICA – ANEEL, no uso de suas atribuições regimentais, de acordo com deliberação tomada em sua Reunião Pública Ordinária nº 37/2021, realizada em 7 de dezembro de 2021,
+
+RESOLVE:
+
+TÍTULO I - DISPOSIÇÕES GERAIS (Arts. 1º ao 36)
+
+Art. 1º Esta Resolução Normativa estabelece as regras de prestação do serviço público de distribuição de energia elétrica, abrangendo dentre outros aspectos o atendimento ao consumidor, a leitura, o faturamento, a cobrança de energia elétrica, os procedimentos de suspensão e religação do serviço, o ressarcimento de danos elétricos, a ouvidoria e os indicadores de qualidade do serviço.
+
+Art. 2º Para fins e efeitos desta Resolução Normativa, são adotadas as seguintes definições:
+I - acessada: a distribuidora cujas instalações de distribuição são acessadas pelo consumidor ou demais agentes;
+II - acessante: o consumidor ou demais agentes que acessam instalações de distribuição de uma distribuidora;
+III - consumidor: pessoa física ou jurídica, ou comunhão de fato ou de direito, legalmente representada, que solicitar à distribuidora o fornecimento de energia elétrica e assumir a responsabilidade pelo pagamento das faturas e pelas demais obrigações fixadas em normas e regulamentos da ANEEL, assim vinculando-se aos contratos de fornecimento, de uso e de conexão ou de adesão, conforme cada caso;
+IV - unidade consumidora: conjunto de instalações e equipamentos elétricos caracterizado pelo recebimento de energia elétrica em um só ponto de entrega, com medição individualizada e correspondente a um único consumidor;
+V - microgeração distribuída: central geradora de energia elétrica, com potência instalada menor ou igual a 75 kW, que utilize cogeração qualificada ou fontes renováveis de energia elétrica;
+VI - minigeração distribuída: central geradora de energia elétrica, com potência instalada superior a 75 kW e menor ou igual a 5 MW para cogeração qualificada ou fontes renováveis de energia elétrica.
+
+CAPÍTULO I - CONEXÃO E ATENDIMENTO
+
+Art. 3º A distribuidora deve garantir o atendimento abrangente a todos os consumidores localizados em sua área de concessão ou permissão, sem distinção de qualquer espécie.
+
+Art. 4º A conexão ao sistema de distribuição será gratuita para a primeira ligação da unidade consumidora, observadas as condições estabelecidas nesta Resolução.
+
+Art. 5º A distribuidora deve efetuar as obras necessárias para a conexão ao sistema de distribuição nos seguintes prazos máximos, contados da data de solicitação do consumidor:
+I - área urbana: até 10 dias úteis;
+II - área rural: até 30 dias úteis.
+
+Art. 6º A distribuidora não poderá condicionar a ligação de nova unidade consumidora à existência de débitos anteriores vinculados àquele endereço.
+
+CAPÍTULO II - FATURAMENTO E COBRANÇA
+
+Art. 7º O faturamento será realizado mensalmente, respeitado o ciclo mínimo de 27 dias e máximo de 33 dias.
+
+Art. 8º Em caso de cobrança de valores indevidos, a distribuidora deverá restituir o valor em dobro ao consumidor, atualizado monetariamente, no prazo máximo de 60 dias.
+
+Art. 9º O consumidor tem direito a receber fatura detalhada e legível contendo, no mínimo:
+I - identificação da unidade consumidora;
+II - classificação (grupo, subgrupo e modalidade tarifária);
+III - leituras atual e anterior;
+IV - consumo medido e faturado;
+V - valor da tarifa aplicada;
+VI - tributos incidentes;
+VII - histórico de consumo dos últimos 13 meses.
+
+CAPÍTULO III - SUSPENSÃO E RELIGAÇÃO
+
+Art. 10. A suspensão do fornecimento de energia elétrica somente pode ocorrer por:
+I - inadimplemento do consumidor, mediante aviso prévio de 15 dias;
+II - deficiência técnica ou de segurança das instalações da unidade consumidora;
+III - solicitação do consumidor.
+
+Art. 11. É vedada a suspensão do fornecimento:
+I - em sextas-feiras, sábados, domingos, feriados e dias imediatamente anteriores a feriados;
+II - em unidade consumidora que abrigue consumidor cuja situação de saúde demande uso de equipamento elétrico;
+III - de pessoa beneficiária da Tarifa Social de Energia Elétrica, entre os meses de junho e setembro.
+
+Art. 12. A distribuidora deve efetuar a religação da unidade consumidora nos seguintes prazos:
+I - área urbana: até 24 horas;
+II - área rural: até 48 horas.
+
+CAPÍTULO IV - RESSARCIMENTO DE DANOS ELÉTRICOS
+
+Art. 13. O consumidor tem direito ao ressarcimento de danos causados a seus equipamentos elétricos em decorrência de perturbações ocorridas no sistema elétrico.
+
+Art. 14. O consumidor pode solicitar o ressarcimento no prazo de até 5 anos contados da ocorrência do dano.
+
+Art. 15. A distribuidora deve apresentar resposta ao pedido de ressarcimento em até 15 dias corridos, contados da data da solicitação.
+
+CAPÍTULO V - TARIFA SOCIAL DE ENERGIA ELÉTRICA
+
+Art. 16. A Tarifa Social de Energia Elétrica (TSEE) é caracterizada por descontos incidentes sobre a tarifa aplicável à subclasse residencial, aplicada a consumidores inscritos no Cadastro Único para Programas Sociais do Governo Federal (CadÚnico).
+
+Art. 17. São beneficiários da TSEE:
+I - famílias inscritas no CadÚnico com renda familiar mensal per capita menor ou igual a meio salário mínimo;
+II - idosos com 65 anos ou mais ou pessoas com deficiência que recebam o Benefício de Prestação Continuada (BPC);
+III - famílias indígenas e quilombolas inscritas no CadÚnico.
+
+Art. 18. Os descontos da TSEE são:
+I - 65% sobre os primeiros 30 kWh de consumo;
+II - 40% sobre o consumo entre 31 e 100 kWh;
+III - 10% sobre o consumo entre 101 e 220 kWh;
+IV - sem desconto sobre o consumo acima de 220 kWh.
+
+CAPÍTULO VI - INDICADORES DE QUALIDADE
+
+Art. 19. A distribuidora deve observar os seguintes indicadores de continuidade:
+I - DEC (Duração Equivalente de Interrupção por Unidade Consumidora): indica o número de horas em média que um consumidor ficou sem energia elétrica durante determinado período;
+II - FEC (Frequência Equivalente de Interrupção por Unidade Consumidora): indica quantas vezes, em média, ocorreu interrupção na unidade consumidora.
+
+Art. 20. Em caso de violação dos limites individuais de continuidade (DIC, FIC e DMIC), o consumidor tem direito a compensação automática na fatura.
+
+Art. 21. Esta Resolução Normativa entra em vigor de forma faseada, nos seguintes prazos:
+I - 1ª fase: a partir de 1º de março de 2022;
+II - 2ª fase: a partir de 1º de janeiro de 2023;
+III - 3ª fase: a partir de 1º de junho de 2023.

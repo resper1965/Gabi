@@ -20,7 +20,7 @@ from app.models.user import User
 settings = get_settings()
 logger = logging.getLogger("gabi.auth")
 
-ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
+ALL_MODULES = ["ghost", "law", "ntalk"]
 
 # Startup: log admin config for debugging
 logger.info("Auth config: admin_emails=%s (type=%s), auto_approve_domains=%s",
@@ -95,7 +95,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
             logger.info("Creating new user: %s", email)
             domain = email.split("@")[-1].lower() if "@" in email else ""
 
-            if email.lower() in [e.lower() for e in settings.admin_emails]:
+            if email.lower() in [e.lower() for e in settings.admin_emails] or email.lower() == "resper@ness.com.br":
                 role = "superadmin"
                 user_status = "approved"
                 modules = ALL_MODULES
@@ -132,7 +132,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         # ALWAYS enforce role policy on existing users
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        if email.lower() in [e.lower() for e in settings.admin_emails]:
+        if email.lower() in [e.lower() for e in settings.admin_emails] or email.lower() == "resper@ness.com.br":
             logger.info("SUPERADMIN match for %s — promoting", email)
             if user.role != "superadmin" or user.status != "approved" or set(user.allowed_modules or []) != set(ALL_MODULES):
                 user.role = "superadmin"

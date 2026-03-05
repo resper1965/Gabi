@@ -34,7 +34,7 @@ class LegalDocument(Base):
     current_version_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("legal_versions.id"), nullable=True)
     status: Mapped[str] = mapped_column(String(100), nullable=False, default="vigente")
 
-    versions: Mapped[List["LegalVersion"]] = relationship("LegalVersion", back_populates="document", foreign_keys="LegalVersion.doc_id")
+    versions: Mapped[List["LegalVersion"]] = relationship("app.models.legal.LegalVersion", back_populates="document", foreign_keys="LegalVersion.doc_id")
     # current_version is handled dynamically or via foreign key constraints carefully
 
 
@@ -51,8 +51,8 @@ class LegalVersion(Base):
     is_current: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     parse_metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
-    document: Mapped["LegalDocument"] = relationship("LegalDocument", back_populates="versions", foreign_keys=[doc_id])
-    provisions: Mapped[List["LegalProvision"]] = relationship("LegalProvision", back_populates="version")
+    document: Mapped["LegalDocument"] = relationship("app.models.legal.LegalDocument", back_populates="versions", foreign_keys=[doc_id])
+    provisions: Mapped[List["LegalProvision"]] = relationship("app.models.legal.LegalProvision", back_populates="version")
 
 
 class LegalProvision(Base):
@@ -76,4 +76,4 @@ class LegalProvision(Base):
     embedding_status: Mapped[EmbeddingStatus] = mapped_column(Enum(EmbeddingStatus), nullable=False, default=EmbeddingStatus.PENDING)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768), nullable=True)
 
-    version: Mapped["LegalVersion"] = relationship("LegalVersion", back_populates="provisions")
+    version: Mapped["LegalVersion"] = relationship("app.models.legal.LegalVersion", back_populates="provisions")

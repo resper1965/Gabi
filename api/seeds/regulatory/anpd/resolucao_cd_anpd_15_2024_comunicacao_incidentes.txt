@@ -1,0 +1,81 @@
+RESOLUÇÃO CD/ANPD Nº 15, DE 24 DE ABRIL DE 2024
+
+Aprova o Regulamento de Comunicação de Incidentes de Segurança.
+
+O CONSELHO DIRETOR DA AUTORIDADE NACIONAL DE PROTEÇÃO DE DADOS (ANPD), no uso das competências que lhe são atribuídas pelo art. 55-J da Lei nº 13.709, de 14 de agosto de 2018 (Lei Geral de Proteção de Dados Pessoais - LGPD),
+
+RESOLVE:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Este Regulamento estabelece os procedimentos para a comunicação de incidentes de segurança que possam acarretar risco ou dano relevante aos titulares.
+
+Art. 2º Para fins deste Regulamento, considera-se:
+I - incidente de segurança: qualquer evento adverso confirmado, relacionado à violação na segurança de dados pessoais, tais como acesso não autorizado, acidental ou ilícito que resulte em destruição, perda, alteração, vazamento ou qualquer forma de tratamento inadequado ou ilícito, que possa ocasionar risco ou dano relevante aos titulares;
+II - controlador: pessoa natural ou jurídica, de direito público ou privado, a quem competem as decisões referentes ao tratamento de dados pessoais;
+III - risco ou dano relevante: situação que possa causar danos materiais ou morais aos titulares, incluindo discriminação, violação à integridade física, ao direito à imagem e à reputação, fraudes financeiras ou roubo de identidade.
+
+CAPÍTULO II - CRITÉRIOS PARA COMUNICAÇÃO
+
+Art. 3º O controlador deverá comunicar à ANPD e ao titular a ocorrência de incidente de segurança que possa acarretar risco ou dano relevante aos titulares.
+
+Art. 4º O risco ou dano relevante será avaliado com base nos seguintes critérios:
+I - dados pessoais sensíveis;
+II - dados de crianças, de adolescentes ou de idosos;
+III - dados financeiros;
+IV - dados de autenticação em sistemas;
+V - dados protegidos por sigilo legal ou judicial;
+VI - dados em larga escala;
+VII - a possibilidade de os dados serem utilizados para fins discriminatórios, fraudulentos ou de roubo de identidade.
+
+§ 1º Será considerado como de potencial risco ou dano relevante o incidente que envolver pelo menos um dos critérios previstos nos incisos I a VII do caput.
+
+Art. 5º A comunicação à ANPD deverá ser realizada pelo controlador, por meio de formulário eletrônico disponibilizado pela ANPD, no prazo de 3 (três) dias úteis, contados da data do conhecimento pelo controlador de que o incidente afetou dados pessoais.
+
+§ 1º Considera-se que o controlador tomou conhecimento do incidente no momento em que houver razoável grau de certeza de que o incidente ocorreu e envolveu dados pessoais.
+
+§ 2º O prazo previsto no caput poderá ser prorrogado pela ANPD, mediante justificativa fundamentada do controlador.
+
+Art. 6º A comunicação à ANPD deverá conter, no mínimo:
+I - a descrição da natureza dos dados pessoais afetados;
+II - as informações sobre os titulares envolvidos;
+III - a indicação das medidas técnicas e de segurança utilizadas para a proteção dos dados;
+IV - os riscos relacionados ao incidente com identificação dos possíveis impactos aos titulares;
+V - os motivos da demora, no caso de a comunicação não ter sido feita no prazo previsto no art. 5º;
+VI - as medidas que foram ou que serão adotadas para reverter ou mitigar os efeitos do prejuízo;
+VII - a data da ocorrência do incidente, quando possível determiná-la;
+VIII - a data e a hora em que o controlador tomou conhecimento do incidente;
+IX - os dados do encarregado ou do responsável pela comunicação;
+X - o total de titulares afetados ou estimativa;
+XI - a identificação do controlador e, quando aplicável, do operador.
+
+CAPÍTULO III - COMUNICAÇÃO AOS TITULARES
+
+Art. 7º A comunicação ao titular deverá ser realizada em linguagem simples e de fácil compreensão e deverá conter, no mínimo:
+I - a descrição da natureza dos dados pessoais afetados;
+II - as informações sobre os titulares envolvidos;
+III - as medidas técnicas e de segurança utilizadas para a proteção dos dados;
+IV - os riscos relacionados ao incidente;
+V - as medidas que foram ou que serão adotadas para reverter ou mitigar os efeitos do prejuízo;
+VI - a data do conhecimento do incidente;
+VII - o contato para obtenção de informações e, quando aplicável, os dados de contato do encarregado.
+
+Art. 8º A comunicação ao titular deverá ser realizada:
+I - de forma direta e individualizada, por meio de telefone, e-mail, mensagem eletrônica ou carta, quando possível identificar e contatar os titulares;
+II - de forma indireta, por meio de comunicados em sítio eletrônico do controlador, aplicativos, mídias sociais ou canais de atendimento ao titular, quando não for possível a comunicação direta.
+
+CAPÍTULO IV - REGISTRO DE INCIDENTES
+
+Art. 9º O controlador deverá manter o registro de incidentes de segurança, inclusive daqueles não comunicados à ANPD e aos titulares, pelo prazo mínimo de 5 (cinco) anos, contados a partir da data do registro do incidente.
+
+Art. 10. O registro do incidente deverá conter, no mínimo:
+I - a data de conhecimento do incidente;
+II - a descrição geral das circunstâncias em que o incidente ocorreu;
+III - a natureza dos dados afetados;
+IV - o número de titulares afetados;
+V - a avaliação do risco e a identificação dos possíveis impactos para os titulares;
+VI - as medidas de correção e mitigação dos efeitos do incidente, quando aplicáveis;
+VII - a forma e o conteúdo da comunicação, quando o incidente for comunicado à ANPD e aos titulares;
+VIII - os motivos da ausência de comunicação, quando aplicável.
+
+Art. 11. Este Regulamento entra em vigor na data de sua publicação.

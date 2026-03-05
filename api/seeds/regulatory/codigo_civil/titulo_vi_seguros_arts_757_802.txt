@@ -1,0 +1,108 @@
+CÓDIGO CIVIL BRASILEIRO — LEI Nº 10.406, DE 10 DE JANEIRO DE 2002
+
+TÍTULO VI — DAS VÁRIAS ESPÉCIES DE CONTRATO
+CAPÍTULO XV — DO SEGURO (Arts. 757 a 802)
+
+SEÇÃO I — DISPOSIÇÕES GERAIS
+
+Art. 757. Pelo contrato de seguro, o segurador se obriga, mediante o pagamento do prêmio, a garantir interesse legítimo do segurado, relativo a pessoa ou a coisa, contra riscos predeterminados.
+Parágrafo único. Somente pode ser parte, no contrato de seguro, como segurador, entidade para tal fim legalmente autorizada.
+
+Art. 758. O contrato de seguro prova-se com a exibição da apólice ou do bilhete do seguro, e, na falta deles, por documento comprobatório do pagamento do respectivo prêmio.
+
+Art. 759. A emissão da apólice deverá ser precedida de proposta escrita com a declaração dos elementos essenciais do interesse a ser garantido e do risco.
+
+Art. 760. A apólice ou o bilhete de seguro serão nominativos, à ordem, ou ao portador, e mencionarão os riscos assumidos, o início e o fim de sua validade, o limite da garantia e o prêmio devido, e, quando for o caso, o nome do segurado e o do beneficiário.
+Parágrafo único. No seguro de pessoas, a apólice ou o bilhete não podem ser ao portador.
+
+Art. 761. Quando o risco for assumido em co-seguro, a apólice indicará o segurador que administrará o contrato e representará os demais, para todos os seus efeitos.
+
+Art. 762. Nulo será o contrato para garantia de risco proveniente de ato doloso do segurado, do beneficiário, ou de representante de um ou de outro.
+
+Art. 763. Não terá direito a indenização o segurado que estiver em mora no pagamento do prêmio, se ocorrer o sinistro antes de sua purgação.
+
+Art. 764. Salvo disposição especial, o fato de se não ter verificado o risco, em previsão do qual se faz o seguro, não exime o segurado de pagar o prêmio.
+
+Art. 765. O segurado e o segurador são obrigados a guardar na conclusão e na execução do contrato, a mais estrita boa-fé e veracidade, tanto a respeito do objeto como das circunstâncias e declarações a ele concernentes.
+
+Art. 766. Se o segurado, por si ou por seu representante, fizer declarações inexatas ou omitir circunstâncias que possam influir na aceitação da proposta ou na taxa do prêmio, perderá o direito à garantia, além de ficar obrigado ao prêmio vencido.
+Parágrafo único. Se a inexatidão ou omissão nas declarações não resultar de má-fé do segurado, o segurador terá direito a resolver o contrato, ou a cobrar, mesmo após o sinistro, a diferença do prêmio.
+
+Art. 767. No seguro à conta de outrem, o segurador pode opor ao segurado quaisquer defesas que tenha contra o estipulante, por descumprimento das normas de conclusão do contrato, ou de pagamento do prêmio.
+
+Art. 768. O segurado perderá o direito à garantia se agravar intencionalmente o risco objeto do contrato.
+
+Art. 769. O segurado é obrigado a comunicar ao segurador, logo que saiba, todo incidente suscetível de agravar consideravelmente o risco coberto, sob pena de perder o direito à garantia, se provar que silenciou de má-fé.
+§ 1º O segurador, desde que o faça nos quinze dias seguintes ao recebimento do aviso da agravação do risco sem culpa do segurado, poderá dar-lhe ciência, por escrito, de sua decisão de resolver o contrato.
+§ 2º A resolução só será eficaz trinta dias após a notificação, devendo ser restituída pelo segurador a diferença do prêmio.
+
+Art. 770. Salvo disposição em contrário, a diminuição do risco no curso do contrato não acarreta a redução do prêmio estipulado; mas, se a redução do risco for considerável, o segurado poderá exigir a revisão do prêmio, ou a resolução do contrato.
+
+Art. 771. Sob pena de perder o direito à indenização, o segurado participará o sinistro ao segurador, logo que o saiba, e tomará as providências imediatas para minorar-lhe as consequências.
+Parágrafo único. Correm à conta do segurador, até o limite fixado no contrato, as despesas de salvamento consequente ao sinistro.
+
+Art. 772. A mora do segurador em pagar o sinistro obriga à atualização monetária da indenização devida segundo índices oficiais regularmente estabelecidos, sem prejuízo dos juros moratórios.
+
+Art. 773. O segurador que, ao tempo do contrato, sabe estar passado o risco de que o segurado se pretende cobrir, e, não obstante, expede a apólice, pagará em dobro o prêmio estipulado.
+
+Art. 774. A recondução tácita do contrato pelo mesmo prazo, mediante expressa cláusula contratual, não poderá operar mais de uma vez.
+
+Art. 775. Os agentes autorizados do segurador presumem-se seus representantes para todos os atos relativos aos contratos que agenciarem.
+
+Art. 776. O segurador é obrigado a pagar em dinheiro o prejuízo no interesse segurado, salvo se convencionada a reposição da coisa.
+
+Art. 777. O disposto no presente Capítulo aplica-se, no que couber, aos seguros regidos por leis próprias.
+
+SEÇÃO II — DO SEGURO DE DANO (Arts. 778-788)
+
+Art. 778. Nos seguros de dano, a garantia prometida não pode ultrapassar o valor do interesse segurado no momento da conclusão do contrato, sob pena do disposto no art. 766, e sem prejuízo da ação penal que no caso couber.
+
+Art. 779. O risco do seguro compreenderá todos os prejuízos resultantes ou consequentes, como sejam os estragos ocasionados para evitar o sinistro, minorar o dano, ou salvar a coisa.
+
+Art. 781. A indenização não pode ultrapassar o valor do interesse segurado no momento do sinistro, e, em hipótese alguma, o limite máximo da garantia fixado na apólice, salvo em caso de mora do segurador.
+
+Art. 786. Paga a indenização, o segurador sub-roga-se, nos limites do valor respectivo, nos direitos e ações que competirem ao segurado contra o autor do dano.
+§ 1º Salvo dolo, a sub-rogação não tem lugar se o dano foi causado pelo cônjuge do segurado, seus descendentes ou ascendentes, consanguíneos ou afins.
+§ 2º É ineficaz qualquer ato do segurado que diminua ou extinga, em prejuízo do segurador, os direitos a que se refere este artigo.
+
+Art. 787. No seguro de responsabilidade civil, o segurador garante o pagamento de perdas e danos devidos pelo segurado a terceiro.
+§ 1º Tão logo saiba o segurado das consequências de ato seu, suscetível de lhe acarretar a responsabilidade incluída na garantia, comunicará o fato ao segurador.
+§ 2º É defeso ao segurado reconhecer sua responsabilidade ou confessar a ação, bem como transigir com o terceiro prejudicado, ou indenizá-lo diretamente, sem anuência expressa do segurador.
+§ 3º Intentada a ação contra o segurado, dará este ciência da lide ao segurador.
+§ 4º Subsistirá a responsabilidade do segurado perante o terceiro, se o segurador for insolvente.
+
+Art. 788. Nos seguros de responsabilidade legalmente obrigatórios, a indenização por sinistro será paga pelo segurador diretamente ao terceiro prejudicado.
+Parágrafo único. Demandado em ação direta pela vítima do dano, o segurador não poderá opor a exceção de contrato não cumprido pelo segurado, sem promover a citação deste para integrar o contraditório.
+
+SEÇÃO III — DO SEGURO DE PESSOA (Arts. 789-802)
+
+Art. 789. Nos seguros de pessoas, o capital segurado é livremente estipulado pelo proponente, que pode contratar mais de um seguro sobre o mesmo interesse, com o mesmo ou diversos seguradores.
+
+Art. 790. No seguro sobre a vida de outros, o proponente é obrigado a declarar, sob pena de falsidade, o seu interesse pela preservação da vida do segurado.
+Parágrafo único. Até prova em contrário, presume-se o interesse, quando o segurado é cônjuge, ascendente ou descendente do proponente.
+
+Art. 791. Se o segurado não renunciar à faculdade, ou se o seguro não tiver como causa declarada a garantia de alguma obrigação, é lícita a substituição do beneficiário, por ato entre vivos ou de última vontade.
+
+Art. 793. É válida a instituição do companheiro como beneficiário, se ao tempo do contrato o segurado era separado judicialmente, ou já se encontrava separado de fato.
+
+Art. 795. É nula, no seguro de pessoa, qualquer transação para pagamento reduzido do capital segurado.
+
+Art. 797. No seguro de vida para o caso de morte, é lícito estipular-se um prazo de carência, durante o qual o segurador não responde pela ocorrência do sinistro.
+Parágrafo único. No caso deste artigo o segurador é obrigado a devolver ao beneficiário o montante da reserva técnica já formada.
+
+Art. 798. O beneficiário não tem direito ao capital estipulado quando o segurado se suicida nos primeiros dois anos de vigência inicial do contrato, ou da sua recondução depois de suspenso, observado o disposto no parágrafo único do artigo antecedente.
+Parágrafo único. Ressalvada a hipótese prevista neste artigo, é nula a cláusula contratual que exclui o pagamento do capital por suicídio do segurado.
+
+Art. 799. O segurador não pode eximir-se ao pagamento do seguro, ainda que da apólice conste a restrição, se a morte ou a incapacidade do segurado provier da utilização de meio de transporte mais arriscado, da prestação de serviço militar, da prática de esporte, ou de atos de humanidade em auxílio de outrem.
+
+Art. 801. O seguro de pessoas pode ser estipulado por pessoa natural ou jurídica em proveito de grupo que a ela, de qualquer modo, se vincule.
+§ 1º O estipulante não representa o segurador perante o grupo segurado, e é o único responsável, para com o segurador, pelo cumprimento de todas as obrigações contratuais.
+§ 2º A modificação da apólice em vigor dependerá da anuência expressa de segurados que representem três quartos do grupo.
+
+Art. 802. Não se compreende nas disposições deste capítulo a garantia do reembolso de despesas hospitalares ou de tratamento médico, nem o custeio das despesas de luto e de funeral do segurado.
+Parágrafo único. A garantia de tais seguros obedecerá às disposições relativas ao seguro de dano.
+
+PRESCRIÇÃO (Art. 206, § 1º, II)
+§ 1º Em um ano: a pretensão do segurado contra o segurador, ou a deste contra aquele, contado o prazo:
+a) para o segurado, no caso de seguro de responsabilidade civil, da data em que é citado para responder à ação de indenização proposta pelo terceiro prejudicado, ou da data que a este indeniza, com a anuência do segurador;
+b) quanto aos demais seguros, da ciência do fato gerador da pretensão.

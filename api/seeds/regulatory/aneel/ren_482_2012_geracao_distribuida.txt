@@ -1,0 +1,54 @@
+RESOLUÇÃO NORMATIVA ANEEL Nº 482, DE 17 DE ABRIL DE 2012
+(Alterada pela REN 687/2015 e consolidada pela REN 1.000/2021)
+
+Estabelece as condições gerais para o acesso de microgeração e minigeração distribuída aos sistemas de distribuição de energia elétrica, o sistema de compensação de energia elétrica, e dá outras providências.
+
+A DIRETORIA DA AGÊNCIA NACIONAL DE ENERGIA ELÉTRICA – ANEEL, no uso de suas atribuições regimentais,
+
+RESOLVE:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Esta Resolução Normativa estabelece as condições gerais para o acesso de microgeração e minigeração distribuída aos sistemas de distribuição de energia elétrica e o sistema de compensação de energia elétrica correspondente.
+
+Art. 2º Para fins e efeitos desta Resolução Normativa, ficam adotadas as seguintes definições:
+I - microgeração distribuída: central geradora de energia elétrica, com potência instalada menor ou igual a 75 kW, que utilize cogeração qualificada ou fontes renováveis de energia elétrica, conectada na rede de distribuição por meio de instalações de unidades consumidoras;
+II - minigeração distribuída: central geradora de energia elétrica, com potência instalada superior a 75 kW e menor ou igual a 5 MW para cogeração qualificada, ou até 3 MW para as demais fontes renováveis de energia elétrica, conectada na rede de distribuição por meio de instalações de unidades consumidoras;
+III - sistema de compensação de energia elétrica: sistema no qual a energia ativa injetada por unidade consumidora com microgeração ou minigeração distribuída é cedida, por meio de empréstimo gratuito, à distribuidora local e posteriormente compensada com o consumo de energia elétrica ativa;
+IV - autoconsumo remoto: utilização de créditos de energia por unidades consumidoras de titularidade de uma mesma pessoa jurídica ou pessoa física, incluindo matriz e filial, dentro da mesma área de concessão ou permissão;
+V - geração compartilhada: utilização de créditos de energia por unidades consumidoras reunidas em consórcio ou cooperativa, compostos por pessoa física ou jurídica, que possua unidade consumidora com microgeração ou minigeração distribuída.
+
+CAPÍTULO II - CONDIÇÕES DE ACESSO
+
+Art. 3º As distribuidoras devem adequar seus sistemas comerciais e elaborar ou revisar normas técnicas para tratar do acesso de microgeração e minigeração distribuída, observadas as disposições desta Resolução.
+
+Art. 4º O consumidor que instalar microgeração ou minigeração distribuída terá direito ao sistema de compensação de energia elétrica, mediante prévia solicitação à distribuidora.
+
+Art. 5º A distribuidora deverá emitir parecer de acesso em até:
+I - 15 dias para microgeração distribuída (até 75 kW);
+II - 30 dias para minigeração distribuída (acima de 75 kW até 5 MW).
+
+CAPÍTULO III - SISTEMA DE COMPENSAÇÃO (Lei 14.300/2022 — Marco Legal da GD)
+
+Art. 6º A energia ativa injetada na rede de distribuição pela unidade consumidora será cedida a título de empréstimo gratuito à distribuidora e compensada com o consumo de energia elétrica ativa dessa mesma unidade consumidora ou de outras unidades consumidoras.
+
+Art. 7º O excedente de energia que não for compensado no ciclo de faturamento corrente será registrado como crédito de energia para compensação nos ciclos de faturamento subsequentes.
+
+§ 1º Os créditos de energia terão validade de 60 meses.
+
+§ 2º Os créditos de energia poderão ser utilizados para compensar o consumo de unidades consumidoras do mesmo titular (autoconsumo remoto) ou de participantes de geração compartilhada, desde que as unidades consumidoras estejam na mesma área de concessão ou permissão.
+
+CAPÍTULO IV - TRANSIÇÃO (Lei 14.300/2022)
+
+Art. 8º Os consumidores que protocolaram solicitação de acesso antes de 7 de janeiro de 2023 mantêm as condições anteriores do sistema de compensação até 31 de dezembro de 2045.
+
+Art. 9º Para novas unidades a partir de 2023, aplica-se o pagamento gradual do "fio B" (TUSD Distribuição) conforme cronograma:
+I - 2023: 15% da TUSD Distribuição;
+II - 2024: 30% da TUSD Distribuição;
+III - 2025: 45% da TUSD Distribuição;
+IV - 2026: 60% da TUSD Distribuição;
+V - 2027: 75% da TUSD Distribuição;
+VI - 2028: 90% da TUSD Distribuição;
+VII - 2029 em diante: a ser definido pela ANEEL.
+
+Art. 10. Esta Resolução Normativa entra em vigor na data de sua publicação.

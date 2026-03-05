@@ -2,6 +2,68 @@ import { auth } from "./firebase"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
+// ── Response Types ──
+
+export interface AgentResponse {
+  agent: string
+  result: Record<string, unknown> | string
+  response: unknown
+  sources_used: number
+  sources: Array<{ title: string; type: string }>
+  dynamic_rag: boolean
+  orchestration: { agents: string[]; reason: string } | null
+  summary: string | null
+}
+
+export interface DocumentInfo {
+  id: string
+  filename: string
+  title: string | null
+  type: string
+  chunks: number
+}
+
+export interface AlertInfo {
+  id: string
+  title: string
+  source: string
+  severity: string
+  is_read: boolean
+}
+
+export interface UploadResult {
+  document_id?: string
+  filename: string
+  chunk_count: number
+  char_count?: number
+  file_size?: number
+  error?: string
+}
+
+export interface InsightInfo {
+  id: number
+  doc_id: number
+  authority: string
+  tipo_ato: string
+  numero: string
+  resumo_executivo: string | null
+  risco_nivel: string
+  risco_justificativa: string | null
+  analisado_em: string
+  extra_data: Record<string, unknown>
+}
+
+export interface UserStats {
+  total_users: number
+  active_users: number
+  pending_users: number
+}
+
+export interface ChatMessage {
+  role: string
+  content: string
+}
+
 async function request<T = unknown>(path: string, options: RequestInit = {}): Promise<T> {
   const user = auth.currentUser
   const headers: Record<string, string> = {
@@ -101,13 +163,14 @@ export const gabiWriter = {
 // ── gabi.legal ──
 
 export const gabiLegal = {
-  agent: (data: { agent: string; query: string; document_text?: string; chat_history?: Array<{ role: string; content: string }> }) =>
-    request("/api/law/agent", { method: "POST", body: JSON.stringify(data) }),
-  documents: () => request("/api/law/documents"),
-  alerts: () => request("/api/law/alerts"),
+  agent: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[] }) =>
+    request<AgentResponse>("/api/law/agent", { method: "POST", body: JSON.stringify(data) }),
+  documents: () => request<DocumentInfo[]>("/api/law/documents"),
+  alerts: () => request<AlertInfo[]>("/api/law/alerts"),
   upload: (docType: string, file: File, title?: string) =>
-    uploadFile("/api/law/upload", file, { doc_type: docType, ...(title ? { title } : {}) }),
-  insights: () => request("/api/law/insights"),
+    uploadFile<UploadResult>("/api/law/upload", file, { doc_type: docType, ...(title ? { title } : {}) }),
+  insights: (authority?: string) =>
+    request<InsightInfo[]>(`/api/law/insights${authority ? `?authority=${authority}` : ""}`),
 }
 
 // ── gabi.data ──
@@ -123,18 +186,8 @@ export const gabiData = {
     request(`/api/ntalk/connections/${tenantId}/schema-sync`, { method: "POST" }),
 }
 
-// ── gabi.care ──
-
-export const gabiCare = {
-  chat: (data: { tenant_id: string; agent: string; question: string; client_id?: string; chat_history?: Array<{ role: string; content: string }>; summary?: string }) =>
-    request("/api/insightcare/chat", { method: "POST", body: JSON.stringify(data) }),
-  clients: (tenantId: string) => request(`/api/insightcare/clients/${tenantId}`),
-  policies: (tenantId: string, clientId?: string) => request(`/api/insightcare/policies/${tenantId}${clientId ? `?client_id=${clientId}` : ""}`),
-  documents: (tenantId: string) => request(`/api/insightcare/documents/${tenantId}`),
-  upload: (tenantId: string, docType: string, file: File, clientId?: string) =>
-    uploadFile("/api/insightcare/upload", file, { tenant_id: tenantId, doc_type: docType, ...(clientId ? { client_id: clientId } : {}) }),
-  insights: () => request("/api/insightcare/insights"),
-}
+// ── gabi.care → consolidated into gabi.legal ──
+// Insurance methods now route through /api/law/* endpoints
 
 // ── Admin ──
 
@@ -158,6 +211,9 @@ export const gabiAdmin = {
     request("/api/admin/regulatory/seed", { method: "POST", body: JSON.stringify({ packs, force }) }),
   removeSeedPack: (packId: string) =>
     request(`/api/admin/regulatory/seed/${packId}`, { method: "DELETE" }),
+  // Regulatory Ingestion Pipeline
+  triggerIngest: () =>
+    request("/api/admin/regulatory/ingest", { method: "POST" }),
 }
 
 // ── Chat History ──
@@ -175,20 +231,22 @@ export const gabiAuth = {
   me: () => request("/api/auth/me"),
 }
 
-// Unified export — supports both branded (writer/legal/data/care) and module (ghost/law/ntalk/insightcare) names
+// Unified export — 3 modules: writer, legal, data
 export const gabi = {
   // Branded names
   writer: gabiWriter,
   legal: gabiLegal,
   data: gabiData,
-  care: gabiCare,
   // Module names (aliases)
   ghost: gabiWriter,
   law: gabiLegal,
   ntalk: gabiData,
-  insightcare: gabiCare,
+  // Backward compat: care/insightcare → legal
+  care: gabiLegal,
+  insightcare: gabiLegal,
   // Shared
   admin: gabiAdmin,
   auth: gabiAuth,
   chat: gabiChat,
 }
+

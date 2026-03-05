@@ -25,7 +25,7 @@ Cada módulo combina três princípios:
 
 | Módulo | O que faz |
 | --- | --- |
-| **ness.AI** | IA escritora que absorve seu estilo e escreve por você |
+| **gabi.writer** | IA escritora que absorve seu estilo e escreve por você |
 | **gabi.legal** | 4 agentes jurídicos: auditora, pesquisadora, redatora, sentinela |
 | **gabi.data** | Converse com bancos de dados em linguagem natural |
 | **gabi.care** | Análise de sinistralidade, apólices e normas ANS/SUSEP |
@@ -60,7 +60,7 @@ A **ness.** é a desenvolvedora e produtora da plataforma Gabi. Para suporte, en
 `,
 
   modules: {
-    ghost: `# ness.AI — IA Escritora
+    ghost: `# gabi.writer — IA Escritora
 
 Sua IA escritora que absorve estilos de escrita e produz textos fiéis ao tom original.
 
@@ -100,13 +100,13 @@ Exemplos de prompts:
 > Desenvolvido por **ness.** — ness.com.br
 `,
 
-    law: `# gabi.legal — Auditora Jurídica
+    law: `# gabi.legal — Inteligência Jurídica & Seguros
 
-Sistema multi-agente com 4 especialistas para análise jurídica corporativa.
+Sistema multi-agente com 7 especialistas para análise jurídica, regulatória e de seguros.
 
 ---
 
-## Agentes disponíveis
+## Agentes Jurídicos
 
 | Agente | Especialidade |
 | --- | --- |
@@ -115,15 +115,25 @@ Sistema multi-agente com 4 especialistas para análise jurídica corporativa.
 | **Redatora** | Gera pareceres, minutas e documentos jurídicos |
 | **Sentinela** | Monitora prazos, obrigações e alertas regulatórios |
 
+## Agentes de Seguros
+
+| Agente | Especialidade |
+| --- | --- |
+| **Anal. Coberturas** | Compara apólices, analisa coberturas e exclusões |
+| **Anal. Sinistralidade** | Análise atuarial, loss ratio, PMPM e KPIs |
+| **Consult. Regulatório** | Normas ANS e SUSEP, compliance de seguros |
+
 ---
 
 ## Como usar
 
 1. **Faça upload de documentos legais** — contratos, regulamentos, normas
-2. **Pergunte em linguagem natural:**
+2. **Faça upload de planilhas** (XLSX) com dados de sinistralidade
+3. **Pergunte em linguagem natural:**
 
    - \`"Quais são os riscos neste contrato?"\`
-   - \`"Existe cláusula de rescisão antecipada?"\`
+   - \`"Qual a taxa de sinistralidade por faixa etária?"\`
+   - \`"Quais cláusulas da ANS se aplicam?"\`
    - \`"Redija um parecer sobre esta situação"\`
 
 ---
@@ -131,6 +141,12 @@ Sistema multi-agente com 4 especialistas para análise jurídica corporativa.
 ## Fontes e rastreabilidade
 
 Abaixo de cada resposta, a Gabi mostra as **fontes consultadas** — os documentos reais que fundamentaram a análise. Isso garante rastreabilidade total e conformidade.
+
+---
+
+## Radar Regulatório
+
+O painel **Radar Regulatório** unifica insights de 8 agências (BCB, CMN, CVM, ANS, SUSEP, ANPD, ANEEL, Planalto) em uma única tela com filtros por agência e nível de risco.
 
 ---
 
@@ -170,37 +186,6 @@ Exemplos de consultas:
 | Limite de linhas | 1.000 linhas por consulta |
 | Timeout | 30 segundos por query |
 | Isolamento | Cada tenant tem conexão separada |
-
----
-
-> Desenvolvido por **ness.** — ness.com.br
-`,
-
-    insightcare: `# gabi.care — Analista de Seguros
-
-Especialista em análise de sinistralidade, apólices e regulamentação ANS/SUSEP.
-
----
-
-## Como usar
-
-1. **Faça upload de planilhas** (XLSX) com dados de sinistralidade
-2. **Faça upload de PDFs** com apólices ou regulamentos
-3. **Pergunte:**
-
-   - \`"Qual a taxa de sinistralidade por faixa etária?"\`
-   - \`"Compare custos hospitalares vs ambulatoriais"\`
-   - \`"Quais cláusulas da ANS se aplicam?"\`
-
----
-
-## Formatos aceitos
-
-| Formato | Uso |
-| --- | --- |
-| XLSX | Dados tabulares (sinistros, apólices, financeiro) |
-| PDF | Documentos (regulamentos, contratos, apólices) |
-| DOCX | Pareceres e relatórios internos |
 
 ---
 
@@ -287,10 +272,9 @@ export function getModuleDocs(module: string): string {
 /** Get all section keys for navigation */
 export const docsSections = [
   { id: "overview", label: "Visão Geral", icon: "BookOpen" },
-  { id: "ghost", label: "ness.AI", icon: "PenTool" },
+  { id: "ghost", label: "gabi.writer", icon: "PenTool" },
   { id: "law", label: "gabi.legal", icon: "Scale" },
   { id: "ntalk", label: "gabi.data", icon: "Database" },
-  { id: "insightcare", label: "gabi.care", icon: "ShieldCheck" },
   { id: "shortcuts", label: "Atalhos", icon: "Keyboard" },
   { id: "faq", label: "FAQ", icon: "HelpCircle" },
 ] as const

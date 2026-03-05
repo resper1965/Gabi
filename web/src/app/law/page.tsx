@@ -5,7 +5,7 @@ import { ChatPanel, type Message } from "@/components/chat-panel"
 import { MassUploadZone } from "@/components/mass-upload-zone"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { gabi } from "@/lib/api"
-import { Scale, ChevronDown, ChevronUp, Sparkles } from "lucide-react"
+import { Scale, ChevronDown, ChevronUp, Sparkles, Wand2 } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -15,7 +15,7 @@ const CTX_WINDOW = 10
 export default function LawPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [agent, setAgent] = useState("auditor")
+  const [agent, setAgent] = useState("auto")
   const [docType, setDocType] = useState("law")
   const [showUpload, setShowUpload] = useState(false)
   const [recentInsights, setRecentInsights] = useState<Array<{ id: number; authority: string; numero: string; tipo_ato: string }>>([])
@@ -27,11 +27,14 @@ export default function LawPage() {
   }, [])
 
   const agents = [
-    { key: "auditor", label: "Auditora", desc: "Cruza contratos com regulações" },
-    { key: "researcher", label: "Pesquisadora", desc: "Busca precedentes" },
-    { key: "drafter", label: "Redatora", desc: "Redige peças jurídicas" },
-    { key: "watcher", label: "Sentinela", desc: "Monitora regulações" },
+    { key: "auto", label: "Auto", desc: "A Gabi decide os agentes ideais para sua pergunta", icon: "✨" },
+    { key: "auditor", label: "Compliance", desc: "Cruza contratos com normativos e identifica não-conformidades", icon: "🔍" },
+    { key: "researcher", label: "Pesquisa", desc: "Busca precedentes, jurisprudência e fundamentação na base", icon: "📚" },
+    { key: "drafter", label: "Parecer", desc: "Redige pareceres, minutas e relatórios regulatórios", icon: "✍️" },
+    { key: "watcher", label: "Radar", desc: "Monitora publicações do DOU e avalia impacto nos seus contratos", icon: "📡" },
   ]
+
+  const selectedAgent = agents.find((a) => a.key === agent)
 
   const handleSend = async (text: string) => {
     const userMsg: Message = { id: Date.now().toString(), role: "user", content: text }
@@ -44,15 +47,23 @@ export default function LawPage() {
         agent,
         query: text,
         chat_history: history,
-      }) as { result: Record<string, unknown>; sources_used: number; sources?: Array<{ title: string; type: string }> }
+      }) as { result: Record<string, unknown>; sources_used: number; sources?: Array<{ title: string; type: string }>; orchestration?: { agents: string[]; reason: string } }
 
       const content = typeof res.result === "string"
         ? res.result
-        : res.result?.text || JSON.stringify(res.result, null, 2)
+        : res.result?.synthesis || res.result?.text || JSON.stringify(res.result, null, 2)
+
+      // Build metadata footer
+      let footer = `\n\n_Fontes utilizadas: ${res.sources_used}_`
+      if (res.orchestration) {
+        const agentNames: Record<string, string> = { auditor: "Compliance", researcher: "Pesquisa", drafter: "Parecer", watcher: "Radar" }
+        const used = res.orchestration.agents.map((a: string) => agentNames[a] || a).join(" + ")
+        footer += `\n_Agentes acionados: ${used}_`
+      }
 
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(), role: "assistant",
-        content: `${content}\n\n_Fontes utilizadas: ${res.sources_used}_`,
+        content: `${content}${footer}`,
         metadata: res.sources ? { sources: res.sources } : undefined,
       }])
     } catch (e: unknown) {
@@ -73,13 +84,13 @@ export default function LawPage() {
       <header className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[var(--radius-tech)] flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
               <Scale className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-semibold">gabi.legal</h1>
               <div className="flex items-center gap-2">
-                <p className="text-xs text-zinc-500">Sua Auditora Jurídica</p>
+                <p className="text-xs text-zinc-500">Inteligência Jurídica com Orquestração IA</p>
                 {recentInsights.length > 0 && (
                   <>
                     <span className="w-1 h-1 rounded-full bg-zinc-700" />
@@ -123,23 +134,39 @@ export default function LawPage() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        {/* Agent selector */}
+        <div className="flex gap-2 flex-wrap">
           {agents.map((a) => (
             <button
               key={a.key}
               onClick={() => setAgent(a.key)}
-              className={`px-3 py-1.5 rounded-[var(--radius-tech)] text-xs font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                 agent === a.key ? "text-white" : "bg-white/5 text-slate-400 hover:text-white"
               }`}
               style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}30` } : undefined}
               title={a.desc}
             >
+              <span className="text-[11px]">{a.icon}</span>
               {a.label}
             </button>
           ))}
         </div>
+
+        {/* Agent description */}
+        {selectedAgent && (
+          <p className="mt-2 text-[11px] text-slate-500 flex items-center gap-1.5">
+            {agent === "auto" && <Wand2 className="w-3 h-3" style={{ color: ACCENT }} />}
+            {selectedAgent.desc}
+          </p>
+        )}
       </header>
-      <ChatPanel messages={messages} onSend={handleSend} isLoading={isLoading} placeholder={`Pergunte à gabi. ${agents.find((a) => a.key === agent)?.label}...`} moduleAccent={ACCENT} />
+      <ChatPanel
+        messages={messages}
+        onSend={handleSend}
+        isLoading={isLoading}
+        placeholder={agent === "auto" ? "Pergunte qualquer coisa — a Gabi decide os melhores agentes..." : `Pergunte à ${selectedAgent?.label}...`}
+        moduleAccent={ACCENT}
+      />
       <HelpTooltip module="law" moduleAccent={ACCENT} />
     </div>
   )

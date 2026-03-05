@@ -7,7 +7,7 @@ steps:
       - "-t"
       - "us-central1-docker.pkg.dev/gabi-hub/gabi/gabi-web:latest"
       - "--build-arg"
-      - "NEXT_PUBLIC_API_URL=https://api.gabi.ness.com.br"
+      - "NEXT_PUBLIC_API_URL=https://api-gabi.ness.com.br"
       - "--build-arg"
       - "NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyD33o0h2hlMp7izg7oMdB-PbEBrZW_e4o8"
       - "--build-arg"

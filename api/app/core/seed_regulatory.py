@@ -25,7 +25,7 @@ AVAILABLE_PACKS = {
     "ans": {
         "name": "ANS — Agência Nacional de Saúde Suplementar",
         "description": "Rol de Procedimentos (RN 465), prazos de atendimento (RN 259), Lei dos Planos de Saúde (9.656/98)",
-        "module": "insightcare",
+        "module": "law",
         "dir": "ans",
     },
     "cvm": {
@@ -37,7 +37,7 @@ AVAILABLE_PACKS = {
     "susep": {
         "name": "SUSEP — Superintendência de Seguros Privados",
         "description": "Segurança cibernética (648/2022), seguros de pessoas (637/2021), provisões técnicas (CNSP 432)",
-        "module": "insightcare",
+        "module": "law",
         "dir": "susep",
     },
     "bacen": {
@@ -52,21 +52,71 @@ AVAILABLE_PACKS = {
         "module": "law",
         "dir": "lgpd",
     },
+    "anpd": {
+        "name": "ANPD — Autoridade Nacional de Proteção de Dados",
+        "description": "Agentes de pequeno porte (Res. 2/2022), dosimetria de sanções (Res. 4/2023), comunicação de incidentes (Res. 15/2024)",
+        "module": "law",
+        "dir": "anpd",
+    },
+    "aneel": {
+        "name": "ANEEL — Agência Nacional de Energia Elétrica",
+        "description": "Consolidação distribuição (REN 1.000/2021), geração distribuída (REN 482), bandeiras tarifárias e qualidade",
+        "module": "law",
+        "dir": "aneel",
+    },
+    "cmn": {
+        "name": "CMN — Conselho Monetário Nacional",
+        "description": "Instrumentos financeiros IFRS 9 (Res. 4.966/2021), gestão de riscos (Res. 4.557/2017), PLD/FT (Res. 5.008/2022)",
+        "module": "law",
+        "dir": "cmn",
+    },
+    "codigo_civil": {
+        "name": "Código Civil Brasileiro",
+        "description": "Do Seguro (Arts. 757-802), Contratos em Geral (Arts. 421-480), Responsabilidade Civil (Arts. 927-954)",
+        "module": "law",
+        "dir": "codigo_civil",
+    },
+    "cdc": {
+        "name": "CDC — Código de Defesa do Consumidor",
+        "description": "Direitos básicos (Arts. 6-7), Responsabilidade (Arts. 12-25), Práticas comerciais (Arts. 29-45), Proteção contratual (Arts. 46-54)",
+        "module": "law",
+        "dir": "cdc",
+    },
 }
 
 # Map module → (doc_model_class, chunk_model_class)
 MODEL_MAP = {
     "law": ("app.models.law", "LegalDocument", "LegalChunk"),
-    "insightcare": ("app.models.insightcare", "InsuranceDocument", "InsuranceChunk"),
 }
 
 
-def list_packs() -> list[dict]:
-    """List all available regulatory packs with status."""
-    return [
-        {"id": pack_id, **info}
-        for pack_id, info in AVAILABLE_PACKS.items()
-    ]
+async def list_packs(db: AsyncSession) -> list[dict]:
+    """List all available regulatory packs with installation status."""
+    from sqlalchemy import func
+    packs = []
+    for pack_id, info in AVAILABLE_PACKS.items():
+        doc_model, _ = _get_models(info["module"])
+        # Query installed count and last update
+        result = await db.execute(
+            select(
+                func.count(doc_model.id),
+                func.max(doc_model.updated_at),
+            ).where(
+                doc_model.is_shared == True,
+                doc_model.is_active == True,
+                doc_model.title.like(f"[SEED:{pack_id.upper()}]%"),
+            )
+        )
+        row = result.one()
+        installed_count = row[0] or 0
+        last_updated = row[1]
+        packs.append({
+            "id": pack_id,
+            **info,
+            "installed_count": installed_count,
+            "last_updated": last_updated.isoformat() if last_updated else None,
+        })
+    return packs
 
 
 def _get_models(module: str):
@@ -79,16 +129,17 @@ def _get_models(module: str):
 
 async def _count_shared_docs(db: AsyncSession, module: str, pack_id: str) -> int:
     """Count existing shared documents for a pack (by title prefix)."""
+    from sqlalchemy import func
     doc_model, _ = _get_models(module)
     result = await db.execute(
-        select(doc_model)
+        select(func.count(doc_model.id))
         .where(
             doc_model.is_shared == True,
             doc_model.is_active == True,
             doc_model.title.like(f"[SEED:{pack_id.upper()}]%"),
         )
     )
-    return len(result.scalars().all())
+    return result.scalar() or 0
 
 
 async def seed_pack(
@@ -167,15 +218,12 @@ async def seed_pack(
             "file_size": len(text.encode("utf-8")),
             "chunk_count": len(chunks),
             "is_shared": True,
-            "user_id": "system",
         }
 
-        # Module-specific fields
+        # Module-specific fields (LegalDocument uses user_id, InsuranceDocument uses tenant_id)
         if module == "law":
+            doc_fields["user_id"] = "system"
             doc_fields["doc_type"] = "regulation"
-        elif module == "insightcare":
-            doc_fields["doc_type"] = "regulation"
-            doc_fields["tenant_id"] = "system"
 
         doc_record = doc_model(**doc_fields)
         db.add(doc_record)

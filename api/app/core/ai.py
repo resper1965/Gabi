@@ -20,7 +20,7 @@ settings = get_settings()
 
 _initialized = False
 
-ModuleName = Literal["ghost", "law", "ntalk", "insightcare"]
+ModuleName = Literal["ghost", "law", "ntalk"]
 
 MODEL_MAP: dict[ModuleName, str] = {
     "ghost": settings.model_ghost,  # Flash: creativity
@@ -92,12 +92,12 @@ async def generate(
         model = get_model(module, system_instruction)
         contents = _build_contents(prompt, chat_history)
         response = model.generate_content(contents)
-        vertex_ai_breaker.record_success()
+        await vertex_ai_breaker.record_success()
         duration_ms = round((time.perf_counter() - start) * 1000, 1)
         logger.info("AI generate: module=%s, duration=%sms", module, duration_ms)
         return response.text
     except Exception as e:
-        vertex_ai_breaker.record_failure()
+        await vertex_ai_breaker.record_failure()
         logger.error("AI generate failed: module=%s, error=%s", module, str(e), exc_info=True)
         raise
 
@@ -121,9 +121,9 @@ async def generate_stream(
         for chunk in response:
             if chunk.text:
                 yield chunk.text
-        vertex_ai_breaker.record_success()
+        await vertex_ai_breaker.record_success()
     except Exception as e:
-        vertex_ai_breaker.record_failure()
+        await vertex_ai_breaker.record_failure()
         logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
         raise
 

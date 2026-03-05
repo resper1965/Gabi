@@ -4,13 +4,19 @@ Supports: PDF (PyMuPDF), DOCX (python-docx), TXT, XLSX (openpyxl/pandas)
 """
 
 import io
+import logging
 import uuid
 from typing import Any
 
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.embeddings import embed_batch
+
+logger = logging.getLogger("gabi.ingest")
+
+# Maximum upload file size: 50 MB
+MAX_FILE_SIZE = 50 * 1024 * 1024
 
 
 # ── Text Extraction ──
@@ -19,14 +25,18 @@ def extract_text_from_pdf(data: bytes) -> str:
     """Extract text from PDF using PyMuPDF."""
     import pymupdf
 
-    doc = pymupdf.open(stream=data, filetype="pdf")
-    pages = []
-    for page in doc:
-        text = page.get_text("text")
-        if text.strip():
-            pages.append(text.strip())
-    doc.close()
-    return "\n\n".join(pages)
+    try:
+        doc = pymupdf.open(stream=data, filetype="pdf")
+        pages = []
+        for page in doc:
+            text = page.get_text("text")
+            if text.strip():
+                pages.append(text.strip())
+        doc.close()
+        return "\n\n".join(pages)
+    except Exception as e:
+        logger.error("Error extracting PDF: %s", e, exc_info=True)
+        return ""
 
 
 def extract_text_from_docx(data: bytes) -> str:
@@ -116,9 +126,16 @@ async def process_document(
 
     Returns summary dict with doc_id, chunk_count, char_count.
     """
+    # ── Enforce file size limit ──
     data = await file.read()
     filename = file.filename or "unknown"
     file_size = len(data)
+
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail=f"Arquivo excede o limite de {MAX_FILE_SIZE // (1024 * 1024)}MB.",
+        )
 
     # Extract text
     text = extract_text(data, filename)
@@ -130,8 +147,9 @@ async def process_document(
     if not chunks:
         return {"error": "Arquivo vazio após extração.", "chunk_count": 0}
 
-    # Generate embeddings in batch
-    embeddings = embed_batch(chunks)
+    # Generate embeddings in batch (run in thread to avoid blocking event loop)
+    import asyncio
+    embeddings = await asyncio.to_thread(embed_batch, chunks)
 
     # Create document record
     doc_id = uuid.uuid4()

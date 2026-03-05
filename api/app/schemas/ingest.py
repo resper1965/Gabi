@@ -7,6 +7,10 @@ class RegulatoryAuthority(str, enum.Enum):
     BACEN = "BACEN"
     CMN = "CMN"
     CVM = "CVM"
+    ANS = "ANS"
+    SUSEP = "SUSEP"
+    ANPD = "ANPD"
+    ANEEL = "ANEEL"
 
 class IngestStatus(str, enum.Enum):
     NEW = "NEW"

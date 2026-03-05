@@ -1,6 +1,6 @@
 """
 Gabi Hub — Unified FastAPI Application
-Serves all 4 modules: nGhost, Law & Comply, nTalkSQL, InsightCare
+Serves 3 modules: nGhost, Law & Comply (+ Insurance), nTalkSQL
 """
 
 import logging
@@ -23,7 +23,7 @@ logger = logging.getLogger("gabi.app")
 async def lifespan(app: FastAPI):
     """Pre-warm services on startup (non-blocking — app starts even if services fail)."""
     from app.core.auth import _init_firebase
-    logger.info("Starting Gabi Hub API v0.3.0")
+    logger.info("Starting Gabi Hub API v0.4.0")
     try:
         _init_firebase()
         logger.info("Firebase initialized")
@@ -36,8 +36,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Gabi Hub API",
-    description="Unified AI Backend — nGhost + Law & Comply + nTalkSQL + InsightCare",
-    version="0.3.0",
+    description="Unified AI Backend — nGhost + Law & Comply (Legal + Insurance) + nTalkSQL",
+    version="0.4.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.gcp_project_id == "" else None,  # Disable docs in prod
     redoc_url=None,
@@ -45,7 +45,20 @@ app = FastAPI(
 
 # ── Middleware (order matters: last added = first executed) ──
 
-# 1. CORS — tightened: explicit methods and headers
+# 1. Global error handler — sanitizes exceptions, never leaks internals
+from app.middleware.error_handler import ErrorHandlerMiddleware
+app.add_middleware(ErrorHandlerMiddleware)
+
+# 2. Security headers — HSTS, CSP, X-Frame-Options
+from app.middleware.security_headers import SecurityHeadersMiddleware
+app.add_middleware(SecurityHeadersMiddleware)
+
+# 3. Request logging — structured JSON with correlation
+from app.middleware.request_logging import RequestLoggingMiddleware
+app.add_middleware(RequestLoggingMiddleware)
+
+# 4. CORS — tightened: explicit methods and headers
+# MUST BE LAST ADDED so it surrounds everything (outermost layer)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -55,18 +68,6 @@ app.add_middleware(
     expose_headers=["X-Request-ID"],
 )
 
-# 2. Request logging — structured JSON with correlation
-from app.middleware.request_logging import RequestLoggingMiddleware
-app.add_middleware(RequestLoggingMiddleware)
-
-# 3. Security headers — HSTS, CSP, X-Frame-Options
-from app.middleware.security_headers import SecurityHeadersMiddleware
-app.add_middleware(SecurityHeadersMiddleware)
-
-# 4. Global error handler — sanitizes exceptions, never leaks internals
-from app.middleware.error_handler import ErrorHandlerMiddleware
-app.add_middleware(ErrorHandlerMiddleware)
-
 # ── Health Check ──
 from app.core.health import router as health_router
 app.include_router(health_router, tags=["Health"])
@@ -75,12 +76,14 @@ app.include_router(health_router, tags=["Health"])
 from app.modules.ghost.router import router as ghost_router
 from app.modules.law.router import router as law_router
 from app.modules.ntalk.router import router as ntalk_router
-from app.modules.insightcare.router import router as insightcare_router
 
 app.include_router(ghost_router, prefix="/api/ghost", tags=["nGhost"])
 app.include_router(law_router, prefix="/api/law", tags=["Law & Comply"])
 app.include_router(ntalk_router, prefix="/api/ntalk", tags=["nTalkSQL"])
-app.include_router(insightcare_router, prefix="/api/insightcare", tags=["InsightCare"])
+
+# Backward compat: /api/insightcare/* → same law router
+# Old frontend calls still work during transition
+app.include_router(law_router, prefix="/api/insightcare", tags=["InsightCare (legacy)"])
 
 # ── Admin Router ──
 from app.modules.admin.router import router as admin_router

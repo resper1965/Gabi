@@ -1,0 +1,70 @@
+RESOLUÇÃO CMN Nº 5.008, DE 24 DE MARÇO DE 2022
+
+Dispõe sobre a política, os procedimentos e os controles internos a serem adotados pelas instituições autorizadas a funcionar pelo Banco Central do Brasil visando à prevenção da utilização do sistema financeiro para a prática dos crimes de lavagem de dinheiro e de financiamento do terrorismo (PLD/FT).
+
+O BANCO CENTRAL DO BRASIL, na forma do art. 9º da Lei nº 4.595, de 31 de dezembro de 1964, torna público que o CONSELHO MONETÁRIO NACIONAL,
+
+RESOLVEU:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º As instituições autorizadas a funcionar pelo Banco Central do Brasil devem implementar e manter política de prevenção à lavagem de dinheiro e ao financiamento do terrorismo (PLD/FT) compatível com seu perfil de risco.
+
+Art. 2º A política de PLD/FT deve contemplar:
+I - diretrizes para a definição de papéis e responsabilidades na prevenção à lavagem de dinheiro e ao financiamento do terrorismo;
+II - diretrizes para a identificação e análise de situações suspeitas;
+III - diretrizes para a avaliação e classificação de risco dos clientes;
+IV - diretrizes para a seleção, contratação e treinamento de funcionários;
+V - diretrizes para o atendimento de demandas de informação do poder público.
+
+CAPÍTULO II - AVALIAÇÃO INTERNA DE RISCO
+
+Art. 3º As instituições devem realizar avaliação interna de risco de PLD/FT, com abrangência e detalhamento condizentes com o perfil de risco da instituição e com a natureza, complexidade, estrutura e modelo de negócio de seus produtos e serviços.
+
+Art. 4º A avaliação interna de risco deve considerar:
+I - perfis de risco de clientes;
+II - operações, produtos e serviços;
+III - canais de distribuição;
+IV - atividades exercidas pelos funcionários e prestadores de serviço;
+V - localização geográfica das operações.
+
+CAPÍTULO III - CONHEÇA SEU CLIENTE (KYC)
+
+Art. 5º Os procedimentos de identificação e qualificação dos clientes devem incluir a coleta, verificação e validação de informações destinadas a:
+I - qualificar clientes;
+II - classificá-los em categorias de risco;
+III - identificar a origem dos recursos.
+
+Art. 6º A instituição deve adotar procedimentos reforçados de identificação e qualificação quando a situação do cliente apresentar maior risco, incluindo:
+I - pessoas politicamente expostas (PPE);
+II - correspondências com listas de sanções nacionais e internacionais;
+III - clientes em jurisdições de maior risco;
+IV - transações com características atípicas.
+
+Art. 7º A instituição deve manter os cadastros dos clientes atualizados, com periodicidade mínima de:
+I - 1 ano, para clientes classificados como de alto risco;
+II - 2 anos, para os demais clientes.
+
+CAPÍTULO IV - COMUNICAÇÃO AO COAF
+
+Art. 8º A instituição deve comunicar ao Conselho de Controle de Atividades Financeiras (COAF), no prazo de 24 horas, as operações que envolvam:
+I - depósitos em espécie, pedidos de provisionamento para saques ou saques em espécie de valor igual ou superior a R$ 50.000,00;
+II - pedidos de provisionamento para saques ou saques em espécie de valor igual ou superior a R$ 100.000,00;
+III - solicitações de emissão de cheque administrativo ou instrumento equivalente de valor igual ou superior a R$ 50.000,00;
+IV - transferências internacionais de recursos.
+
+Art. 9º A instituição deve comunicar ao COAF, no prazo de 45 dias contados da detecção, as situações que possam configurar a existência de indícios de:
+I - lavagem de dinheiro;
+II - financiamento do terrorismo;
+III - financiamento da proliferação de armas de destruição em massa.
+
+CAPÍTULO V - GOVERNANÇA
+
+Art. 10. A instituição deve designar diretor responsável pelo cumprimento das obrigações de PLD/FT, o qual deve:
+I - ter acesso irrestrito a informações necessárias ao desempenho de suas funções;
+II - participar das reuniões do conselho de administração ou da diretoria em que sejam discutidos temas afetos à PLD/FT;
+III - garantir a independência do processo de decisão sobre comunicações ao COAF.
+
+Art. 11. A política de PLD/FT e a avaliação interna de risco devem ser aprovadas pelo conselho de administração ou, quando inexistente, pela diretoria da instituição.
+
+Art. 12. Esta Resolução entra em vigor em 1º de julho de 2023.

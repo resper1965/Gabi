@@ -68,31 +68,39 @@ async def upload_document(
     if doc_type not in ("style", "content"):
         return {"error": "doc_type deve ser 'style' ou 'content'"}
 
-    from app.core.ingest import process_document
+    try:
+        from app.core.ingest import process_document
 
-    result = await process_document(
-        file=file,
-        db=db,
-        doc_model=KnowledgeDocument,
-        chunk_model=DocumentChunk,
-        doc_fields={
-            "user_id": user.uid,
-            "profile_id": profile_id,
-            "doc_type": doc_type,
-        },
-    )
-
-    if "error" not in result:
-        # Update sample count on profile
-        profile_result = await db.execute(
-            select(StyleProfile).where(StyleProfile.id == profile_id)
+        result = await process_document(
+            file=file,
+            db=db,
+            doc_model=KnowledgeDocument,
+            chunk_model=DocumentChunk,
+            doc_fields={
+                "user_id": user.uid,
+                "profile_id": profile_id,
+                "doc_type": doc_type,
+            },
         )
-        profile = profile_result.scalar_one_or_none()
-        if profile:
-            profile.sample_count = (profile.sample_count or 0) + 1
-            await db.commit()
 
-    return result
+        if "error" not in result:
+            # Update sample count on profile
+            try:
+                profile_result = await db.execute(
+                    select(StyleProfile).where(StyleProfile.id == profile_id)
+                )
+                profile = profile_result.scalar_one_or_none()
+                if profile:
+                    profile.sample_count = (profile.sample_count or 0) + 1
+                    await db.commit()
+            except Exception:
+                pass  # Non-critical: don't fail upload over counter update
+
+        return result
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": f"Falha no upload: {str(e)}", "chunk_count": 0}
 
 # ── Document Management ──
 
@@ -103,29 +111,40 @@ async def list_documents(
     db: AsyncSession = Depends(get_db),
 ):
     """List all knowledge documents for the current user, optionally filtered by profile."""
-    query = (
-        select(KnowledgeDocument)
-        .where(KnowledgeDocument.user_id == user.uid)
-        .order_by(KnowledgeDocument.created_at.desc())
-    )
-    if profile_id:
-        query = query.where(KnowledgeDocument.profile_id == profile_id)
+    try:
+        query = (
+            select(KnowledgeDocument)
+            .where(KnowledgeDocument.user_id == user.uid)
+            .order_by(KnowledgeDocument.created_at.desc())
+        )
+        # Only filter by profile if it's a valid UUID (not 'default')
+        if profile_id and profile_id != "default":
+            try:
+                import uuid as _uuid
+                _uuid.UUID(profile_id)  # Validate UUID format
+                query = query.where(KnowledgeDocument.profile_id == profile_id)
+            except ValueError:
+                pass  # Invalid UUID — skip filter
 
-    result = await db.execute(query)
-    docs = result.scalars().all()
+        result = await db.execute(query)
+        docs = result.scalars().all()
 
-    return [
-        {
-            "id": str(d.id),
-            "filename": d.filename,
-            "doc_type": d.doc_type,
-            "chunk_count": d.chunk_count,
-            "file_size": d.file_size or 0,
-            "profile_id": str(d.profile_id) if d.profile_id else None,
-            "created_at": d.created_at.isoformat() if d.created_at else None,
-        }
-        for d in docs
-    ]
+        return [
+            {
+                "id": str(d.id),
+                "filename": d.filename,
+                "doc_type": d.doc_type,
+                "chunk_count": d.chunk_count,
+                "file_size": d.file_size or 0,
+                "profile_id": str(d.profile_id) if d.profile_id else None,
+                "created_at": d.created_at.isoformat() if d.created_at else None,
+            }
+            for d in docs
+        ]
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return []
 
 
 @router.delete("/documents/{doc_id}")
@@ -147,7 +166,7 @@ async def delete_document(
 
     # Delete chunks first
     await db.execute(
-        text("DELETE FROM ghost_doc_chunks WHERE document_id = :did"),
+        text("DELETE FROM ghost_doc_chunks WHERE document_id = :did::uuid"),
         {"did": doc_id},
     )
     await db.delete(doc)
@@ -171,18 +190,21 @@ async def list_profiles(
              "has_signature": p.style_signature is not None} for p in profiles]
 
 
+class ProfileCreate(BaseModel):
+    name: str
+
 @router.post("/profiles")
 async def create_profile(
-    name: str,
+    profile: ProfileCreate,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new style profile."""
-    profile = StyleProfile(user_id=user.uid, name=name)
-    db.add(profile)
+    new_profile = StyleProfile(user_id=user.uid, name=profile.name)
+    db.add(new_profile)
     await db.commit()
-    await db.refresh(profile)
-    return {"id": str(profile.id), "name": profile.name}
+    await db.refresh(new_profile)
+    return {"id": str(new_profile.id), "name": new_profile.name}
 
 
 @router.post("/profiles/{profile_id}/extract-style")
@@ -195,42 +217,47 @@ async def extract_style(
     Extract Style Signature — runs ONCE per profile.
     Reads all style documents, sends to Gemini Flash for forensic analysis.
     """
-    # Get style chunks for this profile
-    chunks_result = await db.execute(
-        text("""
-            SELECT c.content FROM ghost_doc_chunks c
-            JOIN ghost_knowledge_docs d ON c.document_id = d.id
-            WHERE d.profile_id = :pid AND d.doc_type = 'style'
-            ORDER BY d.created_at, c.chunk_index
-        """),
-        {"pid": profile_id},
-    )
-    chunks = [row[0] for row in chunks_result]
+    try:
+        # Get style chunks for this profile
+        chunks_result = await db.execute(
+            text("""
+                SELECT c.content FROM ghost_doc_chunks c
+                JOIN ghost_knowledge_docs d ON c.document_id = d.id
+                WHERE d.profile_id = :pid::uuid AND d.doc_type = 'style'
+                ORDER BY d.created_at, c.chunk_index
+            """),
+            {"pid": profile_id},
+        )
+        chunks = [row[0] for row in chunks_result]
 
-    if not chunks:
-        return {"error": "Nenhum documento de estilo encontrado. Faça upload primeiro."}
+        if not chunks:
+            return {"error": "Nenhum documento de estilo encontrado. Faça upload primeiro."}
 
-    # Combine texts (limit to ~50k chars for Flash)
-    combined = "\n\n---\n\n".join(chunks)[:50000]
+        # Combine texts (limit to ~50k chars for Flash)
+        combined = "\n\n---\n\n".join(chunks)[:50000]
 
-    # One-time extraction via Gemini Flash (cheap)
-    signature = await generate(
-        module="ghost",
-        prompt=f"Textos do autor:\n\n{combined}",
-        system_instruction=STYLE_EXTRACTION_PROMPT,
-    )
+        # One-time extraction via Gemini Flash (cheap)
+        signature = await generate(
+            module="ghost",
+            prompt=f"Textos do autor:\n\n{combined}",
+            system_instruction=STYLE_EXTRACTION_PROMPT,
+        )
 
-    # Save signature
-    result = await db.execute(
-        select(StyleProfile).where(StyleProfile.id == profile_id)
-    )
-    profile = result.scalar_one_or_none()
-    if profile:
-        profile.style_signature = signature
-        profile.system_prompt = GHOST_WRITER_PROMPT.format(style_signature=signature)
-        await db.commit()
+        # Save signature
+        result = await db.execute(
+            select(StyleProfile).where(StyleProfile.id == profile_id)
+        )
+        profile = result.scalar_one_or_none()
+        if profile:
+            profile.style_signature = signature
+            profile.system_prompt = GHOST_WRITER_PROMPT.format(style_signature=signature)
+            await db.commit()
 
-    return {"signature": signature[:500] + "...", "status": "extracted"}
+        return {"signature": signature[:500] + "...", "status": "extracted"}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": f"Falha na extração de estilo: {str(e)}"}
 
 
 @router.post("/generate")
@@ -243,44 +270,45 @@ async def generate_text(
     Generate text using Style Signature + Content RAG.
     Cost per generation: minimal (signature is ~500 tokens, no re-reading docs).
     """
-    # Get profile with signature
-    result = await db.execute(
-        select(StyleProfile).where(StyleProfile.id == req.profile_id)
-    )
-    profile = result.scalar_one_or_none()
-    if not profile or not profile.style_signature:
-        return {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}
+    try:
+        # Get profile with signature
+        result = await db.execute(
+            select(StyleProfile).where(StyleProfile.id == req.profile_id)
+        )
+        profile = result.scalar_one_or_none()
+        if not profile or not profile.style_signature:
+            return {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}
 
-    # RAG: search content documents
-    query_embedding = embed(req.prompt)
-    content_results = await db.execute(
-        text("""
-            SELECT c.content, d.title, d.doc_type
-            FROM ghost_doc_chunks c
-            JOIN ghost_knowledge_docs d ON c.document_id = d.id
-            WHERE d.profile_id = :pid AND d.doc_type = 'content'
-              AND c.embedding IS NOT NULL
-            ORDER BY c.embedding <=> :emb::vector
-            LIMIT 5
-        """),
-        {"pid": req.profile_id, "emb": str(query_embedding)},
-    )
-    raw_chunks = [dict(row._mapping) for row in content_results]
-    content_chunks = [c["content"] for c in raw_chunks]
+        # RAG: search content documents
+        query_embedding = embed(req.prompt)
+        content_results = await db.execute(
+            text("""
+                SELECT c.content, d.title, d.doc_type
+                FROM ghost_doc_chunks c
+                JOIN ghost_knowledge_docs d ON c.document_id = d.id
+                WHERE d.profile_id = :pid AND d.doc_type = 'content'
+                  AND c.embedding IS NOT NULL
+                ORDER BY c.embedding <=> :emb::vector
+                LIMIT 5
+            """),
+            {"pid": req.profile_id, "emb": str(query_embedding)},
+        )
+        raw_chunks = [dict(row._mapping) for row in content_results]
+        content_chunks = [c["content"] for c in raw_chunks]
 
-    # Deduplicate sources by title
-    seen_titles = set()
-    sources = []
-    for c in raw_chunks:
-        title = c.get("title", "")
-        if title and title not in seen_titles:
-            seen_titles.add(title)
-            sources.append({"title": title, "type": c.get("doc_type", "")})
+        # Deduplicate sources by title
+        seen_titles = set()
+        sources = []
+        for c in raw_chunks:
+            title = c.get("title", "")
+            if title and title not in seen_titles:
+                seen_titles.add(title)
+                sources.append({"title": title, "type": c.get("doc_type", "")})
 
-    # Build prompt: signature (tiny) + content RAG + user request
-    context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
+        # Build prompt: signature (tiny) + content RAG + user request
+        context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
 
-    full_prompt = f"""
+        full_prompt = f"""
 [CONTEÚDO FACTUAL (Base RAG)]
 {context}
 
@@ -288,16 +316,20 @@ async def generate_text(
 {req.prompt}
 """
 
-    response = await generate(
-        module="ghost",
-        prompt=full_prompt,
-        system_instruction=profile.system_prompt,
-        chat_history=req.chat_history,
-    )
+        response = await generate(
+            module="ghost",
+            prompt=full_prompt,
+            system_instruction=profile.system_prompt,
+            chat_history=req.chat_history,
+        )
 
-    await log_event(db, user.uid, "ghost", "query", metadata={"profile": profile.name, "sources": len(sources)})
+        await log_event(db, user.uid, "ghost", "query", metadata={"profile": profile.name, "sources": len(sources)})
 
-    return {"text": response, "profile": profile.name, "sources": sources}
+        return {"text": response, "profile": profile.name, "sources": sources}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {"error": f"Falha na geração: {str(e)}"}
 
 
 @router.post("/generate-stream")
@@ -313,34 +345,38 @@ async def generate_text_stream(
     from fastapi.responses import StreamingResponse
     from app.core.ai import generate_stream
 
-    # Get profile with signature
-    result = await db.execute(
-        select(StyleProfile).where(StyleProfile.id == req.profile_id)
-    )
-    profile = result.scalar_one_or_none()
-    if not profile or not profile.style_signature:
-        return {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}
+    try:
+        # Get profile with signature
+        result = await db.execute(
+            select(StyleProfile).where(StyleProfile.id == req.profile_id)
+        )
+        profile = result.scalar_one_or_none()
+        if not profile or not profile.style_signature:
+            async def error_gen():
+                yield 'data: {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}\n\n'
+                yield "data: [DONE]\n\n"
+            return StreamingResponse(error_gen(), media_type="text/event-stream")
 
-    # RAG: search content documents
-    query_embedding = embed(req.prompt)
-    content_results = await db.execute(
-        text("""
-            SELECT c.content, d.title, d.doc_type
-            FROM ghost_doc_chunks c
-            JOIN ghost_knowledge_docs d ON c.document_id = d.id
-            WHERE d.profile_id = :pid AND d.doc_type = 'content'
-              AND c.embedding IS NOT NULL
-            ORDER BY c.embedding <=> :emb::vector
-            LIMIT 5
-        """),
-        {"pid": req.profile_id, "emb": str(query_embedding)},
-    )
-    raw_chunks = [dict(row._mapping) for row in content_results]
-    content_chunks = [c["content"] for c in raw_chunks]
+        # RAG: search content documents
+        query_embedding = embed(req.prompt)
+        content_results = await db.execute(
+            text("""
+                SELECT c.content, d.title, d.doc_type
+                FROM ghost_doc_chunks c
+                JOIN ghost_knowledge_docs d ON c.document_id = d.id
+                WHERE d.profile_id = :pid AND d.doc_type = 'content'
+                  AND c.embedding IS NOT NULL
+                ORDER BY c.embedding <=> :emb::vector
+                LIMIT 5
+            """),
+            {"pid": req.profile_id, "emb": str(query_embedding)},
+        )
+        raw_chunks = [dict(row._mapping) for row in content_results]
+        content_chunks = [c["content"] for c in raw_chunks]
 
-    context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
+        context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."
 
-    full_prompt = f"""
+        full_prompt = f"""
 [CONTEÚDO FACTUAL (Base RAG)]
 {context}
 
@@ -348,15 +384,26 @@ async def generate_text_stream(
 {req.prompt}
 """
 
-    async def event_generator():
-        import json as _json
-        async for chunk_text in generate_stream(
-            module="ghost",
-            prompt=full_prompt,
-            system_instruction=profile.system_prompt,
-            chat_history=req.chat_history,
-        ):
-            yield f"data: {_json.dumps({'text': chunk_text})}\n\n"
-        yield "data: [DONE]\n\n"
+        async def event_generator():
+            import json as _json
+            try:
+                async for chunk_text in generate_stream(
+                    module="ghost",
+                    prompt=full_prompt,
+                    system_instruction=profile.system_prompt,
+                    chat_history=req.chat_history,
+                ):
+                    yield f"data: {_json.dumps({'text': chunk_text})}\n\n"
+                yield "data: [DONE]\n\n"
+            except Exception as stream_err:
+                yield f'data: {_json.dumps({"error": str(stream_err)})}\n\n'
+                yield "data: [DONE]\n\n"
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        async def fallback_error():
+            yield f'data: {{"error": "{str(e)}"}}\n\n'
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(fallback_error(), media_type="text/event-stream")

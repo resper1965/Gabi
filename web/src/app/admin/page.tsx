@@ -35,9 +35,11 @@ interface SeedPack {
   description: string
   module: string
   dir: string
+  installed_count: number
+  last_updated: string | null
 }
 
-const ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
+const ALL_MODULES = ["ghost", "law", "ntalk"]
 const MODULE_LABELS: Record<string, string> = {
   ghost: "Writer",
   law: "Legal",
@@ -66,6 +68,7 @@ export default function AdminPage() {
   const [expandedUser, setExpandedUser] = useState<string | null>(null)
   const [seedPacks, setSeedPacks] = useState<SeedPack[]>([])
   const [seedLoading, setSeedLoading] = useState<string | null>(null)
+  const [ingestResults, setIngestResults] = useState<Array<{ source: string; status: string; detail?: string }>>([])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -229,74 +232,166 @@ export default function AdminPage() {
       )}
 
       {/* Regulatory Seed Packs */}
-      {profile?.role === "superadmin" && seedPacks.length > 0 && (
-        <div className="mb-6 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="w-4 h-4 text-violet-400" />
-            <h2 className="text-sm font-semibold">Bases Regulatórias</h2>
-            <span className="text-[0.6rem] text-slate-500 ml-1">Seed Packs</span>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {seedPacks.map((pack) => (
-              <div
-                key={pack.id}
-                className="rounded-lg bg-white/[0.02] border border-white/[0.06] p-3 flex flex-col gap-2"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs font-semibold text-white">{pack.id.toUpperCase()}</p>
-                    <p className="text-[0.6rem] text-slate-500 mt-0.5 leading-relaxed">{pack.description}</p>
-                  </div>
-                  <span
-                    className="text-[0.55rem] px-1.5 py-0.5 rounded font-medium shrink-0"
-                    style={{
-                      color: pack.module === "law" ? "var(--color-mod-law)" : "var(--color-mod-insightcare)",
-                      background: pack.module === "law" ? "var(--color-mod-law)15" : "var(--color-mod-insightcare)15",
-                    }}
-                  >
-                    {pack.module}
+      {profile?.role === "superadmin" && seedPacks.length > 0 && (() => {
+        const MODULE_LABELS: Record<string, string> = { law: "gabi.legal", insightcare: "gabi.care" };
+        const MODULE_COLORS: Record<string, string> = { law: "var(--color-mod-law)", insightcare: "var(--color-mod-insightcare)" };
+        const groups = seedPacks.reduce((acc: Record<string, typeof seedPacks>, p: typeof seedPacks[0]) => {
+          const key = p.module as string;
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(p);
+          return acc;
+        }, {} as Record<string, typeof seedPacks>);
+        return (
+          <div className="mb-6 rounded-soft bg-surface-card tech-border p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <BookOpen className="w-4 h-4 text-violet-400" />
+              <h2 className="text-sm font-semibold">Bases Regulatórias</h2>
+              <span className="text-[0.6rem] text-slate-500 ml-1">Seed Packs</span>
+            </div>
+            {Object.entries(groups).map(([mod, packs]) => (
+              <div key={mod} className="mb-4 last:mb-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[0.65rem] font-bold tracking-wider uppercase" style={{ color: MODULE_COLORS[mod] }}>
+                    {MODULE_LABELS[mod] || mod}
                   </span>
+                  <div className="flex-1 h-px opacity-20" style={{ background: MODULE_COLORS[mod] }} />
                 </div>
-                <div className="flex gap-1.5 mt-auto">
-                  <button
-                    onClick={async () => {
-                      setSeedLoading(pack.id)
-                      try {
-                        const res = await gabi.admin.seedRegulatory([pack.id]) as { results: Array<{ status: string; docs_created?: number; total_chunks?: number }> }
-                        const r = res.results?.[0]
-                        if (r?.status === "already_seeded") {
-                          toast.info(`${pack.id.toUpperCase()} já está instalado`)
-                        } else {
-                          toast.success(`${pack.id.toUpperCase()} instalado: ${r?.docs_created || 0} docs, ${r?.total_chunks || 0} chunks`)
-                        }
-                      } catch { toast.error(`Erro ao instalar ${pack.id}`) }
-                      finally { setSeedLoading(null) }
-                    }}
-                    disabled={seedLoading === pack.id}
-                    className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    {seedLoading === pack.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-                    Instalar
-                  </button>
-                  <button
-                    onClick={async () => {
-                      setSeedLoading(`rm-${pack.id}`)
-                      try {
-                        const res = await gabi.admin.removeSeedPack(pack.id) as { docs_deactivated: number }
-                        toast.success(`${pack.id.toUpperCase()} removido (${res.docs_deactivated} docs)`)
-                      } catch { toast.error(`Erro ao remover ${pack.id}`) }
-                      finally { setSeedLoading(null) }
-                    }}
-                    disabled={seedLoading === `rm-${pack.id}`}
-                    className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-red-500/10 text-red-400/60 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    {seedLoading === `rm-${pack.id}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
-                    Remover
-                  </button>
+                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                  {packs.map((pack: typeof seedPacks[0]) => {
+                    const installed = pack.installed_count > 0;
+                    const lastUpdated = pack.last_updated;
+                    return (
+                      <div
+                        key={pack.id}
+                        className={`rounded-lg p-3 flex flex-col gap-2 transition-colors ${installed ? 'bg-emerald-500/5 border border-emerald-500/20' : 'bg-white/2 border border-white/6'}`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-xs font-semibold text-white">{pack.name?.split("—")[0]?.trim() || pack.id.toUpperCase()}</p>
+                              {installed && (
+                                <span className="text-[0.5rem] px-1 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-medium shrink-0">
+                                  ✓ {pack.installed_count} docs
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[0.6rem] text-slate-500 mt-0.5 leading-relaxed">{pack.description}</p>
+                            {installed && lastUpdated && (
+                              <p className="text-[0.55rem] text-emerald-500/60 mt-1">
+                                Atualizado em {new Date(lastUpdated).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-1.5 mt-auto">
+                          <button
+                            onClick={async () => {
+                              setSeedLoading(pack.id)
+                              try {
+                                const res = await gabi.admin.seedRegulatory([pack.id]) as { results: Array<{ status: string; docs_created?: number; total_chunks?: number }> }
+                                const r = res.results?.[0]
+                                if (r?.status === "already_seeded") {
+                                  toast.info(`${pack.id.toUpperCase()} já está instalado`)
+                                } else {
+                                  toast.success(`${pack.id.toUpperCase()} instalado: ${r?.docs_created || 0} docs, ${r?.total_chunks || 0} chunks`)
+                                }
+                                // Refresh packs to update status
+                                const fresh = await gabi.admin.regulatoryPacks() as { packs: typeof seedPacks }
+                                setSeedPacks(fresh.packs)
+                              } catch { toast.error(`Erro ao instalar ${pack.id}`) }
+                              finally { setSeedLoading(null) }
+                            }}
+                            disabled={seedLoading === pack.id}
+                            className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-violet-500/15 text-violet-400 hover:bg-violet-500/25 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            {seedLoading === pack.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                            {installed ? "Reinstalar" : "Instalar"}
+                          </button>
+                          {installed && (
+                            <button
+                              onClick={async () => {
+                                setSeedLoading(`rm-${pack.id}`)
+                                try {
+                                  const res = await gabi.admin.removeSeedPack(pack.id) as { docs_deactivated: number }
+                                  toast.success(`${pack.id.toUpperCase()} removido (${res.docs_deactivated} docs)`)
+                                  const fresh = await gabi.admin.regulatoryPacks() as { packs: typeof seedPacks }
+                                  setSeedPacks(fresh.packs)
+                                } catch { toast.error(`Erro ao remover ${pack.id}`) }
+                                finally { setSeedLoading(null) }
+                              }}
+                              disabled={seedLoading === `rm-${pack.id}`}
+                              className="flex items-center gap-1 text-[0.65rem] px-2 py-1 rounded bg-red-500/10 text-red-400/60 hover:bg-red-500/20 hover:text-red-400 transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                              {seedLoading === `rm-${pack.id}` ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                              Remover
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
+        );
+      })()}
+
+      {/* Ingestion Pipeline Trigger */}
+      {profile?.role === "superadmin" && (
+        <div className="mb-6 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)] tech-border p-5">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Database className="w-4 h-4 text-emerald-400" />
+              <h2 className="text-sm font-semibold">Ingestão Regulatória</h2>
+              <span className="text-[0.6rem] text-slate-500 ml-1">DOU + APIs oficiais</span>
+            </div>
+            <button
+              onClick={async () => {
+                setSeedLoading("ingest")
+                toast.info("Pipeline iniciado — isso pode levar alguns minutos...")
+                try {
+                  const res = await gabi.admin.triggerIngest() as { steps: Array<{ source: string; status: string; detail?: string }> }
+                  const ok = (res.steps || []).filter(s => s.status === "ok").length
+                  const err = (res.steps || []).filter(s => s.status === "error").length
+                  if (err === 0) {
+                    toast.success(`Pipeline concluído: ${ok} fontes ingeridas com sucesso`)
+                  } else {
+                    toast.warning(`Pipeline concluído: ${ok} ok, ${err} com erro`)
+                  }
+                  // Show details
+                  setIngestResults(res.steps || [])
+                } catch { toast.error("Erro ao executar pipeline de ingestão") }
+                finally { setSeedLoading(null) }
+              }}
+              disabled={seedLoading === "ingest"}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors cursor-pointer disabled:opacity-50 font-medium"
+            >
+              {seedLoading === "ingest" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              Executar Agora
+            </button>
+          </div>
+          <p className="text-[0.65rem] text-slate-500 mb-3">
+            Busca normativos dos últimos 30 dias: BCB, CMN, CVM, SUSEP, ANS, ANPD, ANEEL
+          </p>
+          {ingestResults.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {ingestResults.map((r, i) => (
+                <span
+                  key={i}
+                  className="text-[0.65rem] px-2 py-1 rounded-lg font-medium flex items-center gap-1"
+                  style={{
+                    color: r.status === "ok" ? "#34d399" : "#f87171",
+                    background: r.status === "ok" ? "rgba(52,211,153,0.1)" : "rgba(248,113,113,0.1)",
+                  }}
+                >
+                  {r.status === "ok" ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+                  {r.source}
+                  {r.detail && <span className="text-slate-500 ml-1">({r.detail.slice(0, 40)})</span>}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

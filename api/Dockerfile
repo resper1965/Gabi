@@ -19,6 +19,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=builder /install /usr/local
 COPY app/ app/
+COPY scripts/ scripts/
+COPY seeds/ seeds/
 COPY alembic/ alembic/
 COPY alembic.ini .
 COPY entrypoint.sh .

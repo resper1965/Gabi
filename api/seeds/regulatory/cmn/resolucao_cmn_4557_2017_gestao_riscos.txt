@@ -1,0 +1,69 @@
+RESOLUÇÃO CMN Nº 4.557, DE 23 DE FEVEREIRO DE 2017
+(Com alterações posteriores)
+
+Dispõe sobre a estrutura de gerenciamento de riscos e a estrutura de gerenciamento de capital.
+
+O BANCO CENTRAL DO BRASIL, na forma do art. 9º da Lei nº 4.595, de 31 de dezembro de 1964, torna público que o CONSELHO MONETÁRIO NACIONAL, em sessão extraordinária realizada em 23 de fevereiro de 2017,
+
+RESOLVEU:
+
+TÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Esta Resolução dispõe sobre a estrutura de gerenciamento de riscos e a estrutura de gerenciamento de capital que devem ser implementadas pelas instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+Art. 2º As instituições mencionadas no art. 1º devem implementar estrutura de gerenciamento para os seguintes riscos:
+I - risco de crédito;
+II - risco de mercado;
+III - risco operacional;
+IV - risco de liquidez;
+V - risco socioambiental;
+VI - demais riscos relevantes.
+
+TÍTULO II - GERENCIAMENTO DO RISCO DE CRÉDITO
+
+Art. 3º A estrutura de gerenciamento do risco de crédito deve prever:
+I - políticas e estratégias para o gerenciamento do risco de crédito, claramente documentadas, que estabeleçam limites operacionais, mecanismos de mitigação de risco e procedimentos destinados a manter a exposição ao risco de crédito em níveis considerados aceitáveis pela administração da instituição;
+II - adequada validação dos sistemas, modelos e procedimentos internos utilizados para o gerenciamento do risco de crédito;
+III - estimativas de perdas de crédito em diferentes cenários macroeconômicos;
+IV - classificação das operações sujeitas ao risco de crédito em categorias de risco;
+V - aferição adequada dos mitigadores de risco de crédito;
+VI - avaliação periódica da adequação das provisões constituídas.
+
+TÍTULO III - GERENCIAMENTO DO RISCO OPERACIONAL
+
+Art. 4º A estrutura de gerenciamento do risco operacional deve prever:
+I - identificação, avaliação, monitoramento, controle e mitigação do risco operacional;
+II - documentação das políticas de gerenciamento do risco operacional;
+III - mecanismos para identificação e coleta de informações sobre perdas operacionais e de dados;
+IV - processo de alerta antecipado de riscos operacionais potenciais;
+V - planos de continuidade de negócios.
+
+Art. 5º O risco operacional compreende a possibilidade de perdas resultantes de processos internos inadequados, falhas humanas, falhas de sistemas ou de eventos externos, incluindo:
+I - fraudes internas e externas;
+II - demandas trabalhistas e segurança deficiente do local de trabalho;
+III - práticas inadequadas relativas a clientes, produtos e serviços;
+IV - danos a ativos físicos próprios ou em uso pela instituição;
+V - interrupção das atividades;
+VI - falhas em sistemas, processos ou infraestrutura de tecnologia da informação;
+VII - falhas na execução, no cumprimento de prazos ou no gerenciamento das atividades.
+
+TÍTULO IV - RISCO SOCIOAMBIENTAL
+
+Art. 6º A estrutura de gerenciamento do risco socioambiental deve prever:
+I - a identificação, classificação, avaliação, monitoramento, mitigação e controle do risco socioambiental presente nas atividades e nas operações da instituição;
+II - os critérios específicos para avaliação e classificação do risco socioambiental das operações;
+III - as ações voltadas a assegurar condições de sustentabilidade ambiental.
+
+Art. 7º O risco socioambiental é definido como a possibilidade de perdas decorrentes de danos socioambientais, incluindo:
+I - risco de transição climática: possibilidade de perdas decorrentes do processo de transição para uma economia de baixo carbono;
+II - risco físico climático: possibilidade de perdas decorrentes de eventos climáticos severos.
+
+TÍTULO V - GERENCIAMENTO DE CAPITAL
+
+Art. 8º As instituições devem manter estrutura de gerenciamento de capital que contemple:
+I - Plano de Capital: documento que estabelece metas e projeções de capital, considerando no mínimo 3 anos à frente;
+II - Processo Interno de Avaliação da Adequação de Capital (ICAAP): processo por meio do qual a instituição avalia a suficiente alocação de capital para fazer frente aos riscos associados a suas atividades;
+III - mecanismos para assegurar o cumprimento dos requisitos mínimos de capital regulamentar;
+IV - plano de contingência de capital.
+
+Art. 9º Esta Resolução entra em vigor na data de sua publicação.

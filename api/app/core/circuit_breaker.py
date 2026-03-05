@@ -4,6 +4,7 @@ Protects against cascading failures from upstream services (Vertex AI, Redis).
 States: CLOSED (normal) → OPEN (failing fast) → HALF_OPEN (testing recovery).
 """
 
+import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
@@ -33,6 +34,7 @@ class CircuitBreaker:
     success_count: int = 0
     last_failure_time: float = 0.0
     _last_state_change: float = field(default_factory=time.time)
+    _lock: asyncio.Lock = field(default_factory=asyncio.Lock)
 
     def can_execute(self) -> bool:
         """Check if the circuit allows execution."""
@@ -49,24 +51,26 @@ class CircuitBreaker:
         # HALF_OPEN — allow limited calls
         return True
 
-    def record_success(self) -> None:
-        """Record a successful call."""
-        if self.state == CircuitState.HALF_OPEN:
-            self.success_count += 1
-            if self.success_count >= self.half_open_max:
-                self._transition(CircuitState.CLOSED)
-        elif self.state == CircuitState.CLOSED:
-            self.failure_count = 0  # Reset on success
+    async def record_success(self) -> None:
+        """Record a successful call (thread-safe)."""
+        async with self._lock:
+            if self.state == CircuitState.HALF_OPEN:
+                self.success_count += 1
+                if self.success_count >= self.half_open_max:
+                    self._transition(CircuitState.CLOSED)
+            elif self.state == CircuitState.CLOSED:
+                self.failure_count = 0  # Reset on success
 
-    def record_failure(self) -> None:
-        """Record a failed call."""
-        self.failure_count += 1
-        self.last_failure_time = time.time()
+    async def record_failure(self) -> None:
+        """Record a failed call (thread-safe)."""
+        async with self._lock:
+            self.failure_count += 1
+            self.last_failure_time = time.time()
 
-        if self.state == CircuitState.HALF_OPEN:
-            self._transition(CircuitState.OPEN)
-        elif self.failure_count >= self.failure_threshold:
-            self._transition(CircuitState.OPEN)
+            if self.state == CircuitState.HALF_OPEN:
+                self._transition(CircuitState.OPEN)
+            elif self.failure_count >= self.failure_threshold:
+                self._transition(CircuitState.OPEN)
 
     def _transition(self, new_state: CircuitState) -> None:
         """Transition to a new state with logging."""

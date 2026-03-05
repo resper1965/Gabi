@@ -75,10 +75,12 @@ async def run_ingestion():
                 continue # Safety filter
                 
             doc_num = doc.get("NumeroOWSNMBR")
+            if doc_num is None:
+                continue
             if "." in str(doc_num):
                  doc_num = str(doc_num).split(".")[0]
             
-            doc_url = doc.get("Path")
+            doc_url = doc.get("Path") or f"https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo={doc_type}&numero={doc_num}"
             
             print(f" [+] Processando {doc_type} {doc_num}...")
             content_data = await fetch_doc_content(client, doc_type, doc_num)
@@ -103,7 +105,7 @@ async def run_ingestion():
                 titulo=f"{doc_type} {doc_num} - {assunto[:100]}",
                 version_hash=content_hash,
                 texto_integral=texto_limpo,
-                provisions=[ProvisionSchema(texto_chunk=c, structure_path="Artigo Desconhecido") for c in chunks]
+                provisions=chunks
             )
             
             await ingester.ingest_regulatory_document(run, schema)

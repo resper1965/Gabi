@@ -4,19 +4,23 @@ Agent decides IF it needs to search the knowledge base before answering.
 Saves ~200ms + embedding cost for follow-ups, chit-chat, and clarifications.
 """
 
+import hashlib
 import json
+import logging
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.ai import generate, safe_parse_json
+from app.core.cache import cached_rag_result, cache_rag_result
 from app.core.embeddings import embed
+
+logger = logging.getLogger("gabi.dynamic_rag")
 
 # Allowlist of valid table pairs to prevent SQL injection
 ALLOWED_TABLE_PAIRS = {
     "law": ("law_chunks", "law_documents", "doc_type"),
     "ghost": ("ghost_chunks", "ghost_documents", "doc_type"),
-    "insightcare": ("insightcare_chunks", "insightcare_documents", "doc_type"),
 }
 
 
@@ -86,6 +90,13 @@ async def retrieve_if_needed(
     if not intent["needs_rag"]:
         return [], False
 
+    # Check cache before embedding
+    cache_key = hashlib.sha256(f"{module}:{user_id}:{intent['refined_query']}".encode()).hexdigest()
+    cached = await cached_rag_result(cache_key)
+    if cached is not None:
+        logger.debug("RAG cache HIT for query hash %s", cache_key[:12])
+        return cached, True
+
     # Embed the refined query (often more search-friendly than raw question)
     query_embedding = embed(intent["refined_query"])
 
@@ -123,6 +134,9 @@ async def retrieve_if_needed(
                 "doc_type": "ia_insight"
             })
 
+    # Cache the results for future identical queries
+    await cache_rag_result(cache_key, chunks)
+
     return chunks, True
 
 
@@ -134,17 +148,18 @@ async def retrieve_regulatory_insights(query: str, db: AsyncSession, limit: int 
     from sqlalchemy import or_
     from app.models.regulatory import RegulatoryAnalysis, RegulatoryVersion, RegulatoryDocument
 
-    # Extract potential authority/number patterns (e.g., "BCB 355", "Resolução 123")
-    # For now, we perform a broader search on title/number in documents
+    # Sanitize LIKE wildcards to prevent pattern injection
+    safe_query = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
     stmt = (
         select(RegulatoryAnalysis, RegulatoryDocument)
         .join(RegulatoryVersion, RegulatoryAnalysis.version_id == RegulatoryVersion.id)
         .join(RegulatoryDocument, RegulatoryVersion.document_id == RegulatoryDocument.id)
         .where(
             or_(
-                RegulatoryDocument.numero.ilike(f"%{query}%"),
-                RegulatoryDocument.tipo_ato.ilike(f"%{query}%"),
-                RegulatoryAnalysis.resumo_executivo.ilike(f"%{query}%")
+                RegulatoryDocument.numero.ilike(f"%{safe_query}%"),
+                RegulatoryDocument.tipo_ato.ilike(f"%{safe_query}%"),
+                RegulatoryAnalysis.resumo_executivo.ilike(f"%{safe_query}%")
             )
         )
         .order_by(RegulatoryAnalysis.analisado_em.desc())
@@ -165,7 +180,7 @@ async def retrieve_regulatory_insights(query: str, db: AsyncSession, limit: int 
             })
         return insights
     except Exception as e:
-        print(f"Error fetching regulatory insights: {e}")
+        logger.error("Error fetching regulatory insights: %s", e, exc_info=True)
         return []
 
 

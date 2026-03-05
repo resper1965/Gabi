@@ -1,0 +1,60 @@
+RESOLUÇÃO CD/ANPD Nº 2, DE 27 DE JANEIRO DE 2022
+
+Aprova o Regulamento de aplicação da Lei nº 13.709, de 14 de agosto de 2018, Lei Geral de Proteção de Dados Pessoais (LGPD), para agentes de tratamento de pequeno porte.
+
+O CONSELHO DIRETOR DA AUTORIDADE NACIONAL DE PROTEÇÃO DE DADOS (ANPD), no uso das atribuições que lhe confere o art. 55-J, incisos II e XVIII, da Lei nº 13.709, de 14 de agosto de 2018, e tendo em vista o disposto em seu Regimento Interno, aprovado pela Portaria nº 1, de 8 de março de 2021, e
+
+CONSIDERANDO que a Lei nº 13.709, de 2018, prevê, em seu art. 55-J, XVIII, que compete à ANPD editar normas, orientações e procedimentos simplificados e diferenciados, inclusive quanto aos prazos, para que microempresas e empresas de pequeno porte, bem como iniciativas empresariais de caráter incremental ou disruptivo que se autodeclarem startups ou empresas de inovação, possam adequar-se à LGPD;
+
+RESOLVE:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Este Regulamento dispõe sobre a aplicação da Lei nº 13.709, de 2018, para agentes de tratamento de pequeno porte.
+
+Art. 2º Para fins deste Regulamento, consideram-se:
+I - agentes de tratamento de pequeno porte: microempresas, empresas de pequeno porte, startups, pessoas jurídicas de direito privado, inclusive sem fins lucrativos, nos termos da legislação vigente, bem como pessoas naturais e entes privados despersonalizados que realizam tratamento de dados pessoais, assumindo obrigações típicas de controlador ou de operador;
+II - startups: organizações empresariais ou societárias, nascentes ou em operação recente, cuja atuação caracteriza-se pela inovação aplicada a modelo de negócios ou a produtos ou serviços ofertados, conforme definição do art. 4º, § 1º, I, da Lei Complementar nº 182, de 1º de junho de 2021;
+III - tratamento de alto risco: tratamento de dados pessoais que atenda cumulativamente a pelo menos um critério geral e um critério específico, dentre os a seguir indicados.
+
+§ 1º Critérios gerais:
+a) tratamento de dados pessoais em larga escala;
+b) tratamento de dados pessoais que possa afetar significativamente interesses e direitos fundamentais dos titulares.
+
+§ 2º Critérios específicos:
+a) uso de tecnologias emergentes ou inovadoras;
+b) vigilância ou controle de zonas acessíveis ao público;
+c) decisões tomadas unicamente com base em tratamento automatizado de dados pessoais, inclusive aquelas destinadas a definir o perfil pessoal, profissional, de saúde, de consumo e de crédito ou os aspectos da personalidade do titular;
+d) utilização de dados pessoais sensíveis ou de dados pessoais de crianças, de adolescentes e de idosos.
+
+Art. 3º Não poderão se beneficiar do tratamento jurídico diferenciado previsto neste Regulamento os agentes de tratamento de pequeno porte que:
+I - realizem tratamento de alto risco para os titulares, ressalvada a hipótese prevista no art. 8º;
+II - aufiram receita bruta superior ao limite estabelecido no art. 3º, II, da Lei Complementar nº 123, de 14 de dezembro de 2006, ou, no caso de startups, no art. 4º, § 1º, II, da Lei Complementar nº 182, de 2021;
+III - pertençam a grupo econômico de fato ou de direito, cuja receita global ultrapasse os limites referidos no inciso II.
+
+CAPÍTULO II - FLEXIBILIZAÇÃO E DISPENSA DE OBRIGAÇÕES
+
+Art. 4º Os agentes de tratamento de pequeno porte não são obrigados a indicar o encarregado pelo tratamento de dados pessoais exigido no art. 41 da LGPD.
+Parágrafo único. A dispensa prevista no caput não afasta a obrigação de o agente de tratamento de pequeno porte disponibilizar um canal de comunicação com o titular de dados para atender ao disposto no art. 41, § 2º, I, da LGPD.
+
+Art. 5º Os agentes de tratamento de pequeno porte poderão cumprir a obrigação de elaboração e manutenção de registro das operações de tratamento de dados pessoais, constante do art. 37 da LGPD, de forma simplificada.
+
+Art. 6º Os agentes de tratamento de pequeno porte poderão cumprir a obrigação de elaboração de relatório de impacto à proteção de dados pessoais, nos termos do regulamento, de forma simplificada.
+
+Art. 7º Os agentes de tratamento de pequeno porte poderão adotar medidas de segurança da informação e de proteção de dados pessoais, inclusive boas práticas e governança, de forma simplificada, as quais contemplem requisitos essenciais e necessários ao tratamento de dados pessoais, com o objetivo de protegê-los de acessos não autorizados e de situações acidentais ou ilícitas de destruição, perda, alteração, comunicação ou qualquer forma de tratamento inadequado ou ilícito.
+
+Art. 8º Os agentes de tratamento de pequeno porte que realizem tratamento de alto risco, conforme definido no art. 2º, III, poderão adotar medidas administrativas simplificadas previstas neste Capítulo.
+
+CAPÍTULO III - PRAZOS DIFERENCIADOS
+
+Art. 9º Os agentes de tratamento de pequeno porte terão prazo em dobro, em relação ao previsto na LGPD ou em regulamentação específica, para:
+I - atender às solicitações dos titulares referidas no art. 18, § 5º, e no art. 19, II, da LGPD;
+II - comunicar à ANPD e ao titular a ocorrência de incidente de segurança que possa acarretar risco ou dano relevante aos titulares, referida no art. 48 da LGPD;
+III - fornecer a declaração clara e completa referida no art. 19, II, da LGPD;
+IV - apresentar informações, documentos, relatórios e registros referidos no art. 10, § 3º, da LGPD e demais solicitações da ANPD.
+
+CAPÍTULO IV - DISPOSIÇÕES FINAIS
+
+Art. 10. A dispensa ou a flexibilização das obrigações dispostas neste Regulamento não isenta os agentes de tratamento de pequeno porte do cumprimento dos demais dispositivos da LGPD, incluídas as bases legais para o tratamento de dados pessoais, os princípios, os direitos do titular e as demais disposições legais, regulamentares e contratuais relativas à proteção de dados pessoais.
+
+Art. 11. Este Regulamento entra em vigor na data de sua publicação.

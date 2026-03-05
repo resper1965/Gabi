@@ -1,0 +1,57 @@
+RESOLUÇÃO CMN Nº 4.966, DE 25 DE NOVEMBRO DE 2021
+
+Dispõe sobre os conceitos e os critérios contábeis aplicáveis a instrumentos financeiros, bem como para a designação e o reconhecimento das relações de proteção (contabilidade de hedge) pelas instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil.
+
+O BANCO CENTRAL DO BRASIL, na forma do art. 9º da Lei nº 4.595, de 31 de dezembro de 1964, torna público que o CONSELHO MONETÁRIO NACIONAL, em sessão extraordinária realizada em 25 de novembro de 2021,
+
+RESOLVEU:
+
+CAPÍTULO I - DISPOSIÇÕES GERAIS
+
+Art. 1º Esta Resolução dispõe sobre os conceitos e os critérios contábeis aplicáveis a instrumentos financeiros, bem como para a designação e o reconhecimento das relações de proteção (hedge accounting).
+
+Art. 2º As instituições financeiras e demais instituições autorizadas a funcionar pelo Banco Central do Brasil devem observar os critérios estabelecidos nesta Resolução para:
+I - a classificação, a mensuração, o reconhecimento e a baixa de instrumentos financeiros;
+II - a constituição de provisão para perdas esperadas associadas ao risco de crédito;
+III - a designação e o reconhecimento contábil de relações de proteção (hedge accounting);
+IV - a evidenciação de informações sobre instrumentos financeiros.
+
+CAPÍTULO II - CLASSIFICAÇÃO DE INSTRUMENTOS FINANCEIROS
+
+Art. 3º Os ativos financeiros devem ser classificados nas seguintes categorias de mensuração:
+I - custo amortizado;
+II - valor justo por meio de outros resultados abrangentes (VJORA);
+III - valor justo por meio do resultado (VJR).
+
+Art. 4º A classificação dos ativos financeiros deve considerar:
+I - o modelo de negócios da instituição para a gestão dos ativos financeiros; e
+II - as características dos fluxos de caixa contratuais do ativo financeiro.
+
+Art. 5º O modelo de negócios deve refletir como os ativos financeiros são gerenciados em conjunto para gerar fluxos de caixa:
+I - modelo de negócio cujo objetivo é manter ativos financeiros para receber fluxos de caixa contratuais;
+II - modelo de negócio cujo objetivo é alcançado tanto pelo recebimento de fluxos de caixa contratuais quanto pela venda de ativos financeiros;
+III - outros modelos de negócios, incluindo gestão de ativos financeiros com base em valor justo.
+
+CAPÍTULO III - PROVISÃO PARA PERDAS ESPERADAS (ECL - Expected Credit Loss)
+
+Art. 6º A provisão para perdas esperadas associadas ao risco de crédito deve ser constituída com base em modelo de perda esperada, considerando:
+I - perdas de crédito esperadas para 12 meses: estimativa de perdas de crédito resultantes de eventos de inadimplência de um instrumento financeiro que sejam possíveis no período de 12 meses após a data-base;
+II - perdas de crédito esperadas para a vida inteira: estimativa de perdas que resultam de todos os possíveis eventos de inadimplência ao longo da vida esperada de um instrumento financeiro.
+
+Art. 7º Para fins de provisão, os instrumentos financeiros devem ser classificados em três estágios:
+I - Estágio 1: instrumentos financeiros cujo risco de crédito não aumentou significativamente desde o reconhecimento inicial. Provisão baseada nas perdas esperadas para 12 meses;
+II - Estágio 2: instrumentos financeiros cujo risco de crédito aumentou significativamente desde o reconhecimento inicial, mas que não possuem evidência objetiva de imparidade. Provisão baseada nas perdas esperadas para a vida inteira;
+III - Estágio 3: instrumentos financeiros com evidência objetiva de imparidade (créditos em situação de inadimplência). Provisão baseada nas perdas esperadas para a vida inteira.
+
+Art. 8º A avaliação do aumento significativo do risco de crédito deve considerar:
+I - informações prospectivas razoáveis e sustentáveis;
+II - mudanças no risco de crédito desde a data de reconhecimento inicial;
+III - presunção refutável de aumento significativo quando os pagamentos contratuais estiverem em atraso por mais de 30 dias.
+
+CAPÍTULO IV - VIGÊNCIA E TRANSIÇÃO
+
+Art. 9º Esta Resolução entra em vigor em 1º de janeiro de 2025, exceto os dispositivos relativos à contabilidade de hedge, que entram em vigor em 1º de janeiro de 2027.
+
+Art. 10. A Resolução CMN nº 2.682, de 21 de dezembro de 1999, fica revogada a partir de 1º de janeiro de 2025.
+
+NOTA: Esta resolução alinha os critérios contábeis do sistema financeiro brasileiro com o padrão internacional IFRS 9 (International Financial Reporting Standard 9), substituindo o modelo de perda incorrida pelo modelo de perda esperada para provisões de crédito.

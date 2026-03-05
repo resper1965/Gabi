@@ -1,8 +1,9 @@
 import asyncio
+import hashlib
+import logging
+import uuid
 from typing import List, Optional
 from datetime import datetime, timezone
-import uuid
-import hashlib
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,7 @@ from app.services.legal_structure_parser import parse_legal_structure, LegalProv
 class LegalIngester:
     def __init__(self, db: Session):
         self.db = db
+        self.logger = logging.getLogger("gabi.legal_ingest")
 
     def _generate_hash(self, text: str) -> str:
         return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -50,11 +52,11 @@ class LegalIngester:
             current_version = self.db.execute(stmt_v).scalar_one_or_none()
 
         if current_version and current_version.content_hash == content_hash:
-            print(f"[{law_number}] IDEMPOTENT: Hash unchanged ({content_hash[:8]}). Skipping parsing.")
+            self.logger.debug("[%s] IDEMPOTENT: Hash unchanged (%s). Skipping parsing.", law_number, content_hash[:8])
             return doc
             
         # 3. Hash changed or new document. Create new Version
-        print(f"[{law_number}] NEW VERSION: Compiling new version from Planalto...")
+        self.logger.info("[%s] NEW VERSION: Compiling new version from Planalto...", law_number)
         
         # Mark old versions as not current
         stmt_old = select(LegalVersion).filter_by(doc_id=doc.id, is_current=True)
@@ -75,7 +77,7 @@ class LegalIngester:
         doc.current_version_id = new_version.id
 
         # 4. Parse Structure Deeply
-        print(f"[{law_number}] Chunking provisions...")
+        self.logger.info("[%s] Chunking provisions...", law_number)
         schema_provisions = parse_legal_structure(clean_text, law_name=act_type + " " + law_number)
         
         provisions_to_insert = []
@@ -99,5 +101,5 @@ class LegalIngester:
         new_version.parse_metadata = {"provisions_count": len(provisions_to_insert)}
         self.db.commit()
         
-        print(f"[{law_number}] SUCCESS: Saved {len(provisions_to_insert)} provisions.")
+        self.logger.info("[%s] SUCCESS: Saved %d provisions.", law_number, len(provisions_to_insert))
         return doc

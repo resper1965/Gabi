@@ -9,7 +9,6 @@ import {
   PenTool,
   Scale,
   Database,
-  ShieldCheck,
   LayoutDashboard,
   LogOut,
   ChevronLeft,
@@ -21,10 +20,9 @@ import {
 import { useState } from "react"
 
 const modules = [
-  { key: "ghost", label: "ness.AI", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)" },
+  { key: "ghost", label: "gabi.writer", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)" },
   { key: "law", label: "gabi.legal", icon: Scale, href: "/law", accent: "var(--color-mod-law)" },
   { key: "ntalk", label: "gabi.data", icon: Database, href: "/ntalk", accent: "var(--color-mod-ntalk)" },
-  { key: "insightcare", label: "gabi.care", icon: ShieldCheck, href: "/insightcare", accent: "var(--color-mod-insightcare)" },
 ]
 
 const ENV_LABEL = process.env.NEXT_PUBLIC_ENV || (
@@ -84,7 +82,7 @@ export function Sidebar() {
               Gabi<span style={{ color: "var(--color-gabi-primary)" }}>.</span>
             </span>
             <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-1">
-              IA Corporativa
+              ness.AI
             </span>
           </div>
         )}
@@ -123,22 +121,13 @@ export function Sidebar() {
           collapsed={collapsed}
         />
 
-        {/* Insights */}
+        {/* Radar Regulatório */}
         <NavItem
-          href="/law/insights"
+          href="/regulatory/insights"
           icon={Sparkles}
-          label="Insights Jurídicos"
-          isActive={pathname === "/law/insights"}
+          label="Radar Regulatório"
+          isActive={pathname === "/regulatory/insights"}
           activeColor="#f59e0b"
-          collapsed={collapsed}
-        />
-
-        <NavItem
-          href="/insightcare/insights"
-          icon={Sparkles}
-          label="Insights Seguros"
-          isActive={pathname === "/insightcare/insights"}
-          activeColor="#10b981"
           collapsed={collapsed}
         />
 
