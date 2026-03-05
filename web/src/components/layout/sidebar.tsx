@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import NextImage from "next/image"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { NessBrand } from "@/components/ness-brand"
@@ -64,10 +65,13 @@ export function Sidebar() {
       >
         <div className="relative shrink-0">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 border border-white/10 shadow-lg overflow-hidden">
-            <img
+            <NextImage
               src="/logo.png"
               alt="Gabi Logo"
+              width={36}
+              height={36}
               className="w-full h-full object-cover"
+              unoptimized
             />
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0a0a0a]" />

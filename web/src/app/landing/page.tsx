@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState } from "react"
 import {
   PenTool,
@@ -141,10 +142,13 @@ export default function LandingPage() {
           }}
         />
 
-        <img
+        <Image
           src="/logo.png"
           alt="Gabi"
+          width={80}
+          height={80}
           className="w-20 h-20 rounded-3xl object-cover shadow-2xl mb-6 relative z-10"
+          unoptimized
         />
 
         <h1
