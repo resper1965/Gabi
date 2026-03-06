@@ -16,9 +16,9 @@ class TestBOLA:
         # This test validates the pattern is present
         import ast
         import inspect
-        from app.modules.insightcare.router import list_documents
-        source = inspect.getsource(list_documents)
-        assert "tenant_id" in source, "list_documents must filter by tenant_id"
+        from app.modules.ghost.router import generate_text
+        source = inspect.getsource(generate_text)
+        assert "profile" in source, "generate_text must filter by profile"
 
     def test_chat_messages_scoped_to_user(self):
         """Chat history must be scoped to authenticated user."""
@@ -55,21 +55,7 @@ class TestRateLimiting:
         assert callable(check_rate_limit)
 
 
-class TestInputValidation:
-    """Verify Pydantic models enforce input validation."""
 
-    def test_chat_request_rejects_empty_question(self):
-        """ChatRequest should require non-empty question."""
-        from app.modules.insightcare.router import ChatRequest
-        # Valid request
-        req = ChatRequest(tenant_id="t1", agent="policy_analyst", question="test?")
-        assert req.question == "test?"
-
-    def test_agent_validation(self):
-        """Only valid agent names should be processable."""
-        from app.modules.insightcare.router import AGENTS
-        assert "policy_analyst" in AGENTS
-        assert "hacker_agent" not in AGENTS
 
 
 class TestSQLInjection:
@@ -80,7 +66,6 @@ class TestSQLInjection:
         from app.core.dynamic_rag import ALLOWED_TABLE_PAIRS
         assert "law" in ALLOWED_TABLE_PAIRS
         assert "ghost" in ALLOWED_TABLE_PAIRS
-        assert "insightcare" in ALLOWED_TABLE_PAIRS
         # Injection attempt
         assert "'; DROP TABLE users; --" not in ALLOWED_TABLE_PAIRS
 
@@ -93,12 +78,7 @@ class TestSQLInjection:
 class TestAntiHallucination:
     """Verify AI guardrails are present in system prompts."""
 
-    def test_legal_agents_have_guardrails(self):
-        """Legal agent prompts must include anti-hallucination rules."""
-        from app.modules.insightcare.router import AGENTS
-        for agent, prompt in AGENTS.items():
-            assert "Zero Alucinação" in prompt or "ESTRITAMENTE" in prompt or "APENAS" in prompt, \
-                f"Agent '{agent}' missing anti-hallucination guardrail"
+
 
     def test_ghost_has_citations_rule(self):
         """GhostWriter should cite sources."""

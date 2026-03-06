@@ -39,7 +39,6 @@ class TestUserManagement:
         assert "ghost" in ALL_MODULES
         assert "law" in ALL_MODULES
         assert "ntalk" in ALL_MODULES
-        assert "insightcare" in ALL_MODULES
 
 
 class TestSystemStats:
