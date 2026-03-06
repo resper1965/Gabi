@@ -83,7 +83,14 @@ const clientLogos = [
   { name: "Consultorias", icon: Building },
 ]
 
-const testimonials = [
+type Testimonial = {
+  quote: string;
+  author: string;
+  role: React.ReactNode;
+  stars: number;
+};
+
+const testimonials: Testimonial[] = [
   {
     quote: "A Gabi reduziu nosso tempo de análise normativa semanal de 40 horas para apenas 2. O nível de precisão jurídica em inferência contratual é inédito no mercado brasileiro.",
     author: "Ricardo S.",
@@ -91,7 +98,7 @@ const testimonials = [
       <>
         Head de Compliance, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Banco Top 5</span>
       </>
-    ) as unknown as string, // Cast to string for array type compat
+    ),
     stars: 5,
   },
   {
@@ -101,7 +108,7 @@ const testimonials = [
       <>
         Sócia-Diretora, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Boutique Reg.</span>
       </>
-    ) as unknown as string,
+    ),
     stars: 5,
   },
 ]
@@ -115,21 +122,22 @@ function AnimatedCounter({ end, suffix = "", prefix = "" }: { end: number, suffi
   const [count, setCount] = useState(0)
 
   useEffect(() => {
-    let start = 0
-    const duration = 2000 // 2 seconds
-    const increment = end / (duration / 16) // roughly 60fps
-    
-    const timer = setInterval(() => {
-      start += increment
-      if (start >= end) {
-        setCount(end)
-        clearInterval(timer)
-      } else {
-        setCount(Math.floor(start))
-      }
-    }, 16)
+    let startTimestamp: number | null = null;
+    const duration = 2000;
+    let animationFrameId: number;
 
-    return () => clearInterval(timer)
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(Math.floor(progress * end));
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(animationFrameId);
   }, [end])
 
   return <span>{prefix}{count}{suffix}</span>
@@ -424,7 +432,7 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white">{t.author}</p>
-                    <p className="text-sm text-slate-400">{t.role as unknown as React.ReactNode}</p>
+                    <p className="text-sm text-slate-400">{t.role}</p>
                   </div>
                 </div>
               </div>
