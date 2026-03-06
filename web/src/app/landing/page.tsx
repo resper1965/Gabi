@@ -16,7 +16,9 @@ import {
   Star,
   Quote,
   Building,
-  Gavel
+  Gavel,
+  TrendingUp,
+  Landmark
 } from "lucide-react"
 
 /* ═══════════════════════════════════════════
@@ -54,7 +56,7 @@ const painPoints = [
   {
     before: "Dificuldade em cruzar dados de conformidade",
     after: "Insights gráficos imediatos através de linguagem natural",
-    audience: "Gestores de Risco & CFOs",
+    audience: "Gestores de Risco, CFOs & Fund Managers",
     impact: "Decisões Data-Driven",
     icon: BarChart3,
     accent: "#8b5cf6", // Violet
@@ -75,10 +77,12 @@ const regulatoryAgencies = [
 
 
 const clientLogos = [
-  { name: "Escritórios Top Tier", icon: Building },
+  { name: "Escritórios Top Tier", icon: Gavel },
   { name: "Bancos Múltiplos", icon: Building },
-  { name: "Gestoras de Fundo", icon: Building },
-  { name: "Auditorias Tier 1", icon: Building },
+  { name: "Gestoras de Fundo", icon: TrendingUp },
+  { name: "FIPs & FIIs", icon: Landmark },
+  { name: "Asset Managers", icon: BarChart3 },
+  { name: "Auditorias Tier 1", icon: ShieldCheck },
   { name: "Consultorias", icon: Building },
 ]
 
@@ -106,6 +110,16 @@ const testimonials: Testimonial[] = [
     role: (
       <>
         Sócia-Diretora, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Boutique Reg.</span>
+      </>
+    ),
+    stars: 5,
+  },
+  {
+    quote: "A gestão normativa de fundos de infraestrutura (FIP) era um gargalo operacional enorme. Hoje, a Gabi monitora as instruções da CVM e gera relatórios de impacto para os cotistas em minutos.",
+    author: "Carlos M.",
+    role: (
+      <>
+        Diretor de Compliance, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Asset Manager</span>
       </>
     ),
     stars: 5,
@@ -177,7 +191,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mt-6 text-lg tracking-wide md:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
-            A <span className="brand-mark text-slate-200">Gabi<span className="text-[#00ade8]">.</span></span> transforma a gestão normativa para <strong>escritórios de advocacia</strong> e <strong>departamentos jurídicos e de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
+            A <span className="brand-mark text-slate-200">Gabi<span className="text-[#00ade8]">.</span></span> transforma a gestão normativa para <strong>escritórios de advocacia</strong>, <strong>gestoras de ativos</strong>, <strong>fundos de infraestrutura (FIP/FII)</strong> e <strong>departamentos de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -373,16 +387,28 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {/* Law Firms */}
           <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-cyan-500/10"></div>
             <Gavel className="w-10 h-10 text-cyan-500 mb-6 relative z-10" />
-            <h3 className="text-2xl font-bold text-white mb-4 relative z-10 tracking-tight">Escritórios Privados</h3>
+            <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Escritórios Privados</h3>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Monitore as publicações do BCB e CVM que afetam seus clientes em tempo real.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Gere rascunhos de pareceres com o estilo rigoroso do seu escritório.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Esmague as horas gastas em pesquisas circulares na jurisprudência administrativa.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Monitore as publicações do BCB e CVM que afetam seus clientes em tempo real.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Gere rascunhos de pareceres com o estilo rigoroso do seu escritório.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Esmague as horas gastas em pesquisas circulares na jurisprudência administrativa.</span></li>
+            </ul>
+          </div>
+
+          {/* Funds & Asset Management */}
+          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-amber-500/10"></div>
+            <TrendingUp className="w-10 h-10 text-amber-500 mb-6 relative z-10" />
+            <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Fundos & Asset Management</h3>
+            <ul className="space-y-4 mb-8 relative z-10">
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Rastreamento automático de Instruções CVM impactando FIPs, FIIs e FIDCs.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Geração de relatórios de impacto regulatório para cotistas e investidores institucionais.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Cruzamento inteligente entre normas BCB/CMN e políticas internas de gestão de risco.</span></li>
             </ul>
           </div>
 
@@ -390,11 +416,11 @@ export default function LandingPage() {
           <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-emerald-500/10"></div>
             <ShieldCheck className="w-10 h-10 text-emerald-500 mb-6 relative z-10" />
-            <h3 className="text-2xl font-bold text-white mb-4 relative z-10 tracking-tight">Compliance Interno</h3>
+            <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Compliance Interno</h3>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Cruze automaticamente normativas contra as suas políticas operacionais.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Receba alertas emergenciais de gaps apontados por novas resoluções.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Exporte dashboards executivos de risco para a diretoria em segundos.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Cruze automaticamente normativas contra as suas políticas operacionais.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Receba alertas emergenciais de gaps apontados por novas resoluções.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Exporte dashboards executivos de risco para a diretoria em segundos.</span></li>
             </ul>
           </div>
         </div>
@@ -412,23 +438,23 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {testimonials.map((t, idx) => (
               <div key={idx} className="bg-surface-base p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors relative">
-                <Quote className="absolute top-8 right-8 w-12 h-12 text-slate-800/50" />
+                <Quote className="absolute top-8 right-8 w-10 h-10 text-slate-800/50" />
                 <div className="flex gap-1 mb-6">
                   {[...Array(t.stars)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500" />
+                    <Star key={i} className="w-4 h-4 fill-amber-500 text-amber-500" />
                   ))}
                 </div>
-                <p className="text-lg text-slate-300 mb-8 font-light leading-relaxed italic relative z-10">&quot;{t.quote}&quot;</p>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center font-bold text-lg text-slate-300 border border-slate-700 shrink-0">
+                <p className="text-base text-slate-300 mb-8 font-light leading-relaxed italic relative z-10">&quot;{t.quote}&quot;</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center font-bold text-base text-slate-300 border border-slate-700 shrink-0">
                     {t.author.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-bold text-white">{t.author}</p>
-                    <p className="text-sm text-slate-400">{t.role}</p>
+                    <p className="font-bold text-white text-sm">{t.author}</p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
                   </div>
                 </div>
               </div>
