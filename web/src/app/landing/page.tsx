@@ -87,13 +87,21 @@ const testimonials = [
   {
     quote: "A Gabi reduziu nosso tempo de análise normativa semanal de 40 horas para apenas 2. O nível de precisão jurídica em inferência contratual é inédito no mercado brasileiro.",
     author: "Ricardo S.",
-    role: "Head de Compliance, Banco Top 5",
+    role: (
+      <>
+        Head de Compliance, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Banco Top 5</span>
+      </>
+    ) as unknown as string, // Cast to string for array type compat
     stars: 5,
   },
   {
     quote: "Toda a equipe usa a plataforma diariamente para consolidar pareceres. A IA não apenas encontra as leis do BCB/CVM, ela entende o jargão do escritório e rascunha com maestria.",
     author: "Amanda V.",
-    role: "Sócia-Diretora, Boutique de Regulação",
+    role: (
+      <>
+        Sócia-Diretora, <span className="text-transparent bg-slate-700 rounded-sm select-none blur-sm px-1">Boutique Reg.</span>
+      </>
+    ) as unknown as string,
     stars: 5,
   },
 ]
@@ -148,7 +156,7 @@ export default function LandingPage() {
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-            <span className="text-xs font-bold text-slate-200 tracking-widest uppercase">Gabi by Ness</span>
+            <span className="text-xs font-bold text-slate-200 tracking-widest uppercase">Gabi by ness.</span>
           </div>
 
           <h1
@@ -186,7 +194,7 @@ export default function LandingPage() {
           <div className="mt-16 flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500 opacity-90">
             <span className="font-semibold tracking-wider text-xs">DESENVOLVIDO POR</span>
             <div className="flex gap-4 items-center transition-all duration-500">
-              <span className="font-black text-white text-xl tracking-tighter mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
+              <span className="font-medium text-white text-xl tracking-tight mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
             </div>
           </div>
         </div>
@@ -414,7 +422,7 @@ export default function LandingPage() {
                   </div>
                   <div>
                     <p className="font-bold text-white">{t.author}</p>
-                    <p className="text-sm text-slate-400">{t.role}</p>
+                    <p className="text-sm text-slate-400">{t.role as unknown as React.ReactNode}</p>
                   </div>
                 </div>
               </div>
@@ -506,7 +514,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               <p>&copy; {new Date().getFullYear()} ness. Todos os direitos reservados.</p>
               <span className="hidden sm:inline">&bull;</span>
-              <p>powered by <span className="font-bold text-slate-300">ness<span className="text-[#00ade8]">.</span></span></p>
+              <p>powered by <span className="font-medium text-slate-300 tracking-tight">ness<span className="text-[#00ade8]">.</span></span></p>
             </div>
           </div>
         </div>
