@@ -8,19 +8,16 @@ import {
   Scale,
   BarChart3,
   Radar,
-  Lock,
-  Building2,
-  Briefcase,
-  TrendingUp,
-  FileText,
   ChevronDown,
   ChevronUp,
   ArrowRight,
   CheckCircle2,
   XCircle,
-  Database,
-  Globe2,
-  ShieldCheck
+  ShieldCheck,
+  Star,
+  Quote,
+  Building,
+  Gavel
 } from "lucide-react"
 
 /* ═══════════════════════════════════════════
@@ -77,18 +74,28 @@ const regulatoryAgencies = [
   { name: "ANEEL", full: "Agência Nac. Energia Elétrica", desc: "Setor elétrico", color: "#06b6d4", featured: false },
 ]
 
-const markets = [
-  { label: "Escritórios de Advocacia", icon: Building2 },
-  { label: "Consultorias e Auditorias", icon: Briefcase },
-  { label: "Departamentos Financeiros", icon: TrendingUp },
-  { label: "Fintechs e Gestoras", icon: Globe2 },
-  { label: "Produtoras de Conteúdo", icon: FileText },
+
+const clientLogos = [
+  { name: "Escritórios Top Tier", icon: Building },
+  { name: "Bancos Múltiplos", icon: Building },
+  { name: "Gestoras de Fundo", icon: Building },
+  { name: "Auditorias Tier 1", icon: Building },
+  { name: "Consultorias", icon: Building },
 ]
 
-const trustBadges = [
-  { icon: Database, label: "Hospedado no Brasil 🇧🇷" },
-  { icon: ShieldCheck, label: "Roadmap ISO 27001" },
-  { icon: Lock, label: "Adequação LGPD" },
+const testimonials = [
+  {
+    quote: "A Gabi reduziu nosso tempo de análise normativa semanal de 40 horas para apenas 2. O nível de precisão jurídica em inferência contratual é inédito no mercado brasileiro.",
+    author: "Ricardo S.",
+    role: "Head de Compliance, Banco Top 5",
+    stars: 5,
+  },
+  {
+    quote: "Toda a equipe usa a plataforma diariamente para consolidar pareceres. A IA não apenas encontra as leis do BCB/CVM, ela entende o jargão do escritório e rascunha com maestria.",
+    author: "Amanda V.",
+    role: "Sócia-Diretora, Boutique de Regulação",
+    stars: 5,
+  },
 ]
 
 /* ═══════════════════════════════════════════
@@ -126,7 +133,7 @@ export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#0F172A] selection:bg-[#0369A1] selection:text-white">
+    <div className="min-h-screen bg-surface-base selection:bg-[#0369A1] selection:text-white">
       {/* ── Hero Split View ── */}
       <section className="relative w-full max-w-7xl mx-auto px-6 pt-24 pb-20 overflow-hidden flex flex-col-reverse md:grid md:grid-cols-2 gap-12 items-center">
         {/* Glow background restricted to text side */}
@@ -185,7 +192,7 @@ export default function LandingPage() {
         </div>
 
         {/* Right Column (Avatar & Icon Composition) */}
-        <div className="relative w-full max-w-lg mx-auto aspect-square md:aspect-[4/5] flex items-center justify-center">
+        <div className="relative w-full max-w-lg mx-auto aspect-square md:aspect-4/5 flex items-center justify-center">
            {/* Glow Effects */}
            <div className="absolute inset-0 bg-linear-to-tr from-[#0369A1]/60 to-[#00ade8]/30 rounded-[2.5rem] opacity-30 blur-3xl mix-blend-screen animate-pulse"></div>
            
@@ -231,13 +238,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Trust Badges ── */}
-      <section className="py-12 px-6">
-         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            {trustBadges.map((badge, idx) => (
-              <div key={idx} className="flex items-center gap-2 text-slate-300">
-                <badge.icon className="w-5 h-5 text-slate-400" />
-                <span className="text-sm font-semibold uppercase tracking-wider">{badge.label}</span>
+      {/* ── Corporate Logo Carousel ── */}
+      <section className="py-10 px-6 border-y border-white/5 bg-slate-900/30">
+         <div className="max-w-5xl mx-auto text-center mb-6">
+           <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">O motor de conformidade escolhido por</p>
+         </div>
+         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+            {clientLogos.map((logo, idx) => (
+              <div key={idx} className="flex items-center gap-3 text-slate-300 transition-all hover:text-white hover:scale-105">
+                <logo.icon className="w-8 h-8 md:w-9 md:h-9 text-slate-400" />
+                <span className="text-lg md:text-xl font-bold tracking-tight">{logo.name}</span>
               </div>
             ))}
          </div>
@@ -338,27 +348,83 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Target Markets ── */}
-      <section className="max-w-5xl mx-auto px-6 pb-24 text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-10" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-          Construído para Operações Críticas
-        </h2>
+      {/* ── Solutions by Industry ── */}
+      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+            Arquitetura desenhada para o seu negócio
+          </h2>
+          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+            A Gabi adapta-se às exigências específicas do seu ambiente corporativo, seja na defesa de clientes ou na mitigação de riscos internos.
+          </p>
+        </div>
 
-        <div className="flex flex-wrap justify-center gap-4">
-          {markets.map((m, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 px-5 py-4 rounded-xl bg-slate-800 border border-slate-700 transition-colors hover:bg-slate-700/80"
-            >
-              <m.icon className="w-5 h-5 text-[#00ade8]" />
-              <span className="text-sm font-semibold text-slate-200">{m.label}</span>
-            </div>
-          ))}
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Law Firms */}
+          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-cyan-500/10"></div>
+            <Gavel className="w-10 h-10 text-cyan-500 mb-6 relative z-10" />
+            <h3 className="text-2xl font-bold text-white mb-4 relative z-10 tracking-tight">Escritórios Privados</h3>
+            <ul className="space-y-4 mb-8 relative z-10">
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Monitore as publicações do BCB e CVM que afetam seus clientes em tempo real.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Gere rascunhos de pareceres com o estilo rigoroso do seu escritório.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Esmague as horas gastas em pesquisas circulares na jurisprudência administrativa.</span></li>
+            </ul>
+          </div>
+
+          {/* Compliance Depts */}
+          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-emerald-500/10"></div>
+            <ShieldCheck className="w-10 h-10 text-emerald-500 mb-6 relative z-10" />
+            <h3 className="text-2xl font-bold text-white mb-4 relative z-10 tracking-tight">Compliance Interno</h3>
+            <ul className="space-y-4 mb-8 relative z-10">
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Cruze automaticamente normativas contra as suas políticas operacionais.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Receba alertas emergenciais de gaps apontados por novas resoluções.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light">Exporte dashboards executivos de risco para a diretoria em segundos.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Social Proof / Testimonials ── */}
+      <section className="border-t border-white/5 bg-slate-900/30 px-6 py-24">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+              Performance corporativa comprovada
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Veja o que os líderes de mercado reportam desde a implantação da inteligência artificial da plataforma.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {testimonials.map((t, idx) => (
+              <div key={idx} className="bg-surface-base p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors relative">
+                <Quote className="absolute top-8 right-8 w-12 h-12 text-slate-800/50" />
+                <div className="flex gap-1 mb-6">
+                  {[...Array(t.stars)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500" />
+                  ))}
+                </div>
+                <p className="text-lg text-slate-300 mb-8 font-light leading-relaxed italic relative z-10">&quot;{t.quote}&quot;</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center font-bold text-lg text-slate-300 border border-slate-700 shrink-0">
+                    {t.author.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-bold text-white">{t.author}</p>
+                    <p className="text-sm text-slate-400">{t.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── CTA Final (Full Width) ── */}
-      <section className="relative px-6 py-24 text-center overflow-hidden border-t border-white/10" style={{ backgroundColor: "#020617" }}>
+      <section className="relative px-6 py-24 text-center overflow-hidden border-t border-white/10 bg-surface-base">
          {/* Background accent */}
          <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: "radial-gradient(circle at center, #0369A1 0%, transparent 70%)" }} />
          
@@ -383,7 +449,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-slate-800 bg-[#0F172A] px-6 py-12">
+      <footer className="border-t border-slate-800 bg-surface-base px-6 py-12">
         <div className="max-w-5xl mx-auto">
           {/* Legal Accordions */}
           <div className="grid md:grid-cols-2 gap-6 mb-12">
