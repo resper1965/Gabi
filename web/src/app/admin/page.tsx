@@ -5,7 +5,7 @@ import { useAuth } from "@/components/auth-provider"
 import { gabi } from "@/lib/api"
 import {
   Users, FileText, Database, Shield, RefreshCw, Loader2,
-  CheckCircle2, XCircle, Clock, ChevronDown, BookOpen, Download, Trash2,
+  CheckCircle2, XCircle, Clock, ChevronDown, BookOpen, Download, Trash2, Search, Zap, Code
 } from "lucide-react"
 import { toast } from "sonner"
 import NextImage from "next/image"
@@ -69,17 +69,25 @@ export default function AdminPage() {
   const [seedLoading, setSeedLoading] = useState<string | null>(null)
   const [ingestResults, setIngestResults] = useState<Array<{ source: string; status: string; detail?: string }>>([])
 
+  const [activeTab, setActiveTab] = useState<"users" | "rag">("users")
+  const [ragBases, setRagBases] = useState<{ law_documents: Record<string, unknown>[]; regulatory_insights: Record<string, unknown>[] } | null>(null)
+  const [ragQuery, setRagQuery] = useState("")
+  const [ragSimulation, setRagSimulation] = useState<{ intent?: Record<string, unknown>; did_retrieve?: boolean; chunks?: Record<string, unknown>[] } | null>(null)
+  const [ragLoading, setRagLoading] = useState(false)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      const [u, s, packs] = await Promise.all([
+      const [u, s, packs, rag] = await Promise.all([
         gabi.admin.users() as Promise<UserInfo[]>,
         gabi.admin.stats() as Promise<Stats>,
         gabi.admin.regulatoryPacks().catch(() => ({ packs: [] })) as Promise<{ packs: SeedPack[] }>,
+        gabi.admin.regulatoryBases().catch(() => ({ law_documents: [], regulatory_insights: [] })) as Promise<{ law_documents: Record<string, unknown>[]; regulatory_insights: Record<string, unknown>[] }>,
       ])
       setUsers(u)
       setStats(s)
       setSeedPacks(packs.packs || [])
+      setRagBases(rag)
     } catch {
       toast.error("Erro ao carregar dados")
     } finally {
@@ -230,6 +238,28 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* Tabs */}
+      <div className="flex border-b border-[#334155] mb-6">
+        <button
+          onClick={() => setActiveTab("users")}
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-colors ${
+            activeTab === "users" ? "border-(--color-gabi-primary) text-white" : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Users className="w-4 h-4" /> Usuários e Sistema
+        </button>
+        <button
+          onClick={() => setActiveTab("rag")}
+          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-colors ${
+            activeTab === "rag" ? "border-violet-500 text-white" : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Zap className="w-4 h-4" /> Acervo IA & RAG
+        </button>
+      </div>
+
+      {activeTab === "users" ? (
+        <>
       {/* Regulatory Seed Packs */}
       {profile?.role === "superadmin" && seedPacks.length > 0 && (() => {
         const MODULE_LABELS: Record<string, string> = { law: "gabi.legal" };
@@ -560,6 +590,133 @@ export default function AdminPage() {
           </tbody>
         </table>
       </div>
+      </>
+      ) : (
+        <div className="space-y-6 animate-fade-in">
+          {/* RAG Simulator */}
+          <div className="rounded-2xl bg-[#1E293B] border border-[#334155] overflow-hidden">
+            <div className="p-5 border-b border-[#334155] bg-[#1a2332]/50">
+              <div className="flex items-center gap-2 mb-4">
+                <Search className="w-4 h-4 text-violet-400" />
+                <h2 className="text-sm font-semibold text-white">RAG Simulator</h2>
+                <span className="text-[0.65rem] bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">Preview Neural</span>
+              </div>
+              
+              <form 
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!ragQuery.trim()) return;
+                  setRagLoading(true);
+                  try {
+                    const res = await gabi.admin.simulateRag(ragQuery, "law") as Record<string, unknown>;
+                    setRagSimulation(res);
+                  } catch { toast.error("Falha ao simular busca"); }
+                  finally { setRagLoading(false); }
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={ragQuery}
+                  onChange={e => setRagQuery(e.target.value)}
+                  placeholder="Ex: Como funciona o crédito rural segundo o CMN?"
+                  className="flex-1 bg-transparent border border-[#334155] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500"
+                  disabled={ragLoading}
+                />
+                <button
+                  type="submit"
+                  disabled={ragLoading || !ragQuery.trim()}
+                  className="bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white px-6 py-3 rounded-xl text-sm font-medium transition-colors"
+                >
+                  {ragLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Auditar Busca"}
+                </button>
+              </form>
+            </div>
+            
+            {ragSimulation && (
+              <div className="p-5">
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1 bg-slate-900/50 rounded-lg p-4 border border-[#334155]">
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-1"><Zap className="w-3 h-3" /> Intent Extraction</div>
+                    <code className="text-xs text-emerald-400">{JSON.stringify(ragSimulation.intent, null, 2)}</code>
+                  </div>
+                  <div className="flex-1 bg-slate-900/50 rounded-lg p-4 border border-[#334155]">
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-1"><Database className="w-3 h-3" /> Vector Search Result</div>
+                    <div className="text-sm text-white">
+                      Chunks Regatados: <strong className="text-violet-400">{ragSimulation.chunks?.length || 0}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {ragSimulation.chunks && ragSimulation.chunks.length > 0 && (
+                  <div className="space-y-3 mt-6">
+                    <h3 className="text-xs font-semibold text-slate-400 flex items-center gap-2"><Code className="w-3 h-3" /> Raw Chunks Sent to Model</h3>
+                    {ragSimulation.chunks.map((ck: Record<string, any>, idx: number) => (
+                      <div key={idx} className="bg-slate-900 rounded-lg p-4 border border-[#334155]/50 text-xs">
+                        <div className="flex items-center gap-2 mb-2 text-violet-300">
+                          <span className="font-mono bg-violet-500/20 px-1.5 py-0.5 rounded">Rank #{idx+1}</span>
+                          <span className="truncate max-w-[300px]">{ck.metadata?.source || "Doc"}</span>
+                          {ck.distance !== undefined && <span className="ml-auto text-emerald-400">Score: {(1 - ck.distance).toFixed(3)}</span>}
+                        </div>
+                        <p className="text-slate-300 leading-relaxed max-h-[150px] overflow-y-auto overflow-x-hidden">{ck.page_content}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* RAG Catalog / Data Grid */}
+          <div className="rounded-2xl bg-[#1E293B] border border-[#334155] overflow-hidden">
+            <div className="p-5 border-b border-[#334155] flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-blue-400" />
+              <h2 className="text-sm font-semibold text-white">Acervo Regulatório Operante (Global)</h2>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="data-grid w-full text-left">
+                <thead>
+                  <tr>
+                    <th>Autoridade / Fonte</th>
+                    <th>Título / Norma</th>
+                    <th>Tipo</th>
+                    <th>Status IA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ragBases?.regulatory_insights.map((insight: Record<string, any>, i: number) => (
+                    <tr key={`reg-${i}`}>
+                      <td className="text-white text-xs font-medium">{insight.authority || 'BACEN'}</td>
+                      <td>
+                        <p className="text-sm text-white">{insight.tipo_ato} {insight.numero}</p>
+                        <p className="text-[0.65rem] text-slate-500 max-w-sm truncate">{insight.resumo_executivo}</p>
+                      </td>
+                      <td><span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[0.65rem]">Insight (Risco: {insight.risco_nivel})</span></td>
+                      <td><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[0.65rem] flex items-center gap-1 w-max"><CheckCircle2 className="w-3 h-3" /> Indexado</span></td>
+                    </tr>
+                  ))}
+                  {ragBases?.law_documents.map((doc: Record<string, any>) => (
+                    <tr key={`law-${doc.id}`}>
+                      <td className="text-slate-400 text-xs font-medium">Seed Pack</td>
+                      <td>
+                        <p className="text-sm text-slate-300">{doc.title}</p>
+                      </td>
+                      <td><span className="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 text-[0.65rem]">{doc.doc_type || 'PDF'}</span></td>
+                      <td><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[0.65rem] flex items-center gap-1 w-max"><CheckCircle2 className="w-3 h-3" /> Indexado</span></td>
+                    </tr>
+                  ))}
+                  {(!ragBases?.law_documents.length && !ragBases?.regulatory_insights.length) && (
+                    <tr>
+                      <td colSpan={4} className="text-center text-slate-500 py-8 text-sm">O acervo está vazio. Instale um Seed Pack ou execute a Ingestão Automática.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

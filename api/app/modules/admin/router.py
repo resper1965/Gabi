@@ -15,6 +15,7 @@ from app.core.auth import CurrentUser, require_role
 from app.models.user import User
 from app.models.ghost import KnowledgeDocument
 from app.models.law import LegalDocument
+from app.core.dynamic_rag import should_retrieve, retrieve_if_needed
 
 settings = get_settings()
 
@@ -336,6 +337,69 @@ async def remove_seed_pack(
     await db.commit()
     return {"pack": pack_id, "docs_deactivated": len(docs)}
 
+
+# ── RAG Knowledge Manager ──
+
+class RAGSimulationRequest(BaseModel):
+    query: str
+    module: str = "law"
+
+@router.get("/regulatory/bases")
+async def list_regulatory_bases(
+    user: CurrentUser = Depends(require_role("admin", "superadmin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Catalog of all active global knowledge base documents (RAG)."""
+    from app.models.law import LegalDocument
+    from app.models.regulatory import RegulatoryDocument, RegulatoryAnalysis, RegulatoryVersion
+    
+    # 1. Global Law Documents
+    law_res = await db.execute(
+        select(LegalDocument.id, LegalDocument.title, LegalDocument.doc_type, LegalDocument.created_at)
+        .where(LegalDocument.is_shared == True, LegalDocument.is_active == True)
+    )
+    law_docs = [dict(row._mapping) for row in law_res]
+
+    # 2. Regulatory Insights (e.g. BCB)
+    reg_res = await db.execute(
+        select(RegulatoryDocument.authority, RegulatoryDocument.tipo_ato, RegulatoryDocument.numero, 
+               RegulatoryAnalysis.risco_nivel, RegulatoryAnalysis.resumo_executivo)
+        .join(RegulatoryVersion, RegulatoryDocument.id == RegulatoryVersion.document_id)
+        .join(RegulatoryAnalysis, RegulatoryVersion.id == RegulatoryAnalysis.version_id)
+        .where(RegulatoryDocument.status == "active")
+    )
+    reg_docs = [dict(row._mapping) for row in reg_res]
+
+    return {"law_documents": law_docs, "regulatory_insights": reg_docs}
+
+@router.post("/regulatory/simulate-rag")
+async def simulate_rag(
+    body: RAGSimulationRequest,
+    user: CurrentUser = Depends(require_role("admin", "superadmin")),
+    db: AsyncSession = Depends(get_db),
+):
+    """Simulate RAG retrieval to audit what the AI would read for a given query."""
+    intent = await should_retrieve(body.query, chat_history=[])
+    
+    chunks = []
+    did_retrieve = False
+    
+    if intent.get("needs_rag"):
+        chunks, did_retrieve = await retrieve_if_needed(
+            question=body.query,
+            chat_history=[],
+            db=db,
+            module=body.module,
+            user_id=None,
+            limit=5
+        )
+        
+    return {
+        "intent": intent,
+        "did_retrieve": did_retrieve,
+        "chunks_returned": len(chunks),
+        "chunks": chunks
+    }
 
 # ── Automated Regulatory Ingestion ──
 

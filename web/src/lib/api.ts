@@ -214,6 +214,11 @@ export const gabiAdmin = {
   // Regulatory Ingestion Pipeline
   triggerIngest: () =>
     request("/api/admin/regulatory/ingest", { method: "POST" }),
+  // RAG Knowledge Manager
+  regulatoryBases: () =>
+    request<{ law_documents: Record<string, unknown>[]; regulatory_insights: Record<string, unknown>[] }>("/api/admin/regulatory/bases"),
+  simulateRag: (query: string, module = "law") =>
+    request("/api/admin/regulatory/simulate-rag", { method: "POST", body: JSON.stringify({ query, module }) }),
 }
 
 // ── Chat History ──
