@@ -1,6 +1,6 @@
 "use client"
 
-import { PenTool, Scale, Database, ShieldCheck, ArrowRight, Lock, Clock, FileText, Activity } from "lucide-react"
+import { PenTool, Scale, Database, ArrowRight, Lock, Clock, FileText, Activity } from "lucide-react"
 import Link from "next/link"
 import NextImage from "next/image"
 import { useRouter } from "next/navigation"
@@ -34,15 +34,6 @@ const allModules = [
     icon: Database,
     href: "/ntalk",
     accent: "var(--color-mod-ntalk)",
-  },
-  {
-    key: "insightcare",
-    name: "gabi.care",
-    tagline: "Sua Analista de Seguros",
-    description: "Sinistralidade, apólices e normas ANS/SUSEP — 3 agentes",
-    icon: ShieldCheck,
-    href: "/insightcare",
-    accent: "var(--color-mod-insightcare)",
   },
 ]
 

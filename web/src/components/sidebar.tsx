@@ -9,7 +9,6 @@ import {
   PenTool,
   Scale,
   Database,
-  ShieldCheck,
   LayoutDashboard,
   LogOut,
   ChevronLeft,
@@ -22,7 +21,6 @@ const modules = [
   { key: "ghost", label: "gabi.writer", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)" },
   { key: "law", label: "gabi.legal", icon: Scale, href: "/law", accent: "var(--color-mod-law)" },
   { key: "ntalk", label: "gabi.data", icon: Database, href: "/ntalk", accent: "var(--color-mod-ntalk)" },
-  { key: "insightcare", label: "gabi.care", icon: ShieldCheck, href: "/insightcare", accent: "var(--color-mod-insightcare)" },
 ]
 
 export function Sidebar() {
