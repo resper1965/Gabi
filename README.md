@@ -1,7 +1,7 @@
 # Gabi — Plataforma de IA Empresarial Multimodular
 
-> **Inteligência Artificial especializada para jurídico, finanças, seguros e produção textual.**
-> Quatro módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG dinâmico e conformidade LGPD.
+> **Inteligência Artificial especializada para jurídico, finanças e produção textual.**
+> Três módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG híbrido (Vector + FTS + RRF + Re-Ranking) e conformidade LGPD.
 
 ---
 
@@ -55,15 +55,6 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 | **Limites** | Timeout configurável (30s), max rows (1000), query read-only |
 | **Tabelas** | `ntalk_connections`, `ntalk_business_dictionary`, `ntalk_golden_queries`, `ntalk_audit_logs` |
 
-### 🛡️ gabi.care (InsightCare)
-**Analista de Seguros com 3 Agentes**
-
-| Aspecto | Detalhe |
-|---------|---------|
-| **Função** | Análise de sinistralidade, apólices e normas ANS/SUSEP |
-| **Agentes** | 3 agentes especializados em diferentes aspectos de seguros |
-| **RAG** | Documentos de seguros, apólices, normas regulatórias |
-| **Tabelas** | `ic_documents`, `ic_chunks`, `ic_policies`, `ic_claims`, `ic_clients` |
 
 ---
 
@@ -72,7 +63,7 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 ```
 ┌──────────────────────────────────────────────────────┐
 │                    FRONTEND (Next.js)                 │
-│  Dashboard → 4 módulos + Admin + Chat unificado      │
+│  Dashboard → 3 módulos + Admin + Chat unificado      │
 │  Firebase Auth • Role-based access • Realtime chat   │
 └──────────────────────┬───────────────────────────────┘
                        │ HTTPS
@@ -85,21 +76,21 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 │  │  Request Logging → CORS                         │ │
 │  └─────────────────────────────────────────────────┘ │
 │                                                      │
-│  ┌──────────┬──────────┬──────────┬──────────┐      │
-│  │ gabi.    │ gabi.    │ gabi.    │ gabi.    │      │
-│  │ writer   │ legal    │ data     │ care     │      │
-│  │ /ghost   │ /law     │ /ntalk   │ /insight │      │
-│  └────┬─────┴────┬─────┴────┬─────┴────┬─────┘      │
-│       │          │          │          │             │
-│  ┌────▼──────────▼──────────▼──────────▼─────┐      │
-│  │              CORE ENGINE                   │      │
-│  │  AI Service (Vertex AI Gemini)             │      │
-│  │  Dynamic RAG (intent → embed → search)     │      │
-│  │  Multi-Agent Debate (parallel → synthesis)  │      │
-│  │  Circuit Breaker (fault tolerance)          │      │
-│  │  Rate Limiter (per-user)                    │      │
-│  │  Cache (in-memory LRU)                      │      │
-│  └────┬──────────────────────┬───────────────┘      │
+│  ┌──────────┬──────────┬──────────┐                  │
+│  │ gabi.    │ gabi.    │ gabi.    │                  │
+│  │ writer   │ legal    │ data     │                  │
+│  │ /ghost   │ /law     │ /ntalk   │                  │
+│  └────┬─────┴────┬─────┴────┬─────┘                  │
+│       │          │          │                        │
+│  ┌────▼──────────▼──────────▼──────────────────┐     │
+│  │              CORE ENGINE                     │     │
+│  │  AI Service (Vertex AI Gemini)               │     │
+│  │  Hybrid RAG (FTS + Vector + RRF + Re-Rank)   │     │
+│  │  Multi-Agent Debate (parallel → synthesis)    │     │
+│  │  Circuit Breaker (fault tolerance)            │     │
+│  │  Rate Limiter (per-user)                      │     │
+│  │  Cache (in-memory LRU)                        │     │
+│  └────┬──────────────────────┬─────────────────┘     │
 │       │                      │                       │
 │  ┌────▼────┐           ┌─────▼──────┐               │
 │  │Embeddings│           │ Auth       │               │
@@ -109,7 +100,7 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 └──────────────────────┬───────────────────────────────┘
                        │
 ┌──────────────────────▼───────────────────────────────┐
-│          CLOUD SQL (PostgreSQL 15 + pgvector)        │
+│    CLOUD SQL (PostgreSQL 15 + pgvector + TSVECTOR)   │
 │  42 tabelas • IVFFlat indexes • Alembic migrations   │
 └──────────────────────────────────────────────────────┘
 ```
@@ -173,10 +164,17 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 - **Streaming** — respostas token-by-token via `generate_stream()`
 - **JSON output** — `generate_json()` com parsing automático de fences
 
-### 🔍 Dynamic RAG (`core/dynamic_rag.py`)
+### 🔍 Hybrid RAG (`core/dynamic_rag.py`)
 - **Decision engine** — Gemini Flash classifica a intenção do usuário ANTES de buscar:
-  - `needs_rag=true` → busca factual → embed query → pgvector similarity search
+  - `needs_rag=true` → busca factual → hybrid search
   - `needs_rag=false` → follow-up conversacional → responde sem busca
+- **Busca Híbrida** — executa Vector Search (pgvector) e Full-Text Search (TSVECTOR) em paralelo
+- **Fusão RRF** — Reciprocal Rank Fusion combina ambas as listas por relevância cruzada
+- **Top-K Expansivo** — recupera 40 chunks e filtra para 8 via **Gemini Flash Re-Ranker**
+- **Context-Aware Re-Ranking** — prompt de re-ranking adaptado por módulo:
+  - `law` → cronologia legal (norma mais recente sobrepõe)
+  - `ghost` → relevância narrativa e factual
+- **Profile isolation** — módulo ghost filtra por `profile_id` para isolamento de personas
 - **Economia** — salva ~200ms + custo de embedding em 40-60% das interações
 - **SQL injection prevention** — allowlist de tabelas (`ALLOWED_TABLE_PAIRS`)
 - **Ownership filter** — documentos do usuário + documentos regulatórios compartilhados
@@ -308,10 +306,12 @@ Gabi/
 │   └── pyproject.toml
 ├── web/                          # Frontend Next.js
 │   └── src/
-│       ├── app/                  # Pages (ghost, law, ntalk, insightcare, admin)
+│       ├── app/                  # Pages (ghost, law, ntalk, admin)
 │       └── components/           # Shared UI (auth, chat, sidebar)
 ├── scripts/                      # DB indexes, seeds
+├── docs/                         # ADRs, compliance, runbooks
 ├── cloudbuild.yaml               # CI/CD principal
 ├── cloudbuild-staging.yaml
-└── cloudbuild-prod.yaml
+├── cloudbuild-prod.yaml
+└── CHANGELOG.md
 ```

@@ -34,3 +34,15 @@ Thumbs.db
 # Build artifacts
 *.log
 nghost/
+
+# GCP binaries & temp
+cloud-sql-proxy
+cloud_sql_proxy
+
+# Debug/scratch files
+result.txt
+fix_role.sh
+pr*.json
+prs*.json
+api/promo.py
+.gcp-project
