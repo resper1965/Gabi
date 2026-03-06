@@ -12,7 +12,6 @@ import {
   ChevronUp,
   ArrowRight,
   CheckCircle2,
-  XCircle,
   ShieldCheck,
   Star,
   Quote,
@@ -301,19 +300,15 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              {/* Before/After */}
-              <div className="space-y-4 relative">
-                <div className="flex items-start gap-3">
-                  <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                  <p className="text-slate-400 text-sm italic pr-4">&quot;{p.before}&quot;</p>
+              {/* Before/After - Swiss Style */}
+              <div className="space-y-4 relative pt-2">
+                <div className="pl-4 border-l-2 border-slate-800">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1 block">O Problema</span>
+                  <p className="text-slate-400 text-sm leading-relaxed">&quot;{p.before}&quot;</p>
                 </div>
-                
-                {/* Visual connector line */}
-                <div className="absolute left-2.5 top-6 w-px h-6 bg-slate-800"></div>
-
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                  <p className="text-white font-medium text-base">{p.after}</p>
+                <div className="pl-4 border-l-2 transition-colors duration-300" style={{ borderColor: `${p.accent}50` }}>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mb-1 block" style={{ color: p.accent }}>Com a Gabi</span>
+                  <p className="text-white font-medium text-base leading-relaxed tracking-tight">{p.after}</p>
                 </div>
               </div>
 
@@ -343,22 +338,25 @@ export default function LandingPage() {
           {regulatoryAgencies.map((a) => (
             <div
               key={a.name}
-              className={`rounded-xl p-5 border transition-all duration-200 hover:border-slate-600 ${
-                a.featured ? "md:col-span-2 bg-slate-800/80 border-slate-700" : "bg-slate-900/50 border-white/5"
+              className={`rounded-xl p-6 border transition-all duration-300 hover:-translate-y-1 hover:border-slate-600 group ${
+                a.featured ? "md:col-span-2 bg-slate-800/30 border-slate-700/50 backdrop-blur-sm" : "bg-slate-900/30 border-white/5 hover:bg-slate-800/40 backdrop-blur-sm"
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <p className={`font-bold ${a.featured ? "text-2xl" : "text-lg"}`} style={{ color: a.color }}>
-                  {a.name}
-                </p>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-1.5 h-1.5 rounded-full group-hover:shadow-md transition-shadow duration-300" style={{ backgroundColor: a.color, boxShadow: `0 0 8px ${a.color}40` }}></span>
+                  <p className={`font-medium tracking-wide text-white ${a.featured ? "text-xl" : "text-base"}`}>
+                    {a.name}
+                  </p>
+                </div>
                 {a.featured && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border" style={{ borderColor: `${a.color}40`, color: a.color }}>
-                    Essencial
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                    Core
                   </span>
                 )}
               </div>
-              <p className="text-white font-medium text-sm mb-1">{a.full}</p>
-              <p className="text-slate-400 text-xs leading-relaxed">{a.desc}</p>
+              <p className="text-slate-200 font-medium text-sm mb-1.5 tracking-tight">{a.full}</p>
+              <p className="text-slate-500 text-xs leading-relaxed">{a.desc}</p>
             </div>
           ))}
         </div>
