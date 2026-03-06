@@ -235,7 +235,7 @@ export function ChatPanel({
                     return (
                       <>
                         {hasNumeric && <DataChart columns={results.columns} rows={results.rows} />}
-                        <DataTable columns={results.columns} rows={results.rows} accent={moduleAccent} />
+                        <DataTable columns={results.columns} rows={results.rows} />
                       </>
                     )
                   })()}
