@@ -42,11 +42,10 @@ export function Sidebar() {
     <aside
       className={`${
         collapsed ? "w-[60px]" : "w-[220px]"
-      } h-screen flex flex-col glass-panel transition-all duration-300`}
-      style={{ borderRight: "1px solid rgba(255,255,255,0.06)" }}
+      } h-screen flex flex-col bg-surface-base border-r border-white/5 transition-all duration-300 font-['Inter',sans-serif]`}
     >
       {/* Brand */}
-      <div className="p-4 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="p-4 flex items-center gap-3 border-b border-white/5">
         <NextImage
           src="/logo.png"
           alt="Gabi Logo"
@@ -57,10 +56,9 @@ export function Sidebar() {
         />
         {!collapsed && (
           <span
-            className="text-lg text-white font-medium"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
+            className="text-lg text-white font-semibold tracking-tight"
           >
-            Gabi<span style={{ color: "#00ade8" }}>.</span>
+            Gabi<span style={{ color: "var(--color-gabi-primary)" }}>.</span>
           </span>
         )}
         <button
@@ -163,7 +161,7 @@ export function Sidebar() {
       </nav>
 
       {/* User Block */}
-      <div className="p-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="p-3 border-t border-white/5">
         <div className="flex items-center gap-3">
           <div
             className="w-7 h-7 rounded-full shrink-0 flex items-center justify-center text-[0.6rem] font-bold uppercase"
