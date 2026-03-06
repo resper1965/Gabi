@@ -98,7 +98,7 @@ export default function PendingPage() {
         </div>
 
         <p className="text-slate-700 text-xs mt-10">
-          © {new Date().getFullYear()} ness<span className="neon-text">.</span>
+          &copy; {new Date().getFullYear()} ness<span className="text-[#00ade8]">.</span>
         </p>
       </div>
     </div>

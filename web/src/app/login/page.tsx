@@ -4,6 +4,8 @@ import { useState, type FormEvent } from "react"
 import { signInWithEmailAndPassword, signInWithPopup, googleProvider, auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import NextImage from "next/image"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -47,7 +49,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center cyber-grid">
-      <div className="w-full max-w-sm animate-fade-in-up">
+      <div className="w-full max-w-sm animate-fade-in-up relative">
+        <Link href="/landing" className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Voltar
+        </Link>
         {/* Brand */}
         <div className="text-center mb-10">
           <NextImage
@@ -59,14 +65,14 @@ export default function LoginPage() {
             className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg"
           />
           <h1
-            className="text-3xl text-white font-medium"
+            className="text-3xl text-white font-medium tracking-tight"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Gabi<span style={{ color: "#00ade8" }}>.</span>
           </h1>
           <p className="text-slate-500 text-sm mt-2 leading-relaxed">
-            Inteligencia Artificial<br />
-            powered by <span className="text-slate-400">ness.</span>
+            Inteligência Artificial<br />
+            powered by <span className="text-slate-400">ness<span className="text-[#00ade8]">.</span></span>
           </p>
         </div>
 
@@ -148,7 +154,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-slate-600 text-xs mt-8">
-          © {new Date().getFullYear()} ness<span className="neon-text">.</span>
+          &copy; {new Date().getFullYear()} ness<span className="text-[#00ade8]">.</span>
         </p>
       </div>
     </div>
