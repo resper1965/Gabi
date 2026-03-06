@@ -164,8 +164,8 @@ export default function LandingPage() {
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-            <span className="text-xs font-medium text-slate-200 tracking-widest">
-              <span className="uppercase">Gabi by </span><span className="brand-mark">ness<span className="text-[#00ade8]">.</span></span>
+            <span className="text-xs font-medium text-slate-200 tracking-wide">
+              <span className="brand-mark">Gabi<span className="text-[#00ade8]">.</span></span> by <span className="brand-mark">ness<span className="text-[#00ade8]">.</span></span>
             </span>
           </div>
 
