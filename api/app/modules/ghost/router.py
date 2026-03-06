@@ -279,21 +279,18 @@ async def generate_text(
         if not profile or not profile.style_signature:
             return {"error": "Perfil sem Style Signature. Execute /extract-style primeiro."}
 
-        # RAG: search content documents
-        query_embedding = embed(req.prompt)
-        content_results = await db.execute(
-            text("""
-                SELECT c.content, d.title, d.doc_type
-                FROM ghost_doc_chunks c
-                JOIN ghost_knowledge_docs d ON c.document_id = d.id
-                WHERE d.profile_id = :pid AND d.doc_type = 'content'
-                  AND c.embedding IS NOT NULL
-                ORDER BY c.embedding <=> :emb::vector
-                LIMIT 5
-            """),
-            {"pid": req.profile_id, "emb": str(query_embedding)},
+        # RAG: search content documents via Hybrid Search + Re-Ranking
+        from app.core.dynamic_rag import retrieve_if_needed
+        
+        raw_chunks, did_retrieve = await retrieve_if_needed(
+            question=req.prompt,
+            chat_history=req.chat_history,
+            db=db,
+            module="ghost",
+            user_id=user.uid,
+            profile_id=req.profile_id,
+            limit=5
         )
-        raw_chunks = [dict(row._mapping) for row in content_results]
         content_chunks = [c["content"] for c in raw_chunks]
 
         # Deduplicate sources by title
@@ -357,21 +354,18 @@ async def generate_text_stream(
                 yield "data: [DONE]\n\n"
             return StreamingResponse(error_gen(), media_type="text/event-stream")
 
-        # RAG: search content documents
-        query_embedding = embed(req.prompt)
-        content_results = await db.execute(
-            text("""
-                SELECT c.content, d.title, d.doc_type
-                FROM ghost_doc_chunks c
-                JOIN ghost_knowledge_docs d ON c.document_id = d.id
-                WHERE d.profile_id = :pid AND d.doc_type = 'content'
-                  AND c.embedding IS NOT NULL
-                ORDER BY c.embedding <=> :emb::vector
-                LIMIT 5
-            """),
-            {"pid": req.profile_id, "emb": str(query_embedding)},
+        # RAG: search content documents via Hybrid Search + Re-Ranking
+        from app.core.dynamic_rag import retrieve_if_needed
+        
+        raw_chunks, did_retrieve = await retrieve_if_needed(
+            question=req.prompt,
+            chat_history=req.chat_history,
+            db=db,
+            module="ghost",
+            user_id=user.uid,
+            profile_id=req.profile_id,
+            limit=5
         )
-        raw_chunks = [dict(row._mapping) for row in content_results]
         content_chunks = [c["content"] for c in raw_chunks]
 
         context = "\n".join(f"• {c[:500]}" for c in content_chunks) if content_chunks else "Nenhum conteúdo encontrado na base."

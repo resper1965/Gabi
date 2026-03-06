@@ -20,7 +20,7 @@ logger = logging.getLogger("gabi.dynamic_rag")
 # Allowlist of valid table pairs to prevent SQL injection
 ALLOWED_TABLE_PAIRS = {
     "law": ("law_chunks", "law_documents", "doc_type"),
-    "ghost": ("ghost_chunks", "ghost_documents", "doc_type"),
+    "ghost": ("ghost_doc_chunks", "ghost_knowledge_docs", "doc_type"),
 }
 
 
@@ -73,6 +73,7 @@ async def retrieve_if_needed(
     *,
     module: str = "law",
     user_id: str | None = None,
+    profile_id: str | None = None,
     limit: int = 8,
 ) -> tuple[list[dict], bool]:
     """
@@ -101,7 +102,10 @@ async def retrieve_if_needed(
     query_embedding = embed(intent["refined_query"])
 
     # Build ownership filter: user's own docs + shared regulatory docs
-    if user_id:
+    if profile_id:
+        # Ghost module is isolated by profile
+        ownership_filter = "d.profile_id = :pid AND d.doc_type = 'content'"
+    elif user_id:
         ownership_filter = "(d.user_id = :uid OR d.is_shared = true)"
     else:
         ownership_filter = "d.is_shared = true"
@@ -110,7 +114,9 @@ async def retrieve_if_needed(
 
     # 1. Semantic Search (PGVector)
     semantic_params = {"emb": str(query_embedding), "lim": expanded_limit}
-    if user_id:
+    if profile_id:
+        semantic_params["pid"] = profile_id
+    elif user_id:
         semantic_params["uid"] = user_id
     
     semantic_results = await db.execute(
@@ -128,7 +134,9 @@ async def retrieve_if_needed(
 
     # 2. Lexical Search (FTS via tsvector)
     fts_params = {"fts_query": intent["refined_query"], "lim": expanded_limit}
-    if user_id:
+    if profile_id:
+        fts_params["pid"] = profile_id
+    elif user_id:
         fts_params["uid"] = user_id
 
     lexical_results = await db.execute(
@@ -162,11 +170,18 @@ async def retrieve_if_needed(
     fused_chunk_ids = sorted(scores.keys(), key=lambda cid: scores[cid], reverse=True)
     fused_chunks = [chunk_map[cid] for cid in fused_chunk_ids][:expanded_limit]
 
-    # 4. LLM Re-Ranking (Top-K Reduction + Chronological Sorting bias)
+    # 4. LLM Re-Ranking (Top-K Reduction + Context-aware Sorting)
     if len(fused_chunks) > limit:
+        if module == "law":
+            sys_instruct = "Analise a relevância legislativa dos trechos abaixo. Tente ordená-los do mais antigo para o mais recente (critério cronológico legal) se houverem conflitos normativos."
+        elif module == "ghost":
+            sys_instruct = "Analise a relevância narrativa, estilo ou fatos contidos nos trechos abaixo."
+        else:
+            sys_instruct = "Analise a relevância factual dos trechos abaixo em relação à pergunta."
+
         rerank_prompt = (
-            f"Analise a relevância legislativa dos trechos abaixo em relação à dúvida: '{intent['refined_query']}'.\n"
-            f"Selecione no MÁXIMO {limit} índices matemáticos dos trechos mais assertivos. Tente ordená-los do mais antigo para o mais recente (critério cronológico legal) se houverem conflitos normativos.\n"
+            f"{sys_instruct}\n"
+            f"Selecione no MÁXIMO {limit} índices matemáticos dos trechos mais assertivos em relação à dúvida: '{intent['refined_query']}'.\n"
             f"RETORNE APENAS JSON: {{\"indices\": [2, 0, 5, 8]}}\n\nTRECHOS:\n"
         )
         for idx, ck in enumerate(fused_chunks):
