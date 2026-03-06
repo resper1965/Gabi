@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import NextImage from "next/image"
 import { useState, useEffect } from "react"
 import {
   PenTool,
@@ -126,59 +127,85 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] selection:bg-[#0369A1] selection:text-white">
-      {/* ── Hero ── */}
-      <section className="relative flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden">
-        {/* Glow background */}
+      {/* ── Hero Split View ── */}
+      <section className="relative w-full max-w-7xl mx-auto px-6 pt-24 pb-20 overflow-hidden flex flex-col-reverse md:grid md:grid-cols-2 gap-12 items-center">
+        {/* Glow background restricted to text side */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full pointer-events-none opacity-40"
+          className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full pointer-events-none opacity-30"
           style={{
-            background: "radial-gradient(circle, rgba(3,105,161,0.2) 0%, transparent 60%)",
+            background: "radial-gradient(circle, rgba(3,105,161,0.3) 0%, transparent 70%)",
           }}
         />
 
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 relative z-10">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">A Nova Era do Compliance</span>
+        {/* Left Column (Text & CTA) */}
+        <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+            <span className="text-xs font-bold text-slate-200 tracking-widest uppercase">Gabi by Ness</span>
+          </div>
+
+          <h1
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight"
+            style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
+          >
+            A inteligência <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">regulatória</span><br />
+            para o seu jurídico.
+          </h1>
+
+          <p className="mt-6 text-lg tracking-wide md:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
+            A Gabi transforma a gestão normativa para <strong>escritórios de advocacia</strong> e <strong>departamentos jurídicos e de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <Link
+              href="mailto:contato@ness.com.br?subject=Demo%20Gabi"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
+                         transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0369A1]/30"
+              style={{ backgroundColor: "#0369A1" }}
+            >
+              Agendar Demonstração
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            
+            <Link
+              href="/login"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
+                         transition-all duration-300 bg-white/5 hover:bg-white/10 border border-white/10"
+            >
+              Acessar Plataforma
+            </Link>
+          </div>
+
+          <div className="mt-16 flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500 opacity-90">
+            <span className="font-semibold tracking-wider text-xs">DESENVOLVIDO POR</span>
+            <div className="flex gap-4 items-center transition-all duration-500">
+              <span className="font-black text-white text-xl tracking-tighter mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
+            </div>
+          </div>
         </div>
 
-        <h1
-          className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight relative z-10 max-w-4xl mx-auto"
-          style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
-        >
-          Reduza <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">80% do tempo</span><br />
-          em análise regulatória.
-        </h1>
+        {/* Right Column (Avatar & Icon Composition) */}
+        <div className="relative w-full max-w-lg mx-auto aspect-square md:aspect-[4/5] flex items-center justify-center">
+           {/* Glow Effects */}
+           <div className="absolute inset-0 bg-linear-to-tr from-[#0369A1]/60 to-[#00ade8]/30 rounded-[2.5rem] opacity-30 blur-3xl mix-blend-screen animate-pulse"></div>
+           
+           {/* Floating App Icon */}
+           <div className="absolute -top-6 -right-6 z-30 p-4 bg-slate-900 border border-slate-700/50 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-float">
+             <NextImage src="/logo.png" alt="App Icon" width={72} height={72} unoptimized className="rounded-xl object-contain drop-shadow-sm" />
+           </div>
 
-        <p className="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl relative z-10 leading-relaxed font-light">
-          A Plataforma Gabi monitora 8 agências, analisa normativos com IA avançada e entrega obrigações prontas para a sua equipe agir.
-        </p>
-
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10 w-full sm:w-auto">
-          <Link
-            href="mailto:contato@ness.com.br?subject=Demo%20Gabi"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
-                       transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-cyan-500/25"
-            style={{ backgroundColor: "#0369A1" }}
-          >
-            Agendar Demonstração
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          
-          <Link
-            href="/login"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
-                       transition-all duration-300 hover:bg-white/10 border border-white/10"
-            style={{ backgroundColor: "rgba(255,255,255,0.03)" }}
-          >
-            Acessar Plataforma
-          </Link>
-        </div>
-
-        {/* Powered by */}
-        <div className="mt-16 flex items-center gap-3 text-sm text-slate-500 relative z-10">
-          <span>Tecnologia</span>
-          <div className="h-px w-8 bg-slate-700"></div>
-          <span className="font-bold text-white tracking-wide">ness<span className="text-[#00ade8]">.</span></span>
+           {/* Hero Photo - Gabi Avatar */}
+           <div className="absolute inset-4 rounded-[2.5rem] border border-white/10 bg-slate-800/20 backdrop-blur-xl z-10 overflow-hidden shadow-2xl">
+             <NextImage 
+               src="/gabi-avatar.png"
+               alt="A Gabi — Assistente Virtual IA Corporativa"
+               fill
+               unoptimized
+               className="object-cover object-top hover:scale-105 transition-transform duration-[2s] ease-in-out"
+               sizes="(max-width: 768px) 100vw, 50vw"
+               priority
+             />
+           </div>
         </div>
       </section>
 
