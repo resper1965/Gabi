@@ -156,7 +156,9 @@ export default function LandingPage() {
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-            <span className="text-xs font-bold text-slate-200 tracking-widest uppercase">Gabi by ness.</span>
+            <span className="text-xs font-bold text-slate-200 tracking-widest">
+              <span className="uppercase">Gabi by </span><span className="lowercase">ness<span className="text-[#00ade8]">.</span></span>
+            </span>
           </div>
 
           <h1
@@ -192,7 +194,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-16 flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500 opacity-90">
-            <span className="font-semibold tracking-wider text-xs">DESENVOLVIDO POR</span>
+            <span className="font-semibold tracking-wider text-xs uppercase">powered by</span>
             <div className="flex gap-4 items-center transition-all duration-500">
               <span className="font-medium text-white text-xl tracking-tight mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
             </div>
