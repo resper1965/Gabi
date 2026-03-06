@@ -397,8 +397,8 @@ export default function LandingPage() {
               </button>
               {showPrivacy && (
                 <div className="px-6 pb-6 text-xs text-slate-400 leading-relaxed space-y-4">
-                  <p><strong className="text-slate-200">1. Introdução.</strong> Bem-vindo à Plataforma Gabi., operada pela Ness. Respeitamos a sua privacidade e estamos comprometidos em proteger seus dados.</p>
-                  <p><strong className="text-slate-200">2. Uso dos Dados.</strong> Seus dados são usados exclusivamente para fornecer resultados. A Ness não vende dados sob hipótese alguma.</p>
+                  <p><strong className="text-slate-200">1. Introdução.</strong> Bem-vindo à Plataforma Gabi, operada pela ness. Respeitamos a sua privacidade e estamos comprometidos em proteger seus dados.</p>
+                  <p><strong className="text-slate-200">2. Uso dos Dados.</strong> Seus dados são usados exclusivamente para fornecer resultados. A ness. não vende dados sob hipótese alguma.</p>
                   <p><strong className="text-slate-200">3. IA e Segurança.</strong> É estritamente vedado usar seus dados para treinar modelos fundacionais públicos.</p>
                   <p className="pt-2">
                     <Link href="/privacy" className="text-[#00ade8] hover:underline">Ver documento completo →</Link>
@@ -438,7 +438,7 @@ export default function LandingPage() {
             </div>
             
             <div className="flex items-center gap-2">
-              <p>&copy; {new Date().getFullYear()} Ness. Todos os direitos reservados.</p>
+              <p>&copy; {new Date().getFullYear()} ness. Todos os direitos reservados.</p>
               <span className="hidden sm:inline">&bull;</span>
               <p>powered by <span className="font-bold text-slate-300">ness<span className="text-[#00ade8]">.</span></span></p>
             </div>

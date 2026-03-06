@@ -222,7 +222,7 @@ export default function DashboardPage() {
           </Link>
         </div>
         <p className="text-[10px] text-slate-600">
-          &copy; {new Date().getFullYear()} Ness. Todos os direitos reservados.
+          &copy; {new Date().getFullYear()} ness. Todos os direitos reservados.
         </p>
       </div>
     </div>

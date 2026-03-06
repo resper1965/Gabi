@@ -39,7 +39,7 @@ export default function TermsOfServicePage() {
 
           <section>
             <h2 className="text-lg font-semibold text-white mt-8 mb-3">5. Disponibilidade do Serviço</h2>
-            <p>A Ness envidará esforços mercadológicos para garantir 99% de uptime no SLA regular do serviço web e vetorial, podendo o acesso à interface ser temporariamente suspenso para atualizações do modelo cerebral fundacional, desde que alertado sob notificação antecipada na plataforma ou sem pré-aviso caso seja contingência contra ataques e salvaguarda.</p>
+            <p>A ness. envidará esforços mercadológicos para garantir 99% de uptime no SLA regular do serviço web e vetorial, podendo o acesso à interface ser temporariamente suspenso para atualizações do modelo cerebral fundacional, desde que alertado sob notificação antecipada na plataforma ou sem pré-aviso caso seja contingência contra ataques e salvaguarda.</p>
           </section>
         </div>
       </div>

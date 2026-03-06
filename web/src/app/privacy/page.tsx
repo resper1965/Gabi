@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
           
           <section>
             <h2 className="text-lg font-semibold text-white mt-8 mb-3">1. Introdução</h2>
-            <p>Bem-vindo à Plataforma Gabi., operada pela Ness. Respeitamos a sua privacidade e estamos comprometidos em proteger de forma rígida seus dados pessoais e organizacionais. Esta política detalha como coletamos, utilizamos e protegemos as suas informações no ecossistema de inteligência artificial.</p>
+            <p>Bem-vindo à Plataforma Gabi, operada pela ness. Respeitamos a sua privacidade e estamos comprometidos em proteger de forma rígida seus dados pessoais e organizacionais. Esta política detalha como coletamos, utilizamos e protegemos as suas informações no ecossistema de inteligência artificial.</p>
           </section>
 
           <section>
@@ -33,7 +33,7 @@ export default function PrivacyPolicyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-white mt-8 mb-3">3. Como Usamos Seus Dados</h2>
-            <p>Seus dados são encriptados e usados exclusivamente para fornecer resultados customizados de inteligência artificial para a sua navegação (como responder chamados, buscar regulamentos na sua base de conhecimento e emular seu tom de escrita). <strong>A Ness não vende dados sob hipótese alguma.</strong></p>
+            <p>Seus dados são encriptados e usados exclusivamente para fornecer resultados customizados de inteligência artificial para a sua navegação (como responder chamados, buscar regulamentos na sua base de conhecimento e emular seu tom de escrita). <strong>A ness. não vende dados sob hipótese alguma.</strong></p>
           </section>
 
           <section>
@@ -43,7 +43,7 @@ export default function PrivacyPolicyPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-white mt-8 mb-3">5. Retenção e Extinção de Base</h2>
-            <p>Os administradores da interface possuem o pleno direito autoral mantido; você pode apagar seus documentos pelas abas da Plataforma a qualquer tempo (efetuando a purga vetorial atrelada). Para o término completo de licença de conta e deleção total (hard-delete), contate o suporte da Ness e tudo será criptograficamente eliminado.</p>
+            <p>Os administradores da interface possuem o pleno direito autoral mantido; você pode apagar seus documentos pelas abas da Plataforma a qualquer tempo (efetuando a purga vetorial atrelada). Para o término completo de licença de conta e deleção total (hard-delete), contate o suporte da ness. e tudo será criptograficamente eliminado.</p>
           </section>
         </div>
       </div>
