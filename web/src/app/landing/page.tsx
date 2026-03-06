@@ -201,11 +201,9 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="mt-16 flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500 opacity-90">
-            <span className="font-semibold tracking-wider text-xs uppercase">powered by</span>
-            <div className="flex gap-4 items-center transition-all duration-500">
-              <span className="brand-mark text-white text-xl mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
-            </div>
+          <div className="mt-16 flex items-center justify-center md:justify-start gap-2 text-white">
+            <span className="font-medium text-sm tracking-wide" style={{ fontFamily: "Montserrat, sans-serif" }}>powered by</span>
+            <span className="brand-mark text-xl drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
           </div>
         </div>
 
