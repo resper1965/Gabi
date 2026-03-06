@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import NextImage from "next/image"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import { signOut, auth } from "@/lib/firebase"
@@ -46,9 +47,12 @@ export function Sidebar() {
     >
       {/* Brand */}
       <div className="p-4 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <img
+        <NextImage
           src="/logo.png"
           alt="Gabi Logo"
+          width={32}
+          height={32}
+          unoptimized
           className="w-8 h-8 rounded-lg object-cover shrink-0"
         />
         {!collapsed && (
@@ -71,7 +75,7 @@ export function Sidebar() {
       <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
         <Link
           href="/"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-tech)] transition-all duration-200 ${
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
             pathname === "/"
               ? "nav-link-active bg-white/5 text-white"
               : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -96,7 +100,7 @@ export function Sidebar() {
             <Link
               key={mod.key}
               href={mod.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-tech)] transition-all duration-200 ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
                 isActive
                   ? "nav-link-active bg-white/5 text-white"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -122,7 +126,7 @@ export function Sidebar() {
         {collapsed && <div className="pt-2" />}
         <Link
           href="/docs"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-tech)] transition-all duration-200 ${
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
             pathname === "/docs"
               ? "nav-link-active bg-white/5 text-white"
               : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -145,7 +149,7 @@ export function Sidebar() {
             {collapsed && <div className="pt-2" />}
             <Link
               href="/admin"
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-tech)] transition-all duration-200 ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
                 pathname === "/admin"
                   ? "nav-link-active bg-white/5 text-white"
                   : "text-slate-400 hover:text-white hover:bg-white/5"
@@ -179,7 +183,7 @@ export function Sidebar() {
           )}
           <button
             onClick={() => signOut(auth)}
-            className="p-1.5 rounded-[var(--radius-tech)] text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+            className="p-1.5 rounded-tech text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
             title="Sair"
           >
             <LogOut className="w-4 h-4" />

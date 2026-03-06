@@ -79,8 +79,23 @@ export function KnowledgePanel({
     setLoading(false)
   }, [profileId])
 
-  useEffect(() => { void fetchProfiles() }, [fetchProfiles])
-  useEffect(() => { if (profileId) void fetchDocuments() }, [profileId, fetchDocuments])
+  useEffect(() => {
+    let mounted = true
+    const init = async () => {
+      if (mounted) await fetchProfiles()
+    }
+    init()
+    return () => { mounted = false }
+  }, [fetchProfiles])
+
+  useEffect(() => {
+    let mounted = true
+    const init = async () => {
+      if (profileId && mounted) await fetchDocuments()
+    }
+    init()
+    return () => { mounted = false }
+  }, [profileId, fetchDocuments])
 
   const handleCreateProfile = async () => {
     if (!newProfileName.trim()) return
@@ -160,7 +175,7 @@ export function KnowledgePanel({
           <div className="relative">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg tech-border bg-[var(--color-surface-card)] text-sm cursor-pointer"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg tech-border bg-(--color-surface-card) text-sm cursor-pointer"
             >
               <span className="text-white truncate">
                 {currentProfile?.name || "Selecione um perfil"}
@@ -169,7 +184,7 @@ export function KnowledgePanel({
             </button>
 
             {profileOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-[var(--color-surface-raised)] rounded-lg tech-border shadow-lg overflow-hidden">
+              <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-(--color-surface-raised) rounded-lg tech-border shadow-lg overflow-hidden">
                 {profiles.map((p) => (
                   <button
                     key={p.id}
@@ -328,7 +343,7 @@ function DocRow({ doc, onDelete, accent }: { doc: GhostDocument; onDelete: (id: 
   }
 
   return (
-    <div className="group flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/[0.03] transition-colors">
+    <div className="group flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/3 transition-colors">
       <FileText className="w-3 h-3 shrink-0" style={{ color: accent, opacity: 0.5 }} />
       <div className="flex-1 min-w-0">
         <p className="text-[11px] text-slate-300 truncate">{doc.filename}</p>

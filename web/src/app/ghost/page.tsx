@@ -99,14 +99,14 @@ export default function GhostPage() {
     <div className="h-full flex">
       {/* Main chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <header className="px-6 py-4 flex items-center justify-between border-b border-[#1E293B]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-tech flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
               <PenTool className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-lg font-semibold">gabi.writer</h1>
-              <p className="text-xs text-zinc-500">Sua IA Escritora</p>
+              <p className="text-xs text-slate-500">Sua IA Escritora</p>
             </div>
           </div>
 

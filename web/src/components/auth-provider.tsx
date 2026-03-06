@@ -58,12 +58,13 @@ function setCachedProfile(profile: UserProfile | null) {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Initialize with cached profile for instant render
+  const cached = getCachedProfile()
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [profile, setProfile] = useState<UserProfile | null>(() => getCachedProfile())
+  const [loading, setLoading] = useState(!cached)
+  const [profile, setProfile] = useState<UserProfile | null>(cached)
 
   // If we have a cached profile, don't block the UI
-  const hasCache = profile !== null
+  const hasCache = cached !== null
 
   const fetchProfile = useCallback(async (firebaseUser: User) => {
     try {
@@ -93,11 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshInterval = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
-    // If we have a cached profile, stop the loading spinner immediately
-    if (hasCache) {
-      setLoading(false)
-    }
-
     // Safety timeout: reduced from 15s to 8s
     const safetyTimeout = setTimeout(() => {
       setLoading(false)

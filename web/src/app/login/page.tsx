@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react"
 import { signInWithEmailAndPassword, signInWithPopup, googleProvider, auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
+import NextImage from "next/image"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -49,9 +50,12 @@ export default function LoginPage() {
       <div className="w-full max-w-sm animate-fade-in-up">
         {/* Brand */}
         <div className="text-center mb-10">
-          <img
+          <NextImage
             src="/logo.png"
             alt="Gabi Logo"
+            width={64}
+            height={64}
+            unoptimized
             className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg"
           />
           <h1
@@ -70,7 +74,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-3 rounded-[var(--radius-soft)] text-sm font-semibold
+          className="w-full py-3 rounded-xl text-sm font-semibold
                      bg-white text-gray-800 hover:bg-gray-100
                      transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
                      flex items-center justify-center gap-3 mb-6"
@@ -102,7 +106,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)]
+              className="w-full px-4 py-3 rounded-xl bg-(--color-surface-card)
                          tech-border text-sm text-white placeholder:text-slate-600 focus:outline-none"
               style={{ fontFamily: "var(--font-ui)" }}
               placeholder="voce@empresa.com"
@@ -118,7 +122,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-[var(--radius-soft)] bg-[var(--color-surface-card)]
+              className="w-full px-4 py-3 rounded-xl bg-(--color-surface-card)
                          tech-border text-sm text-white placeholder:text-slate-600 focus:outline-none"
               style={{ fontFamily: "var(--font-ui)" }}
               placeholder="••••••••"
@@ -127,7 +131,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <p className="text-xs text-red-400 bg-red-500/10 rounded-[var(--radius-tech)] px-3 py-2">
+            <p className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
@@ -135,7 +139,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-[var(--radius-soft)] text-sm font-semibold text-white
+            className="w-full py-3 rounded-xl text-sm font-semibold text-white
                        transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: "linear-gradient(135deg, var(--color-gabi-primary), var(--color-gabi-hover))" }}
           >

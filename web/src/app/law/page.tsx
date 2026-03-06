@@ -22,7 +22,7 @@ export default function LawPage() {
 
   useEffect(() => {
     gabi.legal.insights().then((data) => {
-      if (Array.isArray(data)) setRecentInsights(data.slice(0, 3) as any)
+      if (Array.isArray(data)) setRecentInsights(data.slice(0, 3) as Array<{ id: number; authority: string; numero: string; tipo_ato: string }>)
     }).catch(console.error)
   }, [])
 
@@ -81,7 +81,7 @@ export default function LawPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <header className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <header className="px-6 py-4 border-b border-[#1E293B]">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
@@ -105,8 +105,8 @@ export default function LawPage() {
           </div>
           <button
             onClick={() => setShowUpload(!showUpload)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200"
-            style={{ background: `color-mix(in srgb, ${ACCENT} 15%, transparent)`, color: ACCENT, border: `1px solid color-mix(in srgb, ${ACCENT} 25%, transparent)` }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200"
+            style={{ background: `${ACCENT}15`, color: ACCENT }}
           >
             📎 Base Jurídica
             {showUpload ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -140,10 +140,10 @@ export default function LawPage() {
             <button
               key={a.key}
               onClick={() => setAgent(a.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
-                agent === a.key ? "text-white" : "bg-white/5 text-slate-400 hover:text-white"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-1.5 ${
+                agent === a.key ? "" : "bg-[#1E293B] text-slate-400 hover:text-white"
               }`}
-              style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT, border: `1px solid ${ACCENT}30` } : undefined}
+              style={agent === a.key ? { background: `${ACCENT}20`, color: ACCENT } : undefined}
               title={a.desc}
             >
               <span className="text-[11px]">{a.icon}</span>

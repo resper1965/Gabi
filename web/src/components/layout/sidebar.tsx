@@ -51,12 +51,7 @@ export function Sidebar() {
     <aside
       className={`${
         collapsed ? "w-[72px]" : "w-[250px]"
-      } h-screen flex flex-col transition-all duration-300 z-50 relative`}
-      style={{
-        background: "var(--color-surface-glass)",
-        backdropFilter: "blur(12px)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
-      }}
+      } h-screen flex flex-col transition-all duration-300 z-50 relative bg-[#0F172A] border-r border-[#1E293B]`}
     >
       {/* ── Brand Header ── */}
       <div
@@ -176,13 +171,16 @@ export function Sidebar() {
 
       {/* ── User Block ── */}
       <div className="p-3 mt-auto shrink-0" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className={`flex items-center gap-3 p-2.5 rounded-xl bg-white/3 border border-white/5 ${collapsed ? "justify-center" : ""}`}>
+        <div className={`flex items-center gap-3 p-2.5 rounded-xl bg-transparent border border-[#1E293B] ${collapsed ? "justify-center" : ""}`}>
           {/* Avatar */}
           {avatarUrl ? (
-            <img
+            <NextImage
               src={avatarUrl}
               alt={displayName}
-              className="w-9 h-9 rounded-lg shrink-0 object-cover border border-white/10"
+              width={36}
+              height={36}
+              unoptimized
+              className="w-9 h-9 rounded-lg shrink-0 object-cover border border-[#1E293B]"
               referrerPolicy="no-referrer"
             />
           ) : (

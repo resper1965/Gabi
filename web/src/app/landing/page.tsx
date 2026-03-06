@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useState, useEffect } from "react"
 import {
   PenTool,
@@ -9,8 +8,6 @@ import {
   BarChart3,
   Radar,
   Lock,
-  Trash2,
-  ShieldOff,
   Building2,
   Briefcase,
   TrendingUp,
@@ -18,7 +15,6 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowRight,
-  Eye,
   CheckCircle2,
   XCircle,
   Database,
@@ -149,7 +145,7 @@ export default function LandingPage() {
           className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight relative z-10 max-w-4xl mx-auto"
           style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
         >
-          Reduza <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00ade8] to-[#0369A1]">80% do tempo</span><br />
+          Reduza <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">80% do tempo</span><br />
           em análise regulatória.
         </h1>
 
@@ -256,7 +252,7 @@ export default function LandingPage() {
               <div className="space-y-4 relative">
                 <div className="flex items-start gap-3">
                   <XCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
-                  <p className="text-slate-400 text-sm italic pr-4">"{p.before}"</p>
+                  <p className="text-slate-400 text-sm italic pr-4">&quot;{p.before}&quot;</p>
                 </div>
                 
                 {/* Visual connector line */}
@@ -280,7 +276,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Regulatory Monitoring ── */}
-      <section className="max-w-6xl mx-auto px-6 py-20 bg-slate-900/40 rounded-3xl border border-white/5 mx-4 md:mx-auto mb-24">
+      <section className="max-w-6xl mx-auto px-6 py-20 bg-slate-900/40 rounded-3xl border border-white/5 mb-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
             O Ecossistema Normativo Integrado
@@ -408,6 +404,7 @@ export default function LandingPage() {
           {/* Bottom */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 pt-8 text-xs text-slate-500">
             <div className="flex items-center gap-6 font-medium uppercase tracking-wider">
+              <Link href="/trust" className="text-emerald-400 hover:text-emerald-300 transition-colors">Trust Center</Link>
               <Link href="/privacy" className="hover:text-white transition-colors">Privacidade</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Termos</Link>
               <Link href="/login" className="hover:text-white transition-colors">Login</Link>

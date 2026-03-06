@@ -1,7 +1,6 @@
 """Law & Comply models — Legal documents, regulatory alerts, gap analysis."""
 
 import uuid
-from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func

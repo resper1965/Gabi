@@ -8,6 +8,7 @@ import {
   CheckCircle2, XCircle, Clock, ChevronDown, BookOpen, Download, Trash2,
 } from "lucide-react"
 import { toast } from "sonner"
+import NextImage from "next/image"
 
 interface UserInfo {
   id: string
@@ -167,7 +168,7 @@ export default function AdminPage() {
         <button
           onClick={fetchData}
           disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer bg-white/5 text-slate-400 hover:text-white transition-all duration-200"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide cursor-pointer bg-[#1E293B] text-slate-400 hover:text-white border border-[#334155] transition-all duration-200"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
           Atualizar
@@ -186,7 +187,7 @@ export default function AdminPage() {
           ].map((card) => (
             <div
               key={card.label}
-              className="rounded-soft bg-surface-card tech-border p-4"
+              className="rounded-2xl bg-[#1E293B] border border-[#334155] p-4"
             >
               <div className="flex items-center gap-2 mb-2">
                 <card.icon className="w-4 h-4" style={{ color: card.color }} />
@@ -200,7 +201,7 @@ export default function AdminPage() {
 
       {/* Pending Users Alert */}
       {pendingUsers.length > 0 && (
-        <div className="mb-6 rounded-[var(--radius-soft)] bg-amber-500/5 border border-amber-500/20 p-4">
+        <div className="mb-6 rounded-2xl bg-amber-500/5 border border-amber-500/20 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Clock className="w-4 h-4 text-amber-400" />
             <span className="text-sm font-medium text-amber-400">
@@ -242,7 +243,7 @@ export default function AdminPage() {
           return acc;
         }, {} as Record<string, typeof seedPacks>);
         return (
-          <div className="mb-6 rounded-soft bg-surface-card tech-border p-5">
+          <div className="mb-6 rounded-2xl bg-[#1E293B] border border-[#334155] p-5">
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="w-4 h-4 text-violet-400" />
               <h2 className="text-sm font-semibold">Bases Regulatórias</h2>
@@ -263,7 +264,7 @@ export default function AdminPage() {
                     return (
                       <div
                         key={pack.id}
-                        className={`rounded-lg p-3 flex flex-col gap-2 transition-colors ${installed ? 'bg-emerald-500/5 border border-emerald-500/20' : 'bg-white/2 border border-white/6'}`}
+                        className={`rounded-lg p-3 flex flex-col gap-2 transition-colors ${installed ? 'bg-emerald-500/5 border border-emerald-500/20' : 'bg-transparent border border-[#334155]'}`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
@@ -339,7 +340,7 @@ export default function AdminPage() {
 
       {/* Ingestion Pipeline Trigger */}
       {profile?.role === "superadmin" && (
-        <div className="mb-6 rounded-soft bg-surface-card tech-border p-5">
+        <div className="mb-6 rounded-2xl bg-[#1E293B] border border-[#334155] p-5">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Database className="w-4 h-4 text-emerald-400" />
@@ -396,7 +397,7 @@ export default function AdminPage() {
       )}
 
       {/* Users Table */}
-      <div className="rounded-soft bg-surface-card tech-border overflow-hidden">
+      <div className="rounded-2xl bg-[#1E293B] border border-[#334155] overflow-hidden">
         <table className="data-grid">
           <thead>
             <tr>
@@ -417,8 +418,8 @@ export default function AdminPage() {
                 <tr key={u.id}>
                   <td>
                     <div className="flex items-center gap-2">
-                      {u.picture ? (
-                        <img src={u.picture} alt="" className="w-6 h-6 rounded-full" />
+                      {typeof u.picture === 'string' && u.picture.trim().length > 0 ? (
+                        <NextImage src={u.picture} alt="" width={24} height={24} unoptimized className="w-6 h-6 rounded-full" />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[0.5rem] font-bold text-slate-400">
                           {(u.email || "?").slice(0, 2).toUpperCase()}
@@ -481,13 +482,13 @@ export default function AdminPage() {
                         <div className="relative">
                           <button
                             onClick={() => setExpandedUser(isExpanded ? null : u.id)}
-                            className="text-[0.6rem] w-5 h-5 rounded flex items-center justify-center bg-white/5 text-slate-500 hover:text-white cursor-pointer transition-colors"
+                            className="text-[0.6rem] w-5 h-5 rounded flex items-center justify-center bg-[#1E293B] border border-[#334155] text-slate-500 hover:text-white cursor-pointer transition-colors"
                             title="Adicionar módulo"
                           >
                             <ChevronDown className={`w-3 h-3 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                           </button>
                           {isExpanded && (
-                            <div className="absolute top-7 right-0 z-10 bg-surface-card tech-border rounded-lg shadow-xl p-2 min-w-[120px]">
+                            <div className="absolute top-7 right-0 z-10 bg-[#1E293B] border border-[#334155] rounded-xl shadow-xl p-2 min-w-[120px]">
                               {ALL_MODULES.filter(m => !(u.allowed_modules || []).includes(m)).map((mod) => (
                                 <button
                                   key={mod}

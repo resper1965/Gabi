@@ -159,15 +159,15 @@ export function ChatPanel({
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}
           >
             <div
-              className={`max-w-[75%] rounded-[var(--radius-soft)] px-4 py-3 text-sm leading-relaxed ${
+              className={`max-w-[75%] rounded-xl px-5 py-4 text-[0.9rem] leading-relaxed border ${
                 msg.role === "user"
-                  ? "bg-white/5 text-white tech-border"
-                  : "bg-[var(--color-surface-card)] text-slate-200"
+                  ? "bg-[#1E293B] border-[#334155] text-slate-100"
+                  : "bg-transparent border-transparent text-slate-200"
               }`}
-              style={msg.role === "assistant" ? { borderLeft: `2px solid ${moduleAccent}` } : undefined}
+              style={msg.role === "assistant" ? { borderLeft: `3px solid ${moduleAccent}` } : undefined}
             >
               {msg.role === "assistant" ? (
-                <div className="prose-chat" style={{ fontFamily: "var(--font-ui)" }}>
+                <div className="prose-chat">
                   <ReactMarkdown
                     components={{
                       code: ({ className, children, ...props }) => {
@@ -245,18 +245,13 @@ export function ChatPanel({
                     const sources = msg.metadata?.sources as Array<{ title: string; type: string }> | undefined
                     if (!sources || !Array.isArray(sources) || sources.length === 0) return null
                     return (
-                      <div className="mt-3 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                        <p className="text-[10px] text-slate-600 mb-1.5 uppercase tracking-wider font-medium">📎 Fontes consultadas</p>
-                        <div className="flex flex-wrap gap-1.5">
+                      <div className="mt-4 pt-3 border-t border-[#1E293B]">
+                        <p className="text-[10px] text-slate-500 mb-2 uppercase tracking-widest font-semibold">📎 Fontes consultadas</p>
+                        <div className="flex flex-wrap gap-2">
                           {sources.map((src: { title: string; type: string }, i: number) => (
                             <span
                               key={i}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
-                              style={{
-                                background: `color-mix(in srgb, ${moduleAccent} 10%, transparent)`,
-                                border: `1px solid color-mix(in srgb, ${moduleAccent} 20%, transparent)`,
-                                color: moduleAccent,
-                              }}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1E293B] text-[10px] font-medium text-slate-300 border border-[#334155]"
                             >
                               {src.type === "contract" ? "📑" : src.type === "regulation" ? "⚖️" : src.type === "style" ? "✍️" : "📄"}
                               {src.title}
@@ -278,12 +273,12 @@ export function ChatPanel({
         {busy && !isStreaming && (
           <div className="flex justify-start animate-fade-in">
             <div
-              className="bg-[var(--color-surface-card)] rounded-[var(--radius-soft)] px-4 py-3"
-              style={{ borderLeft: `2px solid ${moduleAccent}` }}
+              className="bg-[#1E293B] rounded-xl px-5 py-4 border border-[#334155]"
+              style={{ borderLeft: `3px solid ${moduleAccent}` }}
             >
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" style={{ color: moduleAccent }} />
-                <span className="text-xs text-slate-500">gabi. está pensando...</span>
+                <span className="text-[0.9rem] text-slate-400">gabi está pensando...</span>
               </div>
             </div>
           </div>
@@ -294,29 +289,27 @@ export function ChatPanel({
       {/* Input */}
       <form
         onSubmit={handleSubmit}
-        className="p-4"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+        className="p-4 border-t border-[#1E293B]"
       >
-        <div className="flex items-end gap-2 tech-border rounded-[var(--radius-soft)] px-4 py-2.5 bg-[var(--color-surface-card)]">
+        <div className="flex items-end gap-2 border border-[#334155] rounded-xl px-4 py-3 bg-[#1E293B] shadow-sm">
           <textarea
             ref={textareaRef}
             value={input}
             onChange={autoGrow}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 bg-transparent resize-none text-sm text-white
-                       placeholder:text-slate-600 focus:outline-none max-h-[200px]"
-            style={{ fontFamily: "var(--font-ui)" }}
+            className="flex-1 bg-transparent resize-none text-[0.9rem] text-slate-100
+                       placeholder:text-slate-500 focus:outline-none max-h-[200px]"
             rows={1}
           />
           <button
             type="submit"
             disabled={!input.trim() || busy}
-            className="p-2 rounded-[var(--radius-tech)] disabled:opacity-20 disabled:cursor-not-allowed
+            className="p-2 rounded-lg disabled:opacity-20 disabled:cursor-not-allowed
                        transition-all duration-200 active:scale-95"
             style={{
               background: input.trim() && !busy ? moduleAccent : undefined,
-              backgroundColor: !input.trim() || busy ? "rgba(255,255,255,0.05)" : undefined,
+              backgroundColor: !input.trim() || busy ? "#334155" : undefined,
             }}
           >
             <Send className="w-4 h-4 text-white" />

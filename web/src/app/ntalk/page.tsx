@@ -64,29 +64,29 @@ export default function NTalkPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <header className="px-6 py-4 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <header className="px-6 py-4 flex items-center justify-between border-b border-[#1E293B]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[var(--radius-tech)] flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${ACCENT}20`, color: ACCENT }}>
             <Database className="w-4 h-4 text-white" />
           </div>
           <div>
             <h1 className="text-lg font-semibold">gabi.data</h1>
-            <p className="text-xs text-zinc-500">Sua CFO de Dados</p>
+            <p className="text-xs text-slate-500">Sua CFO de Dados</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleSyncSchema}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200"
-            style={{ background: `color-mix(in srgb, ${ACCENT} 15%, transparent)`, color: ACCENT, border: `1px solid color-mix(in srgb, ${ACCENT} 25%, transparent)` }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200"
+            style={{ background: `${ACCENT}15`, color: ACCENT }}
             title="Sincronizar schema do banco MS SQL"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Sync Schema</span>
           </button>
           <button
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200 bg-white/5 text-slate-400 hover:text-white"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all duration-200 bg-[#1E293B] text-slate-400 hover:text-white"
             title="Configurar conexão"
           >
             <Settings className="w-3.5 h-3.5" />

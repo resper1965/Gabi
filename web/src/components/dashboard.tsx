@@ -2,6 +2,7 @@
 
 import { PenTool, Scale, Database, ShieldCheck, ArrowRight, Lock } from "lucide-react"
 import Link from "next/link"
+import NextImage from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { useAuth } from "@/components/auth-provider"
@@ -80,29 +81,25 @@ export default function DashboardPage() {
       {/* ── Welcome Header ── */}
       <div className="mb-10 flex items-center gap-4">
         {avatarUrl ? (
-          <img
+          <NextImage
             src={avatarUrl}
             alt={firstName}
-            className="w-14 h-14 rounded-2xl object-cover border border-white/10 shadow-lg shrink-0"
+            width={56}
+            height={56}
+            unoptimized
+            className="w-14 h-14 rounded-2xl object-cover border border-[#334155] shadow-lg shrink-0"
             referrerPolicy="no-referrer"
           />
         ) : (
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold shrink-0"
-            style={{
-              background: "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05))",
-              color: "var(--color-gabi-primary)",
-              border: "1px solid rgba(16,185,129,0.2)",
-            }}
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold shrink-0 bg-[#1E293B] border border-[#334155]"
+            style={{ color: "var(--color-gabi-primary)" }}
           >
             {firstName.slice(0, 2).toUpperCase()}
           </div>
         )}
         <div>
-          <h1
-            className="text-3xl font-semibold tracking-tight"
-            style={{ fontFamily: "var(--font-ui)" }}
-          >
+          <h1 className="text-3xl font-semibold tracking-tight">
             {getGreeting()}, {firstName}
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
@@ -118,14 +115,14 @@ export default function DashboardPage() {
             <Link
               key={mod.key}
               href={mod.href}
-              className="group relative rounded-soft tech-border p-6
-                         bg-surface-card hover:bg-surface-raised
+              className="group relative rounded-2xl border border-[#334155] p-6
+                         bg-[#1E293B] hover:bg-[#1E293B]/80 hover:border-[#475569]
                          transition-all duration-200 cursor-pointer"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div
-                  className="w-10 h-10 rounded-tech flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
                   style={{ background: `${mod.accent}20`, color: mod.accent }}
                 >
                   <mod.icon className="w-5 h-5" />
@@ -164,11 +161,11 @@ export default function DashboardPage() {
             {locked.map((mod) => (
               <div
                 key={mod.key}
-                className="relative rounded-soft border border-white/5 p-5 bg-white/1"
+                className="relative rounded-2xl border border-[#334155] p-5 bg-transparent"
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-8 h-8 rounded-tech flex items-center justify-center bg-white/5"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#1E293B]"
                   >
                     <mod.icon className="w-4 h-4 text-slate-600" />
                   </div>
@@ -187,7 +184,7 @@ export default function DashboardPage() {
       {/* ── Full empty state (no modules at all) ── */}
       {visible.length === 0 && (
         <div className="text-center py-16">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#1E293B] border border-[#334155] flex items-center justify-center">
             <Lock className="w-7 h-7 text-slate-500" />
           </div>
           <p className="text-slate-400 text-sm font-medium">
@@ -202,7 +199,7 @@ export default function DashboardPage() {
             {allModules.map((mod) => (
               <div
                 key={mod.key}
-                className="rounded-soft border border-white/5 p-4 bg-white/1 flex items-center gap-3"
+                className="rounded-2xl border border-[#334155] p-4 bg-transparent flex items-center gap-3"
               >
                 <mod.icon className="w-4 h-4 text-slate-600 shrink-0" />
                 <span className="text-sm text-slate-500">{mod.name}</span>
@@ -214,7 +211,7 @@ export default function DashboardPage() {
       )}
 
       {/* ── Footer Links ── */}
-      <div className="mt-16 pb-8 text-center flex flex-col items-center justify-center space-y-3 border-t border-white/5 pt-8">
+      <div className="mt-16 pb-8 text-center flex flex-col items-center justify-center space-y-3 border-t border-[#1E293B] pt-8">
         <div className="flex items-center gap-6 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
           <Link href="/privacy" className="hover:text-white transition-colors">
             Política de Privacidade

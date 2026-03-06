@@ -24,11 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           theme="dark"
           toastOptions={{
             style: {
-              background: "var(--color-surface-card)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              color: "#e2e8f0",
+              background: "#1E293B",
+              border: "1px solid #334155",
+              color: "#F8FAFC",
               fontFamily: "var(--font-ui)",
-              fontSize: "0.8rem",
+              fontSize: "0.85rem",
+              borderRadius: "8px",
+              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
             },
           }}
         />

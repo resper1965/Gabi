@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     model_ghost: str = "gemini-2.0-flash-001"   # Creativity + low latency
     model_law: str = "gemini-1.5-pro"            # Long context + precision
     model_ntalk: str = "gemini-2.0-flash-001"   # SQL generation
+    
+    # LLM Settings
+    chat_history_limit: int = 6
 
     # Firebase Auth
     firebase_project_id: str = ""

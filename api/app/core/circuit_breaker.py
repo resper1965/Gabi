@@ -44,6 +44,7 @@ class CircuitBreaker:
         if self.state == CircuitState.OPEN:
             # Check if recovery timeout has passed
             if time.time() - self.last_failure_time >= self.recovery_timeout:
+                # State transition doesn't strictly need await lock block here as it drops early calls
                 self._transition(CircuitState.HALF_OPEN)
                 return True
             return False

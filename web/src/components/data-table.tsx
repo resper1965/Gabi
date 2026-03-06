@@ -6,10 +6,9 @@ import { ChevronUp, ChevronDown, Download, Search } from "lucide-react"
 interface DataTableProps {
   columns: string[]
   rows: Record<string, string | number | null>[]
-  accent?: string
 }
 
-export function DataTable({ columns, rows, accent = "var(--color-gabi-primary)" }: DataTableProps) {
+export function DataTable({ columns, rows }: DataTableProps) {
   const [sortCol, setSortCol] = useState<string | null>(null)
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc")
   const [filter, setFilter] = useState("")

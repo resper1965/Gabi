@@ -69,7 +69,7 @@ def _build_contents(prompt: str, chat_history: list[dict] | None = None) -> list
     """Build Vertex AI contents array from prompt and optional chat history."""
     contents = []
     if chat_history:
-        for msg in chat_history[-6:]:
+        for msg in chat_history[-settings.chat_history_limit:]:
             role = "user" if msg["role"] == "user" else "model"
             contents.append({"role": role, "parts": [{"text": msg["content"]}]})
     contents.append({"role": "user", "parts": [{"text": prompt}]})
