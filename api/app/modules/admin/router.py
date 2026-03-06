@@ -15,13 +15,12 @@ from app.core.auth import CurrentUser, require_role
 from app.models.user import User
 from app.models.ghost import KnowledgeDocument
 from app.models.law import LegalDocument
-from app.models.insightcare import InsuranceDocument
 
 settings = get_settings()
 
 router = APIRouter()
 
-ALL_MODULES = ["ghost", "law", "ntalk", "insightcare"]
+ALL_MODULES = ["ghost", "law", "ntalk"]
 
 
 # ── Models ──
@@ -193,7 +192,6 @@ async def system_stats(
     user_count = (await db.execute(select(func.count(User.id)))).scalar() or 0
     ghost_docs = (await db.execute(select(func.count(KnowledgeDocument.id)))).scalar() or 0
     law_docs = (await db.execute(select(func.count(LegalDocument.id)))).scalar() or 0
-    ic_docs = (await db.execute(select(func.count(InsuranceDocument.id)))).scalar() or 0
 
     # Pending users
     pending = (await db.execute(
@@ -214,8 +212,7 @@ async def system_stats(
         "documents": {
             "ghost": ghost_docs,
             "law": law_docs,
-            "insightcare": ic_docs,
-            "total": ghost_docs + law_docs + ic_docs,
+            "total": ghost_docs + law_docs,
         },
         "database_size_mb": db_size_mb,
     }

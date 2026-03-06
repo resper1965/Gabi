@@ -26,7 +26,7 @@ interface UserInfo {
 interface Stats {
   users: number
   pending_users: number
-  documents: { ghost: number; law: number; insightcare: number; total: number }
+  documents: { ghost: number; law: number; total: number }
   database_size_mb: number
 }
 
@@ -45,13 +45,11 @@ const MODULE_LABELS: Record<string, string> = {
   ghost: "Writer",
   law: "Legal",
   ntalk: "Data",
-  insightcare: "Care",
 }
 const MODULE_COLORS: Record<string, string> = {
   ghost: "var(--color-mod-ghost)",
   law: "var(--color-mod-law)",
   ntalk: "var(--color-mod-ntalk)",
-  insightcare: "var(--color-mod-insightcare)",
 }
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; icon: typeof Clock }> = {
@@ -234,8 +232,8 @@ export default function AdminPage() {
 
       {/* Regulatory Seed Packs */}
       {profile?.role === "superadmin" && seedPacks.length > 0 && (() => {
-        const MODULE_LABELS: Record<string, string> = { law: "gabi.legal", insightcare: "gabi.care" };
-        const MODULE_COLORS: Record<string, string> = { law: "var(--color-mod-law)", insightcare: "var(--color-mod-insightcare)" };
+        const MODULE_LABELS: Record<string, string> = { law: "gabi.legal" };
+        const MODULE_COLORS: Record<string, string> = { law: "var(--color-mod-law)" };
         const groups = seedPacks.reduce((acc: Record<string, typeof seedPacks>, p: typeof seedPacks[0]) => {
           const key = p.module as string;
           if (!acc[key]) acc[key] = [];

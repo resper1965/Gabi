@@ -55,7 +55,6 @@ async def export_user_data(
         "documents": {
             "ghost": [],
             "law": [],
-            "insightcare": [],
         },
     }
 
@@ -81,7 +80,7 @@ async def export_user_data(
         })
 
     # Documents per module
-    for table_name in ["ghost_documents", "law_documents", "insightcare_documents"]:
+    for table_name in ["ghost_documents", "law_documents"]:
         module_key = table_name.split("_")[0]
         try:
             docs = await db.execute(
@@ -132,7 +131,6 @@ async def purge_user_data(
     for doc_table, chunk_table in [
         ("ghost_documents", "ghost_chunks"),
         ("law_documents", "law_chunks"),
-        ("insightcare_documents", "insightcare_chunks"),
     ]:
         try:
             # Delete chunks first (FK constraint)
