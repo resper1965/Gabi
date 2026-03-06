@@ -98,3 +98,10 @@ app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
 from app.modules.chat.router import router as chat_router
 app.include_router(chat_router, prefix="/api/chat", tags=["Chat"])
 
+# ── Organization Router ──
+from app.modules.org.router import router as org_router
+app.include_router(org_router, tags=["Organizations"])
+
+# ── Platform Admin Router ──
+from app.modules.platform.router import router as platform_router
+app.include_router(platform_router, tags=["Platform Admin"])

@@ -64,6 +64,8 @@ class CurrentUser:
     role: str = "user"  # superadmin, admin, user
     status: str = "pending"  # approved, pending, blocked
     allowed_modules: list[str] = field(default_factory=list)
+    org_id: str | None = None
+    org_role: str | None = None  # owner, admin, member
 
 
 async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
@@ -203,6 +205,18 @@ async def get_current_user(
             detail="Sua conta foi bloqueada. Contate o administrador.",
         )
 
+    # Resolve org context
+    org_id = str(user.org_id) if user.org_id else None
+    org_role = None
+    if org_id:
+        from sqlalchemy import text as sa_text
+        org_row = await db.execute(
+            sa_text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
+            {"org_id": org_id, "uid": str(user.id)},
+        )
+        om = org_row.first()
+        org_role = om.role if om else None
+
     return CurrentUser(
         uid=user.firebase_uid,
         email=user.email,
@@ -211,6 +225,8 @@ async def get_current_user(
         role=user.role,
         status=user.status,
         allowed_modules=user.allowed_modules or [],
+        org_id=org_id,
+        org_role=org_role,
     )
 
 

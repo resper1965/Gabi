@@ -3,8 +3,9 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
+from sqlalchemy.orm import relationship
 
 from app.models.base import Base
 
@@ -19,10 +20,13 @@ class User(Base):
     picture = Column(String(500), nullable=True)
     role = Column(String(50), nullable=False, default="user")  # superadmin, admin, user
     status = Column(String(20), nullable=False, default="pending")  # approved, pending, blocked
-    allowed_modules = Column(ARRAY(String), server_default="{}")  # ["ghost","law","ntalk","insightcare"]
+    allowed_modules = Column(ARRAY(String), server_default="{}")  # deprecated → use org_modules
+    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    organization = relationship("Organization", foreign_keys=[org_id])
 
 
 class ChatSession(Base):
