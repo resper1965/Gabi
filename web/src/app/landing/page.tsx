@@ -164,13 +164,13 @@ export default function LandingPage() {
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-            <span className="text-xs font-bold text-slate-200 tracking-widest">
-              <span className="uppercase">Gabi by </span><span className="lowercase">ness<span className="text-[#00ade8]">.</span></span>
+            <span className="text-xs font-medium text-slate-200 tracking-widest">
+              <span className="uppercase">Gabi by </span><span className="brand-mark">ness<span className="text-[#00ade8]">.</span></span>
             </span>
           </div>
 
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
             A inteligência <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">regulatória</span><br />
@@ -178,7 +178,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="mt-6 text-lg tracking-wide md:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
-            A Gabi transforma a gestão normativa para <strong>escritórios de advocacia</strong> e <strong>departamentos jurídicos e de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
+            A <span className="brand-mark text-slate-200">Gabi<span className="text-[#00ade8]">.</span></span> transforma a gestão normativa para <strong>escritórios de advocacia</strong> e <strong>departamentos jurídicos e de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -204,7 +204,7 @@ export default function LandingPage() {
           <div className="mt-16 flex items-center justify-center md:justify-start gap-4 text-sm text-slate-500 opacity-90">
             <span className="font-semibold tracking-wider text-xs uppercase">powered by</span>
             <div className="flex gap-4 items-center transition-all duration-500">
-              <span className="font-medium text-white text-xl tracking-tight mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
+              <span className="brand-mark text-white text-xl mix-blend-screen drop-shadow-md">ness<span className="text-[#00ade8]">.</span></span>
             </div>
           </div>
         </div>
@@ -238,19 +238,19 @@ export default function LandingPage() {
       <section className="border-y border-white/5 bg-slate-900/50 backdrop-blur-sm px-6 py-10 relative z-20">
         <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-white/5">
           <div className="text-center px-4">
-            <h3 className="text-4xl font-bold text-white mb-1"><AnimatedCounter end={8} /></h3>
+            <h3 className="text-4xl font-semibold text-white mb-1"><AnimatedCounter end={8} /></h3>
             <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">Fontes Oficiais</p>
           </div>
           <div className="text-center px-4">
-            <h3 className="text-4xl font-bold text-white mb-1"><AnimatedCounter end={10} prefix="+" suffix="k" /></h3>
+            <h3 className="text-4xl font-semibold text-white mb-1"><AnimatedCounter end={10} prefix="+" suffix="k" /></h3>
             <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">Normativos Analisados</p>
           </div>
           <div className="text-center px-4">
-            <h3 className="text-4xl font-bold text-white mb-1"><AnimatedCounter end={80} suffix="%" /></h3>
+            <h3 className="text-4xl font-semibold text-white mb-1"><AnimatedCounter end={80} suffix="%" /></h3>
             <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">Redução de Tempo</p>
           </div>
           <div className="text-center px-4">
-            <h3 className="text-4xl font-bold text-white mb-1">24<span className="text-2xl text-slate-500">/7</span></h3>
+            <h3 className="text-4xl font-semibold text-white mb-1">24<span className="text-2xl text-slate-500">/7</span></h3>
             <p className="text-xs uppercase tracking-wider text-slate-400 font-medium">Monitoramento Ativo</p>
           </div>
         </div>
@@ -278,7 +278,7 @@ export default function LandingPage() {
             Do caótico ao estratégico
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Abandone os processos manuais. A inteligência artificial da Gabi transforma dados regulatórios em ações claras.
+            Abandone os processos manuais. A inteligência artificial da <span className="brand-mark text-slate-300">Gabi<span className="text-[#00ade8]">.</span></span> transforma dados regulatórios em ações claras.
           </p>
         </div>
 
@@ -373,7 +373,7 @@ export default function LandingPage() {
             Arquitetura desenhada para o seu negócio
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            A Gabi adapta-se às exigências específicas do seu ambiente corporativo, seja na defesa de clientes ou na mitigação de riscos internos.
+            A <span className="brand-mark text-slate-300">Gabi<span className="text-[#00ade8]">.</span></span> adapta-se às exigências específicas do seu ambiente corporativo, seja na defesa de clientes ou na mitigação de riscos internos.
           </p>
         </div>
 
@@ -408,7 +408,7 @@ export default function LandingPage() {
       <section className="border-t border-white/5 bg-slate-900/30 px-6 py-24">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+            <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
               Performance corporativa comprovada
             </h2>
             <p className="text-slate-400 text-lg max-w-2xl mx-auto">
@@ -447,7 +447,7 @@ export default function LandingPage() {
          <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: "radial-gradient(circle at center, #0369A1 0%, transparent 70%)" }} />
          
          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+            <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
               Pronto para elevar seu compliance?
             </h2>
             <p className="text-slate-400 text-lg mb-10">
@@ -524,7 +524,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-2">
               <p>&copy; {new Date().getFullYear()} ness. Todos os direitos reservados.</p>
               <span className="hidden sm:inline">&bull;</span>
-              <p>powered by <span className="font-medium text-slate-300 tracking-tight">ness<span className="text-[#00ade8]">.</span></span></p>
+              <p>powered by <span className="brand-mark text-slate-300">ness<span className="text-[#00ade8]">.</span></span></p>
             </div>
           </div>
         </div>
