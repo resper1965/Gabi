@@ -103,25 +103,94 @@ async def retrieve_if_needed(
     # Build ownership filter: user's own docs + shared regulatory docs
     if user_id:
         ownership_filter = "(d.user_id = :uid OR d.is_shared = true)"
-        params = {"emb": str(query_embedding), "lim": limit, "uid": user_id}
     else:
         ownership_filter = "d.is_shared = true"
-        params = {"emb": str(query_embedding), "lim": limit}
 
-    # Table names are safe — validated against ALLOWED_TABLE_PAIRS above
-    results = await db.execute(
+    expanded_limit = 40
+
+    # 1. Semantic Search (PGVector)
+    semantic_params = {"emb": str(query_embedding), "lim": expanded_limit}
+    if user_id:
+        semantic_params["uid"] = user_id
+    
+    semantic_results = await db.execute(
         text(f"""
-            SELECT c.content, d.title, d.{doc_type_col} as doc_type
+            SELECT c.id, c.content, d.title, d.{doc_type_col} as doc_type
             FROM {chunks_table} c
             JOIN {docs_table} d ON c.document_id = d.id
             WHERE {ownership_filter} AND d.is_active = true AND c.embedding IS NOT NULL
             ORDER BY c.embedding <=> :emb::vector
             LIMIT :lim
         """),
-        params,
+        semantic_params,
     )
+    semantic_chunks = [dict(row._mapping) for row in semantic_results]
 
-    chunks = [dict(row._mapping) for row in results]
+    # 2. Lexical Search (FTS via tsvector)
+    fts_params = {"fts_query": intent["refined_query"], "lim": expanded_limit}
+    if user_id:
+        fts_params["uid"] = user_id
+
+    lexical_results = await db.execute(
+        text(f"""
+            SELECT c.id, c.content, d.title, d.{doc_type_col} as doc_type
+            FROM {chunks_table} c
+            JOIN {docs_table} d ON c.document_id = d.id
+            WHERE {ownership_filter} AND d.is_active = true AND c.content_tsvector @@ websearch_to_tsquery('portuguese', :fts_query)
+            ORDER BY ts_rank_cd(c.content_tsvector, websearch_to_tsquery('portuguese', :fts_query)) DESC
+            LIMIT :lim
+        """),
+        fts_params,
+    )
+    lexical_chunks = [dict(row._mapping) for row in lexical_results]
+
+    # 3. Reciprocal Rank Fusion (RRF Algorithm)
+    K = 60
+    scores = {}
+    chunk_map = {}
+    
+    for rank, ck in enumerate(semantic_chunks):
+        cid = ck["id"]
+        scores[cid] = scores.get(cid, 0.0) + 1.0 / (K + rank + 1)
+        chunk_map[cid] = ck
+        
+    for rank, ck in enumerate(lexical_chunks):
+        cid = ck["id"]
+        scores[cid] = scores.get(cid, 0.0) + 1.0 / (K + rank + 1)
+        chunk_map[cid] = ck
+        
+    fused_chunk_ids = sorted(scores.keys(), key=lambda cid: scores[cid], reverse=True)
+    fused_chunks = [chunk_map[cid] for cid in fused_chunk_ids][:expanded_limit]
+
+    # 4. LLM Re-Ranking (Top-K Reduction + Chronological Sorting bias)
+    if len(fused_chunks) > limit:
+        rerank_prompt = (
+            f"Analise a relevância legislativa dos trechos abaixo em relação à dúvida: '{intent['refined_query']}'.\n"
+            f"Selecione no MÁXIMO {limit} índices matemáticos dos trechos mais assertivos. Tente ordená-los do mais antigo para o mais recente (critério cronológico legal) se houverem conflitos normativos.\n"
+            f"RETORNE APENAS JSON: {{\"indices\": [2, 0, 5, 8]}}\n\nTRECHOS:\n"
+        )
+        for idx, ck in enumerate(fused_chunks):
+            short_content = ck["content"][:250].replace("\n", " ")
+            rerank_prompt += f"[{idx}] {ck['title']} - {short_content}...\n"
+            
+        try:
+            raw_rerank = await generate(module="ntalk", prompt=rerank_prompt)
+            rr_res = safe_parse_json(raw_rerank)
+            best_indices = rr_res.get("indices", list(range(limit)))
+            
+            # Reconstruct array using exclusively valid indexes
+            final_chunks = []
+            for i in best_indices:
+                if isinstance(i, int) and i >= 0 and i < len(fused_chunks):
+                    final_chunks.append(fused_chunks[i])
+            
+            # Fallback if AI hallucinated indices
+            chunks = final_chunks if len(final_chunks) > 0 else fused_chunks[:limit]
+        except Exception as e:
+            logger.warning(f"RRF LLM Re-ranker failed: {e}")
+            chunks = fused_chunks[:limit]
+    else:
+        chunks = fused_chunks[:limit]
     
     # ── Enhancement for "law" module: Fetch Regulatory Insights ──
     if module == "law":

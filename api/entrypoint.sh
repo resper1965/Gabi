@@ -5,7 +5,7 @@ export PYTHONPATH=/app
 
 # Alembic migrations — non-blocking with timeout
 echo "🔄 Running Alembic migrations..."
-timeout 30 alembic upgrade head 2>&1 || echo "⚠️ Migrations skipped (timeout or connection issue)"
+timeout 300 alembic upgrade head 2>&1 || echo "⚠️ Migrations skipped (timeout or connection issue)"
 echo "✅ Migrations step complete."
 
 echo "🚀 Starting uvicorn..."
