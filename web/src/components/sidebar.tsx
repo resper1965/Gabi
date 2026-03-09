@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   Settings,
   BookOpen,
+  Building2,
+  Globe,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -132,6 +134,31 @@ export function Sidebar() {
           {!collapsed && <span className="text-sm font-medium">Documentação</span>}
         </Link>
 
+        {/* Org Link — visible to users with org */}
+        {profile?.org_id && (
+          <>
+            {!collapsed && (
+              <div className="pt-4 pb-1 px-3">
+                <span className="text-[0.6rem] font-semibold text-slate-600 uppercase tracking-widest">
+                  Organização
+                </span>
+              </div>
+            )}
+            {collapsed && <div className="pt-2" />}
+            <Link
+              href="/org"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
+                pathname.startsWith("/org")
+                  ? "nav-link-active bg-white/5 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Building2 className="w-5 h-5 shrink-0" style={{ color: pathname.startsWith("/org") ? "#38bdf8" : undefined }} />
+              {!collapsed && <span className="text-sm font-medium">Minha Org</span>}
+            </Link>
+          </>
+        )}
+
         {/* Admin Link */}
         {(profile?.role === "admin" || profile?.role === "superadmin") && (
           <>
@@ -155,6 +182,21 @@ export function Sidebar() {
               {!collapsed && <span className="text-sm font-medium">Admin</span>}
             </Link>
           </>
+        )}
+
+        {/* Platform Admin — superadmin only */}
+        {profile?.role === "superadmin" && (
+          <Link
+            href="/admin/platform"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
+              pathname === "/admin/platform"
+                ? "nav-link-active bg-white/5 text-white"
+                : "text-slate-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <Globe className="w-5 h-5 shrink-0" style={{ color: pathname === "/admin/platform" ? "var(--color-gabi-primary)" : undefined }} />
+            {!collapsed && <span className="text-sm font-medium">Plataforma</span>}
+          </Link>
         )}
       </nav>
 

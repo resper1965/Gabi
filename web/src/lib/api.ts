@@ -244,6 +244,71 @@ export const gabiAuth = {
   me: () => request("/api/auth/me"),
 }
 
+// ── Org Management ──
+
+export interface OrgInfo {
+  id: string
+  name: string
+  cnpj: string | null
+  sector: string | null
+  domain: string | null
+  plan: string
+  is_active: boolean
+  trial_expires_at: string | null
+  members: Array<{ id: string; email: string; role: string; joined_at: string | null }>
+  modules: Array<{ module: string; enabled: boolean }>
+  usage: { ops_count: number; month: string } | null
+  limits: { max_seats: number; max_ops_month: number; max_concurrent: number } | null
+}
+
+export interface PlatformOrgInfo {
+  id: string
+  name: string
+  cnpj: string | null
+  sector: string | null
+  domain: string | null
+  plan: string
+  member_count: number
+  ops_this_month: number
+  trial_expires_at: string | null
+  is_active: boolean
+  created_at: string
+}
+
+export interface PlatformStats {
+  total_orgs: number
+  total_users: number
+  ops_this_month: number
+  active_sessions: number
+}
+
+export const gabiOrg = {
+  getMyOrg: () => request<{ org: OrgInfo | null }>("/api/orgs/me"),
+  createOrg: (data: { name: string; modules?: string[]; sector?: string; cnpj?: string }) =>
+    request("/api/orgs", { method: "POST", body: JSON.stringify(data) }),
+  updateOrg: (data: { name?: string; cnpj?: string; sector?: string; domain?: string }) =>
+    request("/api/orgs/me", { method: "PATCH", body: JSON.stringify(data) }),
+  sendInvite: (data: { email: string; role?: string }) =>
+    request("/api/orgs/invite", { method: "POST", body: JSON.stringify(data) }),
+  joinByToken: (token: string) =>
+    request("/api/orgs/join", { method: "POST", body: JSON.stringify({ token }) }),
+  getUsage: () => request("/api/orgs/usage"),
+}
+
+// ── Platform Admin ──
+
+export const gabiPlatform = {
+  stats: () => request<PlatformStats>("/api/platform/stats"),
+  listOrgs: (limit = 50, offset = 0) =>
+    request<{ orgs: PlatformOrgInfo[]; total: number; limit: number; offset: number }>(
+      `/api/platform/orgs?limit=${limit}&offset=${offset}`
+    ),
+  provisionOrg: (data: { org_name: string; owner_email: string; plan?: string; modules?: string[]; sector?: string; cnpj?: string }) =>
+    request("/api/platform/orgs", { method: "POST", body: JSON.stringify(data) }),
+  changePlan: (orgId: string, planName: string) =>
+    request(`/api/platform/orgs/${orgId}/plan`, { method: "PATCH", body: JSON.stringify({ plan_name: planName }) }),
+}
+
 // Unified export — 3 modules: writer, legal, data
 export const gabi = {
   // Branded names
@@ -261,5 +326,7 @@ export const gabi = {
   admin: gabiAdmin,
   auth: gabiAuth,
   chat: gabiChat,
+  // Onboarding
+  org: gabiOrg,
+  platform: gabiPlatform,
 }
-
