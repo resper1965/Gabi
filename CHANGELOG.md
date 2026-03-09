@@ -2,6 +2,23 @@
 
 Todas as alterações significativas na plataforma Gabi.
 
+## [0.14.0] — 2026-03-09
+
+### Sprint 24 — E2E Tests
+- **test(api):** Suite E2E com `httpx.AsyncClient` + `app.dependency_overrides`
+- **test(api):** 154 testes passando (unit + integration + E2E)
+
+### Sprint 23 — API Documentation
+- **docs(api):** `API.md` com 50+ endpoints documentados
+- **docs(api):** Error codes, FinOps rate limits, auth reference
+
+### Sprint 22 — ORM Migration
+- **refactor(api):** `org_limits.py` reescrito com SQLAlchemy ORM (zero raw SQL)
+- **refactor(api):** `platform/router.py` e `org/router.py` migrados de `text()` para ORM
+
+### Sprint 21 — CI/CD Fix
+- **fix(ci):** `cloudbuild-staging.yaml` — `${SHORT_SHA}` → `${_TAG}` com default `latest`
+
 ## [0.13.0] — 2026-03-09
 
 ### Sprint 16 — Observability Dashboard
