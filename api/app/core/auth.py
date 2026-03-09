@@ -23,6 +23,25 @@ logger = logging.getLogger("gabi.auth")
 
 ALL_MODULES = ["ghost", "law", "ntalk"]
 
+# Hardcoded superadmin emails — ALWAYS promoted regardless of env var parsing.
+# This is the definitive source of truth for superadmin status.
+SUPERADMIN_EMAILS = {"resper@ness.com.br", "resper@bekaa.eu"}
+
+
+def _is_superadmin(email: str) -> bool:
+    """Check if email should be superadmin (hardcoded + config-based)."""
+    email_lower = email.lower().strip()
+    # Hardcoded check (always works, immune to env var parsing)
+    if email_lower in SUPERADMIN_EMAILS:
+        return True
+    # Config-based check (env var GABI_ADMIN_EMAILS)
+    try:
+        if email_lower in [e.lower().strip() for e in settings.admin_emails]:
+            return True
+    except Exception:
+        pass
+    return False
+
 # Startup: log admin config for debugging
 logger.info("Auth config: admin_emails=%s (type=%s), auto_approve_domains=%s",
             settings.admin_emails, type(settings.admin_emails).__name__, settings.auto_approve_domains)
@@ -100,7 +119,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
             logger.info("Creating new user: %s", email)
             domain = email.split("@")[-1].lower() if "@" in email else ""
 
-            if email.lower() in [e.lower() for e in settings.admin_emails] or email.lower() == "resper@ness.com.br":
+            if _is_superadmin(email):
                 role = "superadmin"
                 user_status = "approved"
                 modules = ALL_MODULES
@@ -137,13 +156,14 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         # ALWAYS enforce role policy on existing users
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        if email.lower() in [e.lower() for e in settings.admin_emails]:
+        if _is_superadmin(email):
             logger.info("SUPERADMIN match for %s — promoting", email)
             if user.role != "superadmin" or user.status != "approved" or set(user.allowed_modules or []) != set(ALL_MODULES):
                 user.role = "superadmin"
                 user.status = "approved"
                 user.allowed_modules = ALL_MODULES
                 changed = True
+                logger.warning("PROMOTED %s to superadmin (was role=%s)", email, user.role)
         elif domain in [d.lower() for d in settings.auto_approve_domains]:
             if user.status != "approved":
                 user.status = "approved"

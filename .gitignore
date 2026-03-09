@@ -35,8 +35,7 @@ Thumbs.db
 *.log
 nghost/
 
-# Legacy monorepo (migrated)
-packages/
+# Legacy monorepo (keep packages/core — web Dockerfile dependency)
 AGENTS.md
 .gcp-project
 cloud-sql-proxy

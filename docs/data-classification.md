@@ -30,7 +30,6 @@
 | `legal_documents` | canonical_url, act_type | 🔵 INTERNAL | Legítimo interesse |
 | `legal_provisions` | text, embedding | 🔵 INTERNAL | Legítimo interesse |
 
-### gabi.care (InsightCare)
 | Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
 |--------|------------------|-------|-----------------|
 | `insurance_clients` | name, cnpj, segment | 🔴 RESTRICTED | Consentimento |

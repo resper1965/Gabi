@@ -2,7 +2,7 @@
 
 ## Context
 
-A Gabi é uma plataforma AI enterprise com 4 módulos verticais (Legal, GhostWriter, Data, InsightCare), servindo setores regulados (jurídico, financeiro, seguros). O repositório já tem CI/CD (Cloud Build), 117 testes, monitoramento, e compliance LGPD. A proposta é formalizar um **programa completo de SDLC (Software Development Life Cycle) + SSDLC (Secure SDLC)** como se já estivesse implantado, passando por todas as fases.
+A Gabi é uma plataforma AI enterprise com 3 módulos verticais (Legal, GhostWriter, Data), servindo setores regulados (jurídico, financeiro, seguros). O repositório já tem CI/CD (Cloud Build), 117 testes, monitoramento, e compliance LGPD. A proposta é formalizar um **programa completo de SDLC (Software Development Life Cycle) + SSDLC (Secure SDLC)** como se já estivesse implantado, passando por todas as fases.
 
 ---
 
@@ -24,7 +24,6 @@ A Gabi é uma plataforma AI enterprise com 4 módulos verticais (Legal, GhostWri
 gabi.legal  → Confidencialidade de documentos jurídicos, sigilo profissional
 gabi.writer → Propriedade intelectual de textos, style profiles
 gabi.data   → Prevent SQL injection (já com allowlist), credential vault
-gabi.care   → Dados de saúde (lei 13.709 + ANS), PHI-like protections
 ```
 
 #### 1.3 Compliance Matrix

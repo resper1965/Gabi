@@ -93,7 +93,6 @@ Este modelo de ameaças cobre a superfície de ataque da plataforma Gabi, uma ap
 | Citação de legislação incorreta (hallucination) | Alto | Anti-hallucination ✅ + RAG citations |
 | Acesso não autorizado a processos | Alto | Role-based access ✅ |
 
-### gabi.care (InsightCare)
 | Ameaça | Risco | Status |
 |--------|-------|--------|
 | Dados de saúde expostos (PHI-like) | Crítico | Tenant isolation ✅, LGPD consent ✅ |

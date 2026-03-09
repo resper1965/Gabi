@@ -10,8 +10,6 @@
 
 | Camada | Artefato | Status |
 |--------|----------|--------|
-| **Backend** | 4 routers completos (ghost 182L, law 145L, ntalk 215L, insightcare 230L) | ✅ Lógica real |
-| **Backend** | 5 models SQLAlchemy (ghost, law, ntalk, insightcare, user) | ✅ Tabelas definidas |
 | **Backend** | `core/ai.py` — Vertex AI + model routing | ✅ |
 | **Backend** | `core/auth.py` — Firebase Admin verify | ✅ |
 | **Backend** | `core/embeddings.py` — bge-m3 local | ✅ |
@@ -29,7 +27,6 @@
 | 1 | `web/src/lib/firebase.ts` — Firebase Client SDK config | Auth client não funciona |
 | 2 | `web/src/lib/api.ts` — Axios client com interceptor | Chamadas API não funcionam |
 | 3 | Login page (`/login`) + route guard | Sem autenticação visual |
-| 4 | Upload endpoints (ghost docs, law docs, insightcare docs) | Sem ingestão de documentos |
 | 5 | Alembic init + migration inicial | Banco não cria tabelas |
 | 6 | `api/Dockerfile` | Não deploya backend |
 | 7 | `web/Dockerfile` | Não deploya frontend |
@@ -87,8 +84,6 @@
 - [ ] POST `/api/ntalk/schema-sync` — sincroniza schema → Business Dictionary
 - [ ] UI: settings panel para conexão
 
-#### 2.4 gabi.care (InsightCare)
-- [ ] POST `/api/insightcare/upload` — recebe apólices, claims XLSX, normas PDF
 - [ ] Processamento XLSX: pandas → ClaimsData
 - [ ] Processamento PDF: PyMuPDF → chunk → embed
 - [ ] UI: botão Upload

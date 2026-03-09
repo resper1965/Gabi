@@ -73,8 +73,6 @@ A plataforma é desenhada para profissionais que lidam com **informação sensí
 
 ---
 
-### 🛡️ gabi.care — Analista de Seguros e Saúde
-
 **Para quem**: Corretoras de seguros, departamentos de benefícios, gestores de saúde corporativa.
 
 **O que faz**:

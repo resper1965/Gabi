@@ -122,7 +122,7 @@ class ConnectionInfo(BaseModel):
     schema_synced: bool = False
 
 
-# ── InsightCare (gabi.care) ──
+# ── (Reserved) ──
 
 class InsightCareResponse(BaseModel):
     """InsightCare agent chat response."""
