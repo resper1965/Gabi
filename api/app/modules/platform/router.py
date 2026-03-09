@@ -1,11 +1,11 @@
 """Platform Admin router — Global management for ness. superadmins."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import select, func, update, text
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user, CurrentUser
@@ -56,8 +56,10 @@ async def platform_stats(
         select(func.count()).select_from(Organization).where(Organization.is_active == True)
     )).scalar() or 0
 
-    total_users_result = await db.execute(text("SELECT COUNT(*) FROM users WHERE is_active = true"))
-    total_users = total_users_result.scalar() or 0
+    from app.models.user import User
+    total_users = (await db.execute(
+        select(func.count()).select_from(User).where(User.is_active == True)
+    )).scalar() or 0
 
     ops_result = await db.execute(
         select(func.coalesce(func.sum(OrgUsage.ops_count), 0))
@@ -67,7 +69,7 @@ async def platform_stats(
 
     sessions_result = await db.execute(
         select(func.count()).select_from(OrgSession)
-        .where(OrgSession.last_active > text("NOW() - INTERVAL '5 minutes'"))
+        .where(OrgSession.last_active > datetime.now(timezone.utc) - timedelta(minutes=5))
     )
     active_sessions = sessions_result.scalar() or 0
 

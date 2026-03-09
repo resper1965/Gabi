@@ -327,13 +327,14 @@ async def get_org_usage(
     ]
 
     # Current concurrent sessions
-    from sqlalchemy import text
+    from datetime import timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=5)
     sessions_result = await db.execute(
         select(func.count())
         .select_from(OrgSession)
         .where(
             OrgSession.org_id == user.org_id,
-            OrgSession.last_active > text("NOW() - INTERVAL '5 minutes'"),
+            OrgSession.last_active > cutoff,
         )
     )
     active_sessions = sessions_result.scalar() or 0
