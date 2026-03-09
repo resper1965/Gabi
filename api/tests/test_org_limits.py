@@ -8,29 +8,58 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi import HTTPException
 
 
+def _mock_row(*values):
+    """Create a mock Row that supports tuple unpacking (like SQLAlchemy Row)."""
+    row = MagicMock()
+    row.__iter__ = MagicMock(return_value=iter(values))
+    row.__len__ = MagicMock(return_value=len(values))
+    row.__getitem__ = MagicMock(side_effect=lambda i: values[i])
+    return row
+
+
 class TestCheckSeatLimit:
     """Test seat limit enforcement."""
 
     @pytest.mark.asyncio
-    async def test_seat_limit_raises_429_when_full(self, mock_db):
-        """Raises 429 when org reaches max_seats."""
+    async def test_seat_limit_raises_403_when_full(self, mock_db):
+        """Raises 403 when org reaches max_seats."""
         from app.core.org_limits import check_seat_limit
-        mock_db.execute.return_value = AsyncMock(
-            first=MagicMock(return_value=MagicMock(max_seats=2, current_seats=2))
-        )
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(2, 2)  # max_seats=2, current=2
+        mock_db.execute.return_value = mock_result
         with pytest.raises(HTTPException) as exc_info:
             await check_seat_limit("org-123", mock_db)
-        assert exc_info.value.status_code == 429
+        assert exc_info.value.status_code == 403
 
     @pytest.mark.asyncio
     async def test_seat_limit_passes_when_available(self, mock_db):
         """No error when seats are available."""
         from app.core.org_limits import check_seat_limit
-        mock_db.execute.return_value = AsyncMock(
-            first=MagicMock(return_value=MagicMock(max_seats=5, current_seats=2))
-        )
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(5, 2)  # max_seats=5, current=2
+        mock_db.execute.return_value = mock_result
         # Should not raise
         await check_seat_limit("org-123", mock_db)
+
+    @pytest.mark.asyncio
+    async def test_seat_limit_unlimited(self, mock_db):
+        """max_seats=0 means unlimited — never raises."""
+        from app.core.org_limits import check_seat_limit
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(0, 100)  # unlimited
+        mock_db.execute.return_value = mock_result
+        await check_seat_limit("org-123", mock_db)
+
+    @pytest.mark.asyncio
+    async def test_seat_limit_org_not_found(self, mock_db):
+        """Raises 404 when org is not found."""
+        from app.core.org_limits import check_seat_limit
+        mock_result = MagicMock()
+        mock_result.first.return_value = None
+        mock_db.execute.return_value = mock_result
+        with pytest.raises(HTTPException) as exc_info:
+            await check_seat_limit("nonexistent", mock_db)
+        assert exc_info.value.status_code == 404
 
 
 class TestCheckOpsLimit:
@@ -40,26 +69,44 @@ class TestCheckOpsLimit:
     async def test_ops_limit_raises_429_when_exhausted(self, mock_db):
         """Raises 429 when monthly ops are exhausted."""
         from app.core.org_limits import check_ops_limit
-        mock_db.execute.return_value = AsyncMock(
-            first=MagicMock(return_value=MagicMock(max_ops_month=100, current_ops=100))
-        )
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(100, 100)  # max=100, current=100
+        mock_db.execute.return_value = mock_result
         with pytest.raises(HTTPException) as exc_info:
             await check_ops_limit("org-123", mock_db)
         assert exc_info.value.status_code == 429
 
+    @pytest.mark.asyncio
+    async def test_ops_limit_passes_when_available(self, mock_db):
+        """No error when ops are available."""
+        from app.core.org_limits import check_ops_limit
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(1000, 50)  # max=1000, current=50
+        mock_db.execute.return_value = mock_result
+        await check_ops_limit("org-123", mock_db)
 
-class TestCheckSessionLimit:
+    @pytest.mark.asyncio
+    async def test_ops_limit_no_org_skips(self, mock_db):
+        """Skips check if org not found (backward compat)."""
+        from app.core.org_limits import check_ops_limit
+        mock_result = MagicMock()
+        mock_result.first.return_value = None
+        mock_db.execute.return_value = mock_result
+        await check_ops_limit("org-123", mock_db)  # should not raise
+
+
+class TestCheckConcurrentLimit:
     """Test concurrent session limit enforcement."""
 
     @pytest.mark.asyncio
-    async def test_session_limit_raises_429_when_full(self, mock_db):
+    async def test_concurrent_limit_raises_429_when_full(self, mock_db):
         """Raises 429 when concurrent sessions reach max."""
-        from app.core.org_limits import check_session_limit
-        mock_db.execute.return_value = AsyncMock(
-            first=MagicMock(return_value=MagicMock(max_concurrent=2, active_sessions=2))
-        )
+        from app.core.org_limits import check_concurrent_limit
+        mock_result = MagicMock()
+        mock_result.first.return_value = _mock_row(2, 2)  # max=2, active=2
+        mock_db.execute.return_value = mock_result
         with pytest.raises(HTTPException) as exc_info:
-            await check_session_limit("org-123", "user-123", mock_db)
+            await check_concurrent_limit("org-123", "user-123", mock_db)
         assert exc_info.value.status_code == 429
 
 
