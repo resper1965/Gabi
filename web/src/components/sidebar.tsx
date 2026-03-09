@@ -17,6 +17,7 @@ import {
   Building2,
   Globe,
   CreditCard,
+  BarChart3,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -192,6 +193,17 @@ export function Sidebar() {
             >
               <Settings className="w-5 h-5 shrink-0" style={{ color: pathname === "/admin" ? "#ef4444" : undefined }} />
               {!collapsed && <span className="text-sm font-medium">Admin</span>}
+            </Link>
+            <Link
+              href="/admin/observability"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
+                pathname === "/admin/observability"
+                  ? "nav-link-active bg-white/5 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <BarChart3 className="w-5 h-5 shrink-0" style={{ color: pathname === "/admin/observability" ? "#34d399" : undefined }} />
+              {!collapsed && <span className="text-sm font-medium">Observabilidade</span>}
             </Link>
           </>
         )}
