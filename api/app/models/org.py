@@ -154,3 +154,5 @@ class OrgSession(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
     started_at = Column(DateTime, server_default=func.now())
     last_active = Column(DateTime, server_default=func.now())
+
+    organization = relationship("Organization", back_populates="sessions")
