@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react"
 import { AppLayout } from "./layout/app-layout"
 import { useEffect } from "react"
 
-const PUBLIC_PATHS = ["/login", "/landing", "/privacy", "/terms", "/trust"]
+const PUBLIC_PATHS = ["/login", "/landing", "/privacy", "/terms", "/trust", "/invite"]
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading, profile } = useAuth()

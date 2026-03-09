@@ -282,6 +282,25 @@ export interface PlatformStats {
   active_sessions: number
 }
 
+export interface PlanInfo {
+  id: string
+  name: string
+  max_seats: number
+  max_ops_month: number
+  max_concurrent: number
+  price_brl: number
+  is_trial: boolean
+}
+
+export interface BillingInfo {
+  plan: PlanInfo
+  org_name: string
+  trial_days_remaining: number | null
+  trial_expires_at: string | null
+  current_usage: { ops_count: number; month: string }
+  members_count: number
+}
+
 export const gabiOrg = {
   getMyOrg: () => request<{ org: OrgInfo | null }>("/api/orgs/me"),
   createOrg: (data: { name: string; modules?: string[]; sector?: string; cnpj?: string }) =>
@@ -293,6 +312,11 @@ export const gabiOrg = {
   joinByToken: (token: string) =>
     request("/api/orgs/join", { method: "POST", body: JSON.stringify({ token }) }),
   getUsage: () => request("/api/orgs/usage"),
+  // Billing
+  listPlans: () => request<PlanInfo[]>("/api/orgs/plans"),
+  billing: () => request<BillingInfo>("/api/orgs/billing"),
+  upgrade: (planName: string) =>
+    request("/api/orgs/upgrade", { method: "POST", body: JSON.stringify({ plan_name: planName }) }),
 }
 
 // ── Platform Admin ──

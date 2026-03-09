@@ -3,6 +3,7 @@
 import React from "react"
 import { Sidebar } from "./sidebar"
 import { ErrorBoundary } from "../error-boundary"
+import { TrialBanner } from "../trial-banner"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -17,6 +18,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* Main Content Area */}
       <main className="flex-1 relative overflow-y-auto cyber-grid">
         <div className="h-full flex flex-col">
+          <TrialBanner />
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

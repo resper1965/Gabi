@@ -16,6 +16,7 @@ import {
   BookOpen,
   Building2,
   Globe,
+  CreditCard,
 } from "lucide-react"
 import { useState } from "react"
 
@@ -155,6 +156,17 @@ export function Sidebar() {
             >
               <Building2 className="w-5 h-5 shrink-0" style={{ color: pathname.startsWith("/org") ? "#38bdf8" : undefined }} />
               {!collapsed && <span className="text-sm font-medium">Minha Org</span>}
+            </Link>
+            <Link
+              href="/org/billing"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
+                pathname === "/org/billing"
+                  ? "nav-link-active bg-white/5 text-white"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <CreditCard className="w-5 h-5 shrink-0" style={{ color: pathname === "/org/billing" ? "#818cf8" : undefined }} />
+              {!collapsed && <span className="text-sm font-medium">Planos</span>}
             </Link>
           </>
         )}

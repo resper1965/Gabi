@@ -339,3 +339,147 @@ async def get_org_usage(
     active_sessions = sessions_result.scalar() or 0
 
     return {"usage": usage, "active_sessions": active_sessions}
+
+
+# ── Billing & Plans ──
+
+@router.get("/plans")
+async def list_plans(
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all available plans with limits and pricing."""
+    result = await db.execute(
+        select(Plan)
+        .where(Plan.is_active == True)
+        .order_by(Plan.price_brl.asc())
+    )
+    plans = result.scalars().all()
+    return [
+        {
+            "id": str(p.id),
+            "name": p.name,
+            "max_seats": p.max_seats,
+            "max_ops_month": p.max_ops_month,
+            "max_concurrent": p.max_concurrent,
+            "price_brl": p.price_brl,
+            "is_trial": p.is_trial,
+        }
+        for p in plans
+    ]
+
+
+@router.get("/billing")
+async def get_billing(
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return billing info: current plan, limits, trial days remaining, usage."""
+    if not user.org_id:
+        raise HTTPException(status_code=404, detail="Sem organização")
+
+    # Get org with plan
+    org_result = await db.execute(
+        select(Organization).where(Organization.id == user.org_id)
+    )
+    org = org_result.scalar_one_or_none()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organização não encontrada")
+
+    plan_result = await db.execute(select(Plan).where(Plan.id == org.plan_id))
+    plan = plan_result.scalar_one()
+
+    # Trial remaining
+    trial_days = None
+    if org.trial_expires_at:
+        delta = org.trial_expires_at - datetime.now(timezone.utc)
+        trial_days = max(0, delta.days)
+
+    # Current month usage
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
+    usage_result = await db.execute(
+        select(OrgUsage).where(OrgUsage.org_id == org.id, OrgUsage.month == month)
+    )
+    usage_row = usage_result.scalar_one_or_none()
+
+    # Member count
+    members_count = await db.execute(
+        select(func.count()).select_from(OrgMember).where(OrgMember.org_id == org.id)
+    )
+
+    return {
+        "plan": {
+            "id": str(plan.id),
+            "name": plan.name,
+            "max_seats": plan.max_seats,
+            "max_ops_month": plan.max_ops_month,
+            "max_concurrent": plan.max_concurrent,
+            "price_brl": plan.price_brl,
+            "is_trial": plan.is_trial,
+        },
+        "org_name": org.name,
+        "trial_days_remaining": trial_days,
+        "trial_expires_at": org.trial_expires_at.isoformat() if org.trial_expires_at else None,
+        "current_usage": {
+            "ops_count": usage_row.ops_count if usage_row else 0,
+            "month": month,
+        },
+        "members_count": members_count.scalar() or 0,
+    }
+
+
+class UpgradeRequest(BaseModel):
+    plan_name: str  # starter, pro, enterprise
+
+
+@router.post("/upgrade")
+async def upgrade_plan(
+    req: UpgradeRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upgrade the org's plan (owner/admin only). Stub for payment integration."""
+    if not user.org_id:
+        raise HTTPException(status_code=404, detail="Sem organização")
+
+    # Auth check: must be owner or admin
+    member_result = await db.execute(
+        select(OrgMember).where(
+            OrgMember.org_id == user.org_id,
+            OrgMember.email == user.email,
+        )
+    )
+    member = member_result.scalar_one_or_none()
+    if not member or member.role not in ("owner", "admin"):
+        raise HTTPException(status_code=403, detail="Apenas owner ou admin pode alterar o plano")
+
+    # Find target plan
+    plan_result = await db.execute(
+        select(Plan).where(Plan.name == req.plan_name, Plan.is_active == True)
+    )
+    target_plan = plan_result.scalar_one_or_none()
+    if not target_plan:
+        raise HTTPException(status_code=404, detail=f"Plano '{req.plan_name}' não encontrado")
+
+    # Update org plan
+    org_result = await db.execute(
+        select(Organization).where(Organization.id == user.org_id)
+    )
+    org = org_result.scalar_one()
+
+    old_plan_name = org.plan.name if org.plan else "unknown"
+    org.plan_id = target_plan.id
+    # Clear trial on upgrade
+    if target_plan.name != "trial":
+        org.trial_expires_at = None
+
+    await db.commit()
+
+    logger.info("Org %s upgraded: %s → %s by %s", org.id, old_plan_name, req.plan_name, user.email)
+
+    return {
+        "status": "upgraded",
+        "from_plan": old_plan_name,
+        "to_plan": req.plan_name,
+        "note": "Pagamento será integrado em breve. Upgrade aplicado imediatamente.",
+    }
