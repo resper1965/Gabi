@@ -65,9 +65,10 @@ class CurrentUser:
     picture: str | None = None
     role: str = "user"  # superadmin, admin, user
     status: str = "pending"  # approved, pending, blocked
-    allowed_modules: list[str] = field(default_factory=list)
+    allowed_modules: list[str] = field(default_factory=list)  # per-user override
     org_id: str | None = None
     org_role: str | None = None  # owner, admin, member
+    org_modules: list[str] = field(default_factory=list)  # org-level enabled modules
 
 
 async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
@@ -210,6 +211,7 @@ async def get_current_user(
     # Resolve org context
     org_id = str(user.org_id) if user.org_id else None
     org_role = None
+    org_modules: list[str] = []
     if org_id:
         org_row = await db.execute(
             select(OrgMember.role)
@@ -217,6 +219,14 @@ async def get_current_user(
         )
         om = org_row.first()
         org_role = om.role if om else None
+
+        # Fetch org-level enabled modules
+        from app.models.org import OrgModule
+        mod_rows = await db.execute(
+            select(OrgModule.module)
+            .where(OrgModule.org_id == user.org_id, OrgModule.enabled == True)
+        )
+        org_modules = [r[0] for r in mod_rows]
 
     return CurrentUser(
         uid=user.firebase_uid,
@@ -229,6 +239,7 @@ async def get_current_user(
         allowed_modules=user.allowed_modules or [],
         org_id=org_id,
         org_role=org_role,
+        org_modules=org_modules,
     )
 
 
@@ -247,7 +258,13 @@ def require_role(*allowed_roles: str):
 
 
 def require_module(module_name: str):
-    """Dependency factory: require access to a specific module."""
+    """Dependency factory: require access to a specific module.
+    
+    Hybrid check:
+    - Superadmins bypass all checks
+    - Users with org: module must be enabled in org_modules AND in user's allowed_modules
+    - Users without org: module must be in user's allowed_modules (backward compat)
+    """
     async def check_module(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
         if user.role == "superadmin":
             return user
@@ -256,6 +273,14 @@ def require_module(module_name: str):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Sua conta ainda não foi aprovada.",
             )
+        # Org-level check: is the module enabled for this organization?
+        if user.org_id and user.org_modules:
+            if module_name not in user.org_modules:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"O módulo '{module_name}' não está habilitado para sua organização.",
+                )
+        # User-level check: is the user authorized for this module?
         if module_name not in (user.allowed_modules or []):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -283,4 +308,5 @@ async def get_me(user: CurrentUser = Depends(get_current_user)):
         "allowed_modules": user.allowed_modules,
         "org_id": user.org_id,
         "org_role": user.org_role,
+        "org_modules": user.org_modules,
     }

@@ -13,6 +13,7 @@ interface UserProfile {
   allowed_modules: string[]
   org_id: string | null
   org_role: string | null
+  org_modules: string[]
 }
 
 interface AuthContextType {
