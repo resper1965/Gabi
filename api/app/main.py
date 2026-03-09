@@ -30,6 +30,22 @@ async def lifespan(app: FastAPI):
         logger.info("Firebase initialized")
     except Exception as e:
         logger.warning("Firebase init failed (non-fatal): %s", e)
+
+    # Self-healing migration: ensure users.org_id column exists
+    try:
+        from app.database import engine
+        from sqlalchemy import text
+        async with engine.begin() as conn:
+            await conn.execute(text("""
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS org_id UUID REFERENCES organizations(id);
+            """))
+            await conn.execute(text("""
+                CREATE INDEX IF NOT EXISTS ix_users_org_id ON users(org_id);
+            """))
+        logger.info("Startup migration: users.org_id verified")
+    except Exception as e:
+        logger.warning("Startup migration skipped: %s", e)
+
     logger.info("Startup complete")
     yield
     logger.info("Shutting down Gabi Hub API")
