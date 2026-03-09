@@ -4,9 +4,11 @@ Delegates to sub-modules: agents, insights, insurance.
 Core endpoints: upload, agent invocation, documents, alerts.
 """
 
+import json
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -184,6 +186,99 @@ Execute a análise conforme suas instruções.
         "orchestration": orchestration,
         "summary": new_summary,
     }
+
+
+# ── Agent Streaming ──
+
+@router.post("/agent-stream")
+async def invoke_agent_stream(
+    req: AgentRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Streaming variant of /agent.
+    RAG + orchestration run synchronously; the final LLM generation streams as SSE.
+
+    SSE protocol:
+      data: {"type": "meta", "sources": [...], "orchestration": {...}}  ← first event
+      data: {"type": "text", "text": "<chunk>"}                         ← N events
+      data: [DONE]
+    """
+    from app.core.ai import generate_stream
+
+    check_rate_limit(user.uid)
+
+    orchestration = None
+    if req.agent == "auto":
+        orchestration = await classify_query(req.query)
+        selected_agents = orchestration["agents"]
+    else:
+        system_prompt = AGENTS.get(req.agent)
+        if not system_prompt:
+            raise HTTPException(400, f"Agente '{req.agent}' inválido")
+        selected_agents = [req.agent]
+
+    is_insurance = is_insurance_query(selected_agents)
+    chunks, _ = await _fetch_rag_context(req, user, db, is_insurance)
+    rag_context = format_rag_context(chunks)
+    sources = _deduplicate_sources(chunks)
+
+    meta_event = json.dumps(
+        {"type": "meta", "sources": sources, "orchestration": orchestration},
+        ensure_ascii=False,
+    )
+
+    # Multi-agent debate cannot be streamed token-by-token; emit as single chunk.
+    if len(selected_agents) > 1:
+        agent_configs = [
+            AgentConfig(
+                name=a,
+                system_prompt=AGENTS[a],
+                module=get_model_module(a),
+                output_json=a in JSON_OUTPUT_AGENTS,
+            )
+            for a in selected_agents
+        ]
+        result = await debate(
+            agents=agent_configs,
+            query=f"{rag_context}\n\n[CONSULTA]\n{req.document_text or req.query}",
+            rag_context="",
+            chat_history=req.chat_history,
+        )
+        full_text = result if isinstance(result, str) else result.get("synthesis", str(result))
+
+        async def _debate_stream():
+            yield f"data: {meta_event}\n\n"
+            yield f"data: {json.dumps({'type': 'text', 'text': full_text}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+
+        await log_event(db, user.uid, "law", "query_stream", metadata={"agent": "+".join(selected_agents), "sources": len(chunks)})
+        return StreamingResponse(_debate_stream(), media_type="text/event-stream")
+
+    # Single-agent streaming
+    single_agent = selected_agents[0]
+    system_prompt = AGENTS[single_agent]
+    module = get_model_module(single_agent)
+    prompt = (
+        f"{rag_context}\n\n"
+        f"[CONSULTA/CONTRATO]\n{req.document_text or req.query}\n\n"
+        "Execute a análise conforme suas instruções."
+    )
+
+    async def _stream():
+        yield f"data: {meta_event}\n\n"
+        async for chunk in generate_stream(
+            module=module,
+            prompt=prompt,
+            system_instruction=system_prompt,
+            chat_history=req.chat_history,
+        ):
+            yield f"data: {json.dumps({'type': 'text', 'text': chunk}, ensure_ascii=False)}\n\n"
+        yield "data: [DONE]\n\n"
+
+    await log_event(db, user.uid, "law", "query_stream", metadata={"agent": single_agent, "sources": len(chunks)})
+    return StreamingResponse(_stream(), media_type="text/event-stream")
 
 
 # ── Legal Document Listing ──

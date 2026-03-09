@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { AuthProvider } from "@/components/auth-provider"
 import { AuthGate } from "@/components/auth-gate"
+import { ChatProvider } from "@/contexts/chat-context"
 import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body className="cyber-grid">
         <AuthProvider>
-          <AuthGate>{children}</AuthGate>
+          <ChatProvider>
+            <AuthGate>{children}</AuthGate>
+          </ChatProvider>
         </AuthProvider>
         <Toaster
           position="bottom-right"

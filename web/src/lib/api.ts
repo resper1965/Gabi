@@ -115,8 +115,13 @@ async function uploadFile<T = unknown>(path: string, file: File, params: Record<
 /**
  * Stream a POST request as SSE (Server-Sent Events).
  * Returns a reader that yields text chunks.
+ * Accepts an optional AbortSignal to allow mid-stream cancellation.
  */
-async function streamRequest(path: string, body: unknown): Promise<ReadableStreamDefaultReader<Uint8Array>> {
+async function streamRequest(
+  path: string,
+  body: unknown,
+  signal?: AbortSignal,
+): Promise<ReadableStreamDefaultReader<Uint8Array>> {
   const user = auth.currentUser
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -131,6 +136,7 @@ async function streamRequest(path: string, body: unknown): Promise<ReadableStrea
     method: "POST",
     headers,
     body: JSON.stringify(body),
+    signal,
   })
 
   if (!res.ok) {
@@ -150,8 +156,8 @@ export const gabiWriter = {
   extractStyle: (profileId: string) => request(`/api/ghost/profiles/${profileId}/extract-style`, { method: "POST" }),
   generate: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }) =>
     request("/api/ghost/generate", { method: "POST", body: JSON.stringify(data) }),
-  generateStream: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }) =>
-    streamRequest("/api/ghost/generate-stream", data),
+  generateStream: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }, signal?: AbortSignal) =>
+    streamRequest("/api/ghost/generate-stream", data, signal),
   upload: (profileId: string, docType: string, file: File) =>
     uploadFile("/api/ghost/upload", file, { profile_id: profileId, doc_type: docType }),
   documents: (profileId?: string) =>
@@ -165,6 +171,8 @@ export const gabiWriter = {
 export const gabiLegal = {
   agent: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[] }) =>
     request<AgentResponse>("/api/law/agent", { method: "POST", body: JSON.stringify(data) }),
+  agentStream: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[] }, signal?: AbortSignal) =>
+    streamRequest("/api/law/agent-stream", data, signal),
   documents: () => request<DocumentInfo[]>("/api/law/documents"),
   alerts: () => request<AlertInfo[]>("/api/law/alerts"),
   upload: (docType: string, file: File, title?: string) =>
