@@ -62,7 +62,7 @@ steps:
     args:
       - "build"
       - "-t"
-      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${SHORT_SHA}"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${_TAG}"
       - "-t"
       - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:staging"
       - "./api"
@@ -77,7 +77,7 @@ steps:
       - "-c"
       - |
         docker build -f web/Dockerfile \
-          -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${SHORT_SHA} \
+          -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${_TAG} \
           -t ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:staging \
           --build-arg NEXT_PUBLIC_API_URL=${_STAGING_API_URL} \
           --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=$$FIREBASE_API_KEY \
@@ -118,7 +118,7 @@ steps:
       - "-c"
       - |
         gcloud run deploy gabi-api \
-          --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${SHORT_SHA} \
+          --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${_TAG} \
           --region=${_REGION} \
           --platform=managed \
           --memory=1Gi --cpu=1 \
@@ -137,7 +137,7 @@ steps:
       - "run"
       - "deploy"
       - "gabi-web"
-      - "--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${SHORT_SHA}"
+      - "--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${_TAG}"
       - "--region=${_REGION}"
       - "--platform=managed"
       - "--memory=512Mi"
@@ -150,6 +150,7 @@ steps:
 substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
+  _TAG: latest # override with --substitutions=_TAG=$SHORT_SHA on trigger
   _STAGING_API_URL: https://gabi-api-3yxil5gluq-rj.a.run.app
   _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
   _FIREBASE_PROJECT_ID: "nghost-gabi"
