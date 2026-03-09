@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import List, Optional
 from datetime import datetime, timezone
@@ -74,9 +75,9 @@ class DBIngester:
                 
                 # AI Analysis
                 await self._analyze_and_store(version.id, doc_schema.texto_integral)
-                
+
                 # Add provisions
-                self._add_provisions(version.id, doc_schema.provisions)
+                await self._add_provisions(version.id, doc_schema.provisions)
                 
                 run.itens_novos += 1
                 self._log_item(run.id, IngestStatus.NEW, doc_schema.id_fonte, doc_schema.version_hash)
@@ -100,7 +101,7 @@ class DBIngester:
                     # AI Analysis
                     await self._analyze_and_store(new_version.id, doc_schema.texto_integral)
 
-                    self._add_provisions(new_version.id, doc_schema.provisions)
+                    await self._add_provisions(new_version.id, doc_schema.provisions)
                     
                     run.itens_atualizados += 1
                     self._log_item(run.id, IngestStatus.UPDATED, doc_schema.id_fonte, doc_schema.version_hash)
@@ -131,14 +132,31 @@ class DBIngester:
             # We don't want to fail the whole ingestion if AI fails
             logger.warning("AI Analysis failed for version %s: %s", version_id, e, exc_info=True)
 
-    def _add_provisions(self, version_id: int, provisions: List[ProvisionSchema]):
-        for prov in provisions:
+    async def _add_provisions(self, version_id: int, provisions: List[ProvisionSchema]) -> None:
+        """Persist provisions with embeddings. Embedding generation runs in a thread pool."""
+        if not provisions:
+            return
+        from app.core.embeddings import embed_batch
+
+        texts = [prov.texto_chunk for prov in provisions]
+        try:
+            embeddings: List[List[float]] = await asyncio.to_thread(embed_batch, texts)
+        except Exception as e:
+            logger.warning(
+                "Embedding generation failed for provisions (version %s): %s — storing without vectors",
+                version_id, e,
+            )
+            embeddings = [None] * len(provisions)
+
+        for prov, emb in zip(provisions, embeddings):
             db_prov = RegulatoryProvision(
                 version_id=version_id,
                 structure_path=prov.structure_path,
-                texto_chunk=prov.texto_chunk
+                texto_chunk=prov.texto_chunk,
+                embedding=emb,
             )
             self.session.add(db_prov)
+        logger.debug("Added %d provisions (version %s)", len(provisions), version_id)
 
     def _log_item(self, run_id: int, status: IngestStatus, url: str, hash_calc: Optional[str] = None, error_msg: Optional[str] = None):
         item = IngestRunItem(
