@@ -35,7 +35,10 @@ Thumbs.db
 *.log
 nghost/
 
-# GCP binaries & temp
+# Legacy monorepo (migrated)
+packages/
+AGENTS.md
+.gcp-project
 cloud-sql-proxy
 cloud_sql_proxy
 
