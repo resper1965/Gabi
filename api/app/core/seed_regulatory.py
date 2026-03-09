@@ -4,6 +4,7 @@ Selectable regulatory packs that populate the shared knowledge base.
 Each pack corresponds to a regulatory body (ANS, CVM, SUSEP, BACEN, LGPD).
 """
 
+import asyncio
 import os
 import uuid
 import logging
@@ -206,8 +207,8 @@ async def seed_pack(
         if not chunks:
             continue
 
-        # Generate embeddings
-        embeddings = embed_batch(chunks)
+        # Generate embeddings (run in thread pool to avoid blocking the event loop)
+        embeddings = await asyncio.to_thread(embed_batch, chunks)
 
         # Create document record
         doc_id = uuid.uuid4()
