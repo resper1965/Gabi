@@ -4,7 +4,7 @@ Enforces plan-based limits: seats, operations/month, concurrent sessions.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timezone
 
 from fastapi import HTTPException
 from sqlalchemy import select, func as sa_func, text
@@ -41,7 +41,7 @@ async def check_seat_limit(org_id: str, db: AsyncSession) -> None:
 
 async def check_ops_limit(org_id: str, db: AsyncSession) -> None:
     """Raise 429 if the org has exhausted its monthly AI operations."""
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     row = await db.execute(
         text("""
             SELECT p.max_ops_month, COALESCE(u.ops_count, 0) AS current_ops
@@ -101,7 +101,7 @@ async def increment_ops(org_id: str, db: AsyncSession) -> None:
     """Increment the monthly operations counter for the org."""
     if not org_id:
         return
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     await db.execute(
         text("""
             INSERT INTO org_usage (org_id, month, ops_count, last_op_at)

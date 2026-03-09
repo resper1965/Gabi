@@ -175,8 +175,8 @@ async def sync_schema(
         terms_created += 1
 
     # Update last connected
-    from datetime import datetime
-    conn.last_connected_at = datetime.utcnow()
+    from datetime import datetime, timezone
+    conn.last_connected_at = datetime.now(timezone.utc)
     await db.commit()
 
     return {

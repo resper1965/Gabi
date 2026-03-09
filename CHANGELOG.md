@@ -4,11 +4,37 @@ Todas as alterações significativas na plataforma Gabi.
 
 ## [Unreleased]
 
-### Sprint 11 — Deploy, Higienização & Documentação
-- **chore:** Remoção de arquivos temporários do repositório (`cloud-sql-proxy`, `fix_role.sh`, `result.txt`, `proxy.log`, `pr*.json`, `api/promo.py`)
-- **chore:** Expansão do `.gitignore` com 10 novas regras de exclusão
-- **docs:** README.md refatorado — removido módulo descontinuado InsightCare, diagrama atualizado para 3 módulos, documentado RAG Híbrido
-- **docs:** CHANGELOG.md criado
+### Sprint 13 — Code Hygiene & Bug Fixes
+- **fix(org):** Import path corrigido (`app.core.database` → `app.database`) nos routers `org` e `platform`
+- **fix(org):** `user.uid` (firebase_uid) corrigido para `user.db_id` (UUID interno) em org_members e org_invites
+- **fix(auth):** `/api/auth/me` agora retorna `org_id` e `org_role`
+- **fix(auth):** `CurrentUser.db_id` adicionado para referenciar `users.id` corretamente
+- **fix(model):** `UniqueConstraint("org_id", "user_id")` adicionado ao `OrgSession`
+- **fix(deprecation):** Migração de `datetime.utcnow()` → `datetime.now(timezone.utc)` em 7 ocorrências
+- **refactor(org):** PATCH `/api/orgs/me` refatorado com allowlist explícita de colunas
+- **refactor(version):** Versão centralizada em `app/__init__.__version__` (v0.11.0)
+
+### Sprint 12 — Onboarding & Multi-Tenancy
+- **feat(org):** CRUD de organizações (`POST /api/orgs`, `GET /api/orgs/me`, `PATCH /api/orgs/me`)
+- **feat(org):** Sistema de convites com token (`POST /api/orgs/me/invites`, `POST /api/orgs/join`)
+- **feat(org):** Dashboard de usage FinOps (`GET /api/orgs/me/usage`)
+- **feat(platform):** Platform Admin para superadmins ness. (`/api/platform/stats`, `/api/platform/orgs`)
+- **feat(platform):** Provisionamento de orgs enterprise (`POST /api/platform/orgs`)
+- **feat(platform):** Troca de plano (`PATCH /api/platform/orgs/{id}/plan`)
+- **feat(finops):** Limites de seats, operações/mês e sessões simultâneas
+- **feat(model):** Models Organization, Plan, OrgMember, OrgInvite, OrgModule, OrgUsage, OrgSession
+- **feat(migration):** Alembic migration `002_onboarding_orgs`
+
+### Sprint 11 — RAG Pipeline Enhancement
+- **feat(rag):** Busca em provisions regulatórias via pgvector (3ª fonte de busca)
+- **feat(rag):** RRF fusiona 3 listas ranqueadas (semântico + léxico + provisions)
+- **feat(rag):** Observabilidade estruturada (trace_id, embed_ms, counts, rerank fallback)
+- **feat(ingest):** Embeddings assíncronos via `asyncio.to_thread()` no `db_ingest.py`
+- **feat(chat):** Streaming SSE com AbortController no frontend
+- **feat(chat):** Persistência de histórico via React Context (`chat-context.tsx`)
+- **fix(auth):** AbortController (10s) + safety timeout (15s) no auth-provider
+- **feat(ingest):** Legal-aware chunker com headers, sub-article splits, limite 1200 chars
+- **feat(scripts):** Script de backfill para provisions sem embedding
 
 ---
 

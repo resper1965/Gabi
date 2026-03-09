@@ -59,6 +59,7 @@ def _init_firebase():
 class CurrentUser:
     uid: str
     email: str
+    db_id: str | None = None  # Internal UUID PK (users.id) — use for FK references
     name: str | None = None
     picture: str | None = None
     role: str = "user"  # superadmin, admin, user
@@ -220,6 +221,7 @@ async def get_current_user(
     return CurrentUser(
         uid=user.firebase_uid,
         email=user.email,
+        db_id=str(user.id),
         name=user.name,
         picture=user.picture,
         role=user.role,
@@ -279,4 +281,6 @@ async def get_me(user: CurrentUser = Depends(get_current_user)):
         "role": user.role,
         "status": user.status,
         "allowed_modules": user.allowed_modules,
+        "org_id": user.org_id,
+        "org_role": user.org_role,
     }

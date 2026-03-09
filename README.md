@@ -1,7 +1,7 @@
 # Gabi — Plataforma de IA Empresarial Multimodular
 
 > **Inteligência Artificial especializada para jurídico, finanças e produção textual.**
-> Três módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG híbrido (Vector + FTS + RRF + Re-Ranking) e conformidade LGPD.
+> Três módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG híbrido (Vector + FTS + RRF + Re-Ranking), conformidade LGPD e sistema de onboarding multi-tenant.
 
 ---
 
@@ -54,6 +54,17 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 | **Segurança** | Dicionário de negócios customizável, Golden Queries validadas, audit log |
 | **Limites** | Timeout configurável (30s), max rows (1000), query read-only |
 | **Tabelas** | `ntalk_connections`, `ntalk_business_dictionary`, `ntalk_golden_queries`, `ntalk_audit_logs` |
+
+### 🏢 Onboarding & Platform Admin
+**Multi-Tenancy, FinOps & Provisionamento**
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Gestão de organizações multi-tenant com controle de planos e limites |
+| **Self-service** | CRUD de organização, convites com token e sistema de join |
+| **FinOps** | Limites de seats, operações/mês e sessões simultâneas por plano |
+| **Platform Admin** | Dashboard global, provisionamento enterprise, troca de planos |
+| **Tabelas** | `organizations`, `plans`, `org_members`, `org_invites`, `org_modules`, `org_usage`, `org_sessions` |
 
 
 ---
@@ -247,7 +258,7 @@ Fonte → Parser → Normalizer → Chunker → Embeddings (768d) → pgvector
 
 - **PostgreSQL 15** (Cloud SQL, `southamerica-east1`)
 - **pgvector 0.8.1** — busca vetorial com IVFFlat indexes
-- **42 tabelas** gerenciadas por 9 Alembic migrations
+- **50+ tabelas** gerenciadas por 10+ Alembic migrations
 - **768 dimensões** — Vertex AI `text-multilingual-embedding-002`
 
 ### Índices de Performance
@@ -296,9 +307,9 @@ git push → Cloud Build → Docker build → Artifact Registry → Cloud Run de
 Gabi/
 ├── api/                          # Backend Python
 │   ├── app/
-│   │   ├── core/                 # Engine: AI, RAG, embeddings, auth
-│   │   ├── models/               # SQLAlchemy models (11 files)
-│   │   ├── modules/              # Routers por módulo (6 modules)
+│   │   ├── core/                 # Engine: AI, RAG, embeddings, auth, org_limits
+│   │   ├── models/               # SQLAlchemy models (12 files)
+│   │   ├── modules/              # Routers por módulo (8 modules)
 │   │   ├── services/             # Ingestão, parsing, análise
 │   │   └── middleware/           # Security, logging, errors
 │   ├── alembic/                  # Database migrations (9 versions)

@@ -2,7 +2,7 @@
 
 import logging
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
@@ -10,7 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user, CurrentUser
-from app.core.database import get_db
+from app.database import get_db
 from app.core.org_limits import check_seat_limit
 
 logger = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ async def create_org(
     if not plan:
         raise HTTPException(status_code=500, detail="Plano trial não encontrado.")
 
-    trial_expires = datetime.utcnow() + timedelta(days=30)
+    trial_expires = datetime.now(timezone.utc) + timedelta(days=30)
 
     # Create org
     result = await db.execute(
@@ -84,7 +84,7 @@ async def create_org(
             INSERT INTO org_members (org_id, user_id, email, role, joined_at)
             VALUES (:org_id, :user_id, :email, 'owner', NOW())
         """),
-        {"org_id": org_id, "user_id": str(user.uid), "email": user.email},
+        {"org_id": org_id, "user_id": user.db_id, "email": user.email},
     )
 
     # Enable selected modules
@@ -97,8 +97,8 @@ async def create_org(
 
     # Link user to org
     await db.execute(
-        text("UPDATE users SET org_id = :org_id WHERE firebase_uid = :uid"),
-        {"org_id": org_id, "uid": user.uid},
+        text("UPDATE users SET org_id = :org_id WHERE id = :uid"),
+        {"org_id": org_id, "uid": user.db_id},
     )
 
     await db.commit()
@@ -146,7 +146,7 @@ async def get_my_org(
     modules = [{"module": m.module, "enabled": m.enabled} for m in mods_row.fetchall()]
 
     # Usage this month
-    month = datetime.utcnow().strftime("%Y-%m")
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
     usage_row = await db.execute(
         text("SELECT ops_count FROM org_usage WHERE org_id = :org_id AND month = :month"),
         {"org_id": str(user.org_id), "month": month},
@@ -188,21 +188,14 @@ async def update_my_org(
     # Check org role
     role_row = await db.execute(
         text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
-        {"org_id": str(user.org_id), "uid": str(user.uid)},
+        {"org_id": str(user.org_id), "uid": user.db_id},
     )
     member = role_row.first()
     if not member or member.role not in ("owner", "admin"):
         raise HTTPException(status_code=403, detail="Apenas Owner ou Admin podem atualizar a organização.")
 
-    updates = {}
-    if req.name is not None:
-        updates["name"] = req.name
-    if req.cnpj is not None:
-        updates["cnpj"] = req.cnpj
-    if req.sector is not None:
-        updates["sector"] = req.sector
-    if req.domain is not None:
-        updates["domain"] = req.domain
+    ALLOWED_FIELDS = {"name", "cnpj", "sector", "domain"}
+    updates = {k: v for k, v in req.model_dump(exclude_unset=True).items() if k in ALLOWED_FIELDS}
 
     if updates:
         set_clause = ", ".join(f"{k} = :{k}" for k in updates)
@@ -226,7 +219,7 @@ async def send_invite(
     # Check caller is owner/admin
     role_row = await db.execute(
         text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
-        {"org_id": str(user.org_id), "uid": str(user.uid)},
+        {"org_id": str(user.org_id), "uid": user.db_id},
     )
     member = role_row.first()
     if not member or member.role not in ("owner", "admin"):
@@ -245,7 +238,7 @@ async def send_invite(
 
     # Create invite
     token = secrets.token_urlsafe(48)
-    expires = datetime.utcnow() + timedelta(days=7)
+    expires = datetime.now(timezone.utc) + timedelta(days=7)
 
     await db.execute(
         text("""
@@ -295,7 +288,7 @@ async def join_org(
         raise HTTPException(status_code=404, detail="Convite não encontrado.")
     if invite.accepted_at:
         raise HTTPException(status_code=409, detail="Este convite já foi aceito.")
-    if invite.expires_at < datetime.utcnow():
+    if invite.expires_at < datetime.now(timezone.utc):
         raise HTTPException(status_code=410, detail="Este convite expirou.")
     if invite.email != user.email:
         raise HTTPException(status_code=403, detail="Este convite não pertence ao seu email.")
@@ -311,7 +304,7 @@ async def join_org(
             INSERT INTO org_members (org_id, user_id, email, role, joined_at)
             VALUES (:org_id, :user_id, :email, :role, NOW())
         """),
-        {"org_id": org_id, "user_id": str(user.uid), "email": user.email, "role": invite.role},
+        {"org_id": org_id, "user_id": user.db_id, "email": user.email, "role": invite.role},
     )
 
     # Mark invite accepted
@@ -322,8 +315,8 @@ async def join_org(
 
     # Link user to org
     await db.execute(
-        text("UPDATE users SET org_id = :org_id WHERE firebase_uid = :uid"),
-        {"org_id": org_id, "uid": user.uid},
+        text("UPDATE users SET org_id = :org_id WHERE id = :uid"),
+        {"org_id": org_id, "uid": user.db_id},
     )
 
     await db.commit()

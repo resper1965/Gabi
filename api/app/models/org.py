@@ -145,6 +145,9 @@ class OrgUsage(Base):
 
 class OrgSession(Base):
     __tablename__ = "org_sessions"
+    __table_args__ = (
+        UniqueConstraint("org_id", "user_id", name="uq_org_session_user"),
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False, index=True)

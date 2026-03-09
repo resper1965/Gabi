@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app import __version__
 from app.config import get_settings
 from app.core.logging_config import setup_logging
 
@@ -23,7 +24,7 @@ logger = logging.getLogger("gabi.app")
 async def lifespan(app: FastAPI):
     """Pre-warm services on startup (non-blocking — app starts even if services fail)."""
     from app.core.auth import _init_firebase
-    logger.info("Starting Gabi Hub API v0.4.0")
+    logger.info("Starting Gabi Hub API v%s", __version__)
     try:
         _init_firebase()
         logger.info("Firebase initialized")
@@ -37,7 +38,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Gabi Hub API",
     description="Unified AI Backend — nGhost + Law & Comply (Legal + Insurance) + nTalkSQL",
-    version="0.4.0",
+    version=__version__,
     lifespan=lifespan,
     docs_url="/docs" if settings.gcp_project_id == "" else None,  # Disable docs in prod
     redoc_url=None,
