@@ -1,14 +1,18 @@
 """Platform Admin router — Global management for ness. superadmins."""
 
 import logging
+from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import text
+from sqlalchemy import select, func, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user, CurrentUser
 from app.database import get_db
+from app.models.org import (
+    Organization, OrgMember, OrgModule, OrgUsage, OrgSession, Plan,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/platform", tags=["platform-admin"])
@@ -46,21 +50,32 @@ async def platform_stats(
     """Global platform dashboard stats."""
     _require_platform_admin(user)
 
-    row = await db.execute(text("""
-        SELECT
-            (SELECT COUNT(*) FROM organizations WHERE is_active = true) AS total_orgs,
-            (SELECT COUNT(*) FROM users WHERE is_active = true) AS total_users,
-            (SELECT COALESCE(SUM(ops_count), 0) FROM org_usage
-             WHERE month = to_char(NOW(), 'YYYY-MM')) AS ops_this_month,
-            (SELECT COUNT(*) FROM org_sessions
-             WHERE last_active > NOW() - INTERVAL '5 minutes') AS active_sessions
-    """))
-    stats = row.first()
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
+
+    total_orgs = (await db.execute(
+        select(func.count()).select_from(Organization).where(Organization.is_active == True)
+    )).scalar() or 0
+
+    total_users_result = await db.execute(text("SELECT COUNT(*) FROM users WHERE is_active = true"))
+    total_users = total_users_result.scalar() or 0
+
+    ops_result = await db.execute(
+        select(func.coalesce(func.sum(OrgUsage.ops_count), 0))
+        .where(OrgUsage.month == month)
+    )
+    ops_this_month = ops_result.scalar() or 0
+
+    sessions_result = await db.execute(
+        select(func.count()).select_from(OrgSession)
+        .where(OrgSession.last_active > text("NOW() - INTERVAL '5 minutes'"))
+    )
+    active_sessions = sessions_result.scalar() or 0
+
     return {
-        "total_orgs": stats.total_orgs,
-        "total_users": stats.total_users,
-        "ops_this_month": stats.ops_this_month,
-        "active_sessions": stats.active_sessions,
+        "total_orgs": total_orgs,
+        "total_users": total_users,
+        "ops_this_month": ops_this_month,
+        "active_sessions": active_sessions,
     }
 
 
@@ -68,38 +83,63 @@ async def platform_stats(
 async def list_all_orgs(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    limit: int = Query(default=50, le=200),
+    offset: int = Query(default=0, ge=0),
 ):
-    """List all organizations with plan and member count."""
+    """List all organizations with plan and member count (paginated)."""
     _require_platform_admin(user)
 
-    rows = await db.execute(text("""
-        SELECT o.id, o.name, o.cnpj, o.sector, o.domain, o.is_active,
-               o.trial_expires_at, o.created_at,
-               p.name AS plan_name,
-               (SELECT COUNT(*) FROM org_members m WHERE m.org_id = o.id) AS member_count,
-               (SELECT COALESCE(SUM(u.ops_count), 0) FROM org_usage u
-                WHERE u.org_id = o.id AND u.month = to_char(NOW(), 'YYYY-MM')) AS ops_this_month
-        FROM organizations o
-        JOIN plans p ON o.plan_id = p.id
-        ORDER BY o.created_at DESC
-    """))
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
+
+    # Count total
+    count_result = await db.execute(select(func.count()).select_from(Organization))
+    total = count_result.scalar() or 0
+
+    # Orgs with plan info
+    member_count_sub = (
+        select(func.count())
+        .where(OrgMember.org_id == Organization.id)
+        .correlate(Organization)
+        .scalar_subquery()
+    )
+
+    ops_sub = (
+        select(func.coalesce(func.sum(OrgUsage.ops_count), 0))
+        .where(OrgUsage.org_id == Organization.id, OrgUsage.month == month)
+        .correlate(Organization)
+        .scalar_subquery()
+    )
+
+    result = await db.execute(
+        select(
+            Organization,
+            Plan.name.label("plan_name"),
+            member_count_sub.label("member_count"),
+            ops_sub.label("ops_this_month"),
+        )
+        .join(Plan, Organization.plan_id == Plan.id)
+        .order_by(Organization.created_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
 
     orgs = []
-    for r in rows.fetchall():
+    for row in result.fetchall():
+        org = row[0]
         orgs.append({
-            "id": str(r.id),
-            "name": r.name,
-            "cnpj": r.cnpj,
-            "sector": r.sector,
-            "domain": r.domain,
-            "plan": r.plan_name,
-            "member_count": r.member_count,
-            "ops_this_month": r.ops_this_month,
-            "trial_expires_at": str(r.trial_expires_at) if r.trial_expires_at else None,
-            "is_active": r.is_active,
-            "created_at": str(r.created_at),
+            "id": str(org.id),
+            "name": org.name,
+            "cnpj": org.cnpj,
+            "sector": org.sector,
+            "domain": org.domain,
+            "plan": row.plan_name,
+            "member_count": row.member_count,
+            "ops_this_month": row.ops_this_month,
+            "trial_expires_at": str(org.trial_expires_at) if org.trial_expires_at else None,
+            "is_active": org.is_active,
+            "created_at": str(org.created_at),
         })
-    return {"orgs": orgs, "count": len(orgs)}
+    return {"orgs": orgs, "total": total, "limit": limit, "offset": offset}
 
 
 @router.post("/orgs")
@@ -112,45 +152,28 @@ async def provision_org(
     _require_platform_admin(user)
 
     # Get plan
-    plan_row = await db.execute(
-        text("SELECT id FROM plans WHERE name = :plan_name"),
-        {"plan_name": req.plan},
-    )
-    plan = plan_row.first()
+    result = await db.execute(select(Plan).where(Plan.name == req.plan))
+    plan = result.scalar_one_or_none()
     if not plan:
         raise HTTPException(status_code=400, detail=f"Plano '{req.plan}' não encontrado.")
 
     # Create org
-    org_row = await db.execute(
-        text("""
-            INSERT INTO organizations (name, cnpj, sector, plan_id)
-            VALUES (:name, :cnpj, :sector, :plan_id)
-            RETURNING id
-        """),
-        {"name": req.org_name, "cnpj": req.cnpj, "sector": req.sector, "plan_id": str(plan.id)},
-    )
-    org_id = str(org_row.first().id)
+    org = Organization(name=req.org_name, cnpj=req.cnpj, sector=req.sector, plan_id=plan.id)
+    db.add(org)
+    await db.flush()
 
     # Enable modules
+    valid_modules = {"ghost", "law", "ntalk"}
     for mod in req.modules:
-        if mod in ("ghost", "law", "ntalk"):
-            await db.execute(
-                text("INSERT INTO org_modules (org_id, module) VALUES (:org_id, :mod)"),
-                {"org_id": org_id, "mod": mod},
-            )
+        if mod in valid_modules:
+            db.add(OrgModule(org_id=org.id, module=mod))
 
-    # Pre-register owner in org_members (user_id will be linked on first login)
-    await db.execute(
-        text("""
-            INSERT INTO org_members (org_id, email, role)
-            VALUES (:org_id, :email, 'owner')
-        """),
-        {"org_id": org_id, "email": req.owner_email},
-    )
+    # Pre-register owner (user_id linked on first login)
+    db.add(OrgMember(org_id=org.id, email=req.owner_email, role="owner"))
 
     await db.commit()
     logger.info("Platform: org provisioned: %s (plan: %s) by %s", req.org_name, req.plan, user.email)
-    return {"org_id": org_id, "name": req.org_name, "plan": req.plan, "owner": req.owner_email}
+    return {"org_id": str(org.id), "name": req.org_name, "plan": req.plan, "owner": req.owner_email}
 
 
 @router.patch("/orgs/{org_id}/plan")
@@ -163,17 +186,15 @@ async def change_plan(
     """Change an organization's plan."""
     _require_platform_admin(user)
 
-    plan_row = await db.execute(
-        text("SELECT id FROM plans WHERE name = :plan_name"),
-        {"plan_name": req.plan_name},
-    )
-    plan = plan_row.first()
+    result = await db.execute(select(Plan).where(Plan.name == req.plan_name))
+    plan = result.scalar_one_or_none()
     if not plan:
         raise HTTPException(status_code=400, detail=f"Plano '{req.plan_name}' não encontrado.")
 
     await db.execute(
-        text("UPDATE organizations SET plan_id = :plan_id, trial_expires_at = NULL, updated_at = NOW() WHERE id = :org_id"),
-        {"plan_id": str(plan.id), "org_id": org_id},
+        update(Organization)
+        .where(Organization.id == org_id)
+        .values(plan_id=plan.id, trial_expires_at=None, updated_at=datetime.now(timezone.utc))
     )
     await db.commit()
     logger.info("Platform: org %s plan changed to %s by %s", org_id, req.plan_name, user.email)

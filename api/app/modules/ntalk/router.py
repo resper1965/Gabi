@@ -3,6 +3,7 @@ nTalkSQL Module — CFO Imobiliária
 SQL generation + secure execution on tenant MS SQL.
 """
 
+import asyncio
 import time
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -145,7 +146,8 @@ async def sync_schema(
 
     # Read schema from MS SQL
     try:
-        schema_raw = _execute_mssql(
+        schema_raw = await asyncio.to_thread(
+            _execute_mssql,
             conn.host, conn.port, conn.db_name, conn.username,
             conn.secret_manager_ref,
             "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE "
@@ -169,7 +171,7 @@ async def sync_schema(
             term=table_name,
             definition=definition,
             category="schema",
-            embedding=embed(f"{table_name}: {definition}"),
+            embedding=await asyncio.to_thread(embed, f"{table_name}: {definition}"),
         )
         db.add(entry)
         terms_created += 1
@@ -194,7 +196,7 @@ async def ask_gabi(
     """Full nTalkSQL flow: RAG → SQL gen → execute → interpret → audit."""
 
     # Step 1: RAG — dictionary + golden queries
-    emb = embed(req.question)
+    emb = await asyncio.to_thread(embed, req.question)
 
     dict_res = await db.execute(
         text("""SELECT term, definition, sql_logic_snippet
@@ -226,7 +228,8 @@ async def ask_gabi(
 
     # Step 3: Get schema
     try:
-        schema_raw = _execute_mssql(conn.host, conn.port, conn.db_name, conn.username,
+        schema_raw = await asyncio.to_thread(
+            _execute_mssql, conn.host, conn.port, conn.db_name, conn.username,
                                      conn.secret_manager_ref,
                                      "SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS ORDER BY TABLE_SCHEMA, TABLE_NAME")
     except Exception as e:
@@ -254,7 +257,8 @@ async def ask_gabi(
     error_msg = None
     if generated_sql:
         try:
-            results = _execute_mssql(conn.host, conn.port, conn.db_name, conn.username,
+            results = await asyncio.to_thread(
+                _execute_mssql, conn.host, conn.port, conn.db_name, conn.username,
                                       conn.secret_manager_ref, generated_sql)
         except (ValueError, ConnectionError) as e:
             status = "error"
@@ -310,7 +314,7 @@ async def add_term(tenant_id: str, term: str, definition: str,
                    db: AsyncSession = Depends(get_db)):
     entry = BusinessDictionary(tenant_id=tenant_id, term=term, definition=definition,
                                 sql_logic_snippet=sql_logic, category=category,
-                                embedding=embed(f"{term}: {definition}"))
+                                embedding=await asyncio.to_thread(embed, f"{term}: {definition}"))
     db.add(entry)
     await db.commit()
     return {"id": str(entry.id)}
@@ -322,7 +326,7 @@ async def add_golden(tenant_id: str, intent: str, sql: str,
                      user: CurrentUser = Depends(get_current_user),
                      db: AsyncSession = Depends(get_db)):
     gq = GoldenQuery(tenant_id=tenant_id, user_intent=intent, approved_sql=sql,
-                      approved_by=approved_by, embedding=embed(intent))
+                      approved_by=approved_by, embedding=await asyncio.to_thread(embed, intent))
     db.add(gq)
     await db.commit()
     return {"id": str(gq.id)}

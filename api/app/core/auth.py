@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import get_settings
 from app.database import get_db
 from app.models.user import User
+from app.models.org import OrgMember, OrgModule
 
 settings = get_settings()
 logger = logging.getLogger("gabi.auth")
@@ -135,7 +136,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         # ALWAYS enforce role policy on existing users
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        if email.lower() in [e.lower() for e in settings.admin_emails] or email.lower() == "resper@ness.com.br":
+        if email.lower() in [e.lower() for e in settings.admin_emails]:
             logger.info("SUPERADMIN match for %s — promoting", email)
             if user.role != "superadmin" or user.status != "approved" or set(user.allowed_modules or []) != set(ALL_MODULES):
                 user.role = "superadmin"
@@ -210,10 +211,9 @@ async def get_current_user(
     org_id = str(user.org_id) if user.org_id else None
     org_role = None
     if org_id:
-        from sqlalchemy import text as sa_text
         org_row = await db.execute(
-            sa_text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
-            {"org_id": org_id, "uid": str(user.id)},
+            select(OrgMember.role)
+            .where(OrgMember.org_id == user.org_id, OrgMember.user_id == user.id)
         )
         om = org_row.first()
         org_role = om.role if om else None

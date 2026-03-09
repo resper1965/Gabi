@@ -5,13 +5,17 @@ import secrets
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, EmailStr
-from sqlalchemy import text
+from pydantic import BaseModel
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user, CurrentUser
 from app.database import get_db
 from app.core.org_limits import check_seat_limit
+from app.models.org import (
+    Organization, OrgMember, OrgModule, OrgInvite, OrgUsage, OrgSession, Plan,
+)
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/orgs", tags=["organizations"])
@@ -48,62 +52,52 @@ async def create_org(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new organization with Trial plan. The creator becomes Owner."""
-    # Check if user already belongs to an org
     if user.org_id:
         raise HTTPException(status_code=409, detail="Você já pertence a uma organização.")
 
     # Get trial plan
-    row = await db.execute(text("SELECT id FROM plans WHERE name = 'trial'"))
-    plan = row.first()
+    result = await db.execute(select(Plan).where(Plan.name == "trial"))
+    plan = result.scalar_one_or_none()
     if not plan:
         raise HTTPException(status_code=500, detail="Plano trial não encontrado.")
 
     trial_expires = datetime.now(timezone.utc) + timedelta(days=30)
 
     # Create org
-    result = await db.execute(
-        text("""
-            INSERT INTO organizations (name, cnpj, sector, plan_id, trial_expires_at)
-            VALUES (:name, :cnpj, :sector, :plan_id, :trial_expires)
-            RETURNING id
-        """),
-        {
-            "name": req.name,
-            "cnpj": req.cnpj,
-            "sector": req.sector,
-            "plan_id": str(plan.id),
-            "trial_expires": trial_expires,
-        },
+    org = Organization(
+        name=req.name,
+        cnpj=req.cnpj,
+        sector=req.sector,
+        plan_id=plan.id,
+        trial_expires_at=trial_expires,
     )
-    org_row = result.first()
-    org_id = str(org_row.id)
+    db.add(org)
+    await db.flush()  # get org.id
 
     # Create owner membership
-    await db.execute(
-        text("""
-            INSERT INTO org_members (org_id, user_id, email, role, joined_at)
-            VALUES (:org_id, :user_id, :email, 'owner', NOW())
-        """),
-        {"org_id": org_id, "user_id": user.db_id, "email": user.email},
+    member = OrgMember(
+        org_id=org.id,
+        user_id=user.db_id,
+        email=user.email,
+        role="owner",
+        joined_at=datetime.now(timezone.utc),
     )
+    db.add(member)
 
     # Enable selected modules
+    valid_modules = {"ghost", "law", "ntalk"}
     for mod in req.modules:
-        if mod in ("ghost", "law", "ntalk"):
-            await db.execute(
-                text("INSERT INTO org_modules (org_id, module) VALUES (:org_id, :mod)"),
-                {"org_id": org_id, "mod": mod},
-            )
+        if mod in valid_modules:
+            db.add(OrgModule(org_id=org.id, module=mod))
 
     # Link user to org
     await db.execute(
-        text("UPDATE users SET org_id = :org_id WHERE id = :uid"),
-        {"org_id": org_id, "uid": user.db_id},
+        update(User).where(User.id == user.db_id).values(org_id=org.id)
     )
 
     await db.commit()
     logger.info("Org created: %s by %s", req.name, user.email)
-    return {"org_id": org_id, "name": req.name, "trial_expires_at": trial_expires.isoformat()}
+    return {"org_id": str(org.id), "name": req.name, "trial_expires_at": trial_expires.isoformat()}
 
 
 @router.get("/me")
@@ -115,43 +109,43 @@ async def get_my_org(
     if not user.org_id:
         return {"org": None, "message": "Você não pertence a nenhuma organização."}
 
-    # Org details
-    row = await db.execute(
-        text("""
-            SELECT o.id, o.name, o.cnpj, o.sector, o.domain, o.logo_url, o.trial_expires_at,
-                   o.is_active, o.created_at, p.name AS plan_name,
-                   p.max_seats, p.max_ops_month, p.max_concurrent
-            FROM organizations o
-            JOIN plans p ON o.plan_id = p.id
-            WHERE o.id = :org_id
-        """),
-        {"org_id": str(user.org_id)},
+    # Org details with plan
+    result = await db.execute(
+        select(Organization, Plan.name.label("plan_name"),
+               Plan.max_seats, Plan.max_ops_month, Plan.max_concurrent)
+        .join(Plan, Organization.plan_id == Plan.id)
+        .where(Organization.id == user.org_id)
     )
-    org = row.first()
-    if not org:
+    row = result.first()
+    if not row:
         return {"org": None}
 
+    org = row[0]
+
     # Members
-    members_row = await db.execute(
-        text("SELECT email, role, joined_at FROM org_members WHERE org_id = :org_id ORDER BY role, email"),
-        {"org_id": str(user.org_id)},
+    members_result = await db.execute(
+        select(OrgMember.email, OrgMember.role, OrgMember.joined_at)
+        .where(OrgMember.org_id == user.org_id)
+        .order_by(OrgMember.role, OrgMember.email)
     )
-    members = [{"email": m.email, "role": m.role, "joined_at": str(m.joined_at) if m.joined_at else None} for m in members_row.fetchall()]
+    members = [
+        {"email": m.email, "role": m.role, "joined_at": str(m.joined_at) if m.joined_at else None}
+        for m in members_result.fetchall()
+    ]
 
     # Modules
-    mods_row = await db.execute(
-        text("SELECT module, enabled FROM org_modules WHERE org_id = :org_id"),
-        {"org_id": str(user.org_id)},
+    mods_result = await db.execute(
+        select(OrgModule.module, OrgModule.enabled).where(OrgModule.org_id == user.org_id)
     )
-    modules = [{"module": m.module, "enabled": m.enabled} for m in mods_row.fetchall()]
+    modules = [{"module": m.module, "enabled": m.enabled} for m in mods_result.fetchall()]
 
     # Usage this month
     month = datetime.now(timezone.utc).strftime("%Y-%m")
-    usage_row = await db.execute(
-        text("SELECT ops_count FROM org_usage WHERE org_id = :org_id AND month = :month"),
-        {"org_id": str(user.org_id), "month": month},
+    usage_result = await db.execute(
+        select(OrgUsage.ops_count)
+        .where(OrgUsage.org_id == user.org_id, OrgUsage.month == month)
     )
-    usage = usage_row.first()
+    usage = usage_result.first()
 
     return {
         "org": {
@@ -160,11 +154,11 @@ async def get_my_org(
             "cnpj": org.cnpj,
             "sector": org.sector,
             "domain": org.domain,
-            "plan": org.plan_name,
+            "plan": row.plan_name,
             "limits": {
-                "max_seats": org.max_seats,
-                "max_ops_month": org.max_ops_month,
-                "max_concurrent": org.max_concurrent,
+                "max_seats": row.max_seats,
+                "max_ops_month": row.max_ops_month,
+                "max_concurrent": row.max_concurrent,
             },
             "trial_expires_at": str(org.trial_expires_at) if org.trial_expires_at else None,
             "is_active": org.is_active,
@@ -186,11 +180,11 @@ async def update_my_org(
         raise HTTPException(status_code=404, detail="Você não pertence a nenhuma organização.")
 
     # Check org role
-    role_row = await db.execute(
-        text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
-        {"org_id": str(user.org_id), "uid": user.db_id},
+    role_result = await db.execute(
+        select(OrgMember.role)
+        .where(OrgMember.org_id == user.org_id, OrgMember.user_id == user.db_id)
     )
-    member = role_row.first()
+    member = role_result.first()
     if not member or member.role not in ("owner", "admin"):
         raise HTTPException(status_code=403, detail="Apenas Owner ou Admin podem atualizar a organização.")
 
@@ -198,9 +192,10 @@ async def update_my_org(
     updates = {k: v for k, v in req.model_dump(exclude_unset=True).items() if k in ALLOWED_FIELDS}
 
     if updates:
-        set_clause = ", ".join(f"{k} = :{k}" for k in updates)
-        updates["org_id"] = str(user.org_id)
-        await db.execute(text(f"UPDATE organizations SET {set_clause}, updated_at = NOW() WHERE id = :org_id"), updates)
+        updates["updated_at"] = datetime.now(timezone.utc)
+        await db.execute(
+            update(Organization).where(Organization.id == user.org_id).values(**updates)
+        )
         await db.commit()
 
     return {"status": "updated", "fields": list(updates.keys())}
@@ -217,11 +212,11 @@ async def send_invite(
         raise HTTPException(status_code=404, detail="Você não pertence a nenhuma organização.")
 
     # Check caller is owner/admin
-    role_row = await db.execute(
-        text("SELECT role FROM org_members WHERE org_id = :org_id AND user_id = :uid"),
-        {"org_id": str(user.org_id), "uid": user.db_id},
+    role_result = await db.execute(
+        select(OrgMember.role)
+        .where(OrgMember.org_id == user.org_id, OrgMember.user_id == user.db_id)
     )
-    member = role_row.first()
+    member = role_result.first()
     if not member or member.role not in ("owner", "admin"):
         raise HTTPException(status_code=403, detail="Apenas Owner ou Admin podem enviar convites.")
 
@@ -230,8 +225,7 @@ async def send_invite(
 
     # Check if email already in an org
     existing = await db.execute(
-        text("SELECT id FROM org_members WHERE email = :email"),
-        {"email": req.email},
+        select(OrgMember.id).where(OrgMember.email == req.email)
     )
     if existing.first():
         raise HTTPException(status_code=409, detail="Este email já pertence a uma organização.")
@@ -240,19 +234,14 @@ async def send_invite(
     token = secrets.token_urlsafe(48)
     expires = datetime.now(timezone.utc) + timedelta(days=7)
 
-    await db.execute(
-        text("""
-            INSERT INTO org_invites (org_id, email, role, token, expires_at)
-            VALUES (:org_id, :email, :role, :token, :expires)
-        """),
-        {
-            "org_id": str(user.org_id),
-            "email": req.email,
-            "role": req.role if req.role in ("admin", "member") else "member",
-            "token": token,
-            "expires": expires,
-        },
+    invite = OrgInvite(
+        org_id=user.org_id,
+        email=req.email,
+        role=req.role if req.role in ("admin", "member") else "member",
+        token=token,
+        expires_at=expires,
     )
+    db.add(invite)
     await db.commit()
     logger.info("Invite sent to %s for org %s", req.email, user.org_id)
 
@@ -276,14 +265,10 @@ async def join_org(
         raise HTTPException(status_code=409, detail="Você já pertence a uma organização.")
 
     # Find invite
-    row = await db.execute(
-        text("""
-            SELECT id, org_id, email, role, expires_at, accepted_at
-            FROM org_invites WHERE token = :token
-        """),
-        {"token": req.token},
+    result = await db.execute(
+        select(OrgInvite).where(OrgInvite.token == req.token)
     )
-    invite = row.first()
+    invite = result.scalar_one_or_none()
     if not invite:
         raise HTTPException(status_code=404, detail="Convite não encontrado.")
     if invite.accepted_at:
@@ -293,35 +278,32 @@ async def join_org(
     if invite.email != user.email:
         raise HTTPException(status_code=403, detail="Este convite não pertence ao seu email.")
 
-    org_id = str(invite.org_id)
+    org_id = invite.org_id
 
     # Check seat limit
-    await check_seat_limit(org_id, db)
+    await check_seat_limit(str(org_id), db)
 
     # Create membership
-    await db.execute(
-        text("""
-            INSERT INTO org_members (org_id, user_id, email, role, joined_at)
-            VALUES (:org_id, :user_id, :email, :role, NOW())
-        """),
-        {"org_id": org_id, "user_id": user.db_id, "email": user.email, "role": invite.role},
+    member = OrgMember(
+        org_id=org_id,
+        user_id=user.db_id,
+        email=user.email,
+        role=invite.role,
+        joined_at=datetime.now(timezone.utc),
     )
+    db.add(member)
 
     # Mark invite accepted
-    await db.execute(
-        text("UPDATE org_invites SET accepted_at = NOW() WHERE id = :id"),
-        {"id": str(invite.id)},
-    )
+    invite.accepted_at = datetime.now(timezone.utc)
 
     # Link user to org
     await db.execute(
-        text("UPDATE users SET org_id = :org_id WHERE id = :uid"),
-        {"org_id": org_id, "uid": user.db_id},
+        update(User).where(User.id == user.db_id).values(org_id=org_id)
     )
 
     await db.commit()
     logger.info("User %s joined org %s", user.email, org_id)
-    return {"status": "joined", "org_id": org_id}
+    return {"status": "joined", "org_id": str(org_id)}
 
 
 @router.get("/me/usage")
@@ -333,26 +315,27 @@ async def get_org_usage(
     if not user.org_id:
         raise HTTPException(status_code=404, detail="Sem organização vinculada.")
 
-    row = await db.execute(
-        text("""
-            SELECT u.month, u.ops_count, u.last_op_at
-            FROM org_usage u
-            WHERE u.org_id = :org_id
-            ORDER BY u.month DESC
-            LIMIT 6
-        """),
-        {"org_id": str(user.org_id)},
+    result = await db.execute(
+        select(OrgUsage.month, OrgUsage.ops_count, OrgUsage.last_op_at)
+        .where(OrgUsage.org_id == user.org_id)
+        .order_by(OrgUsage.month.desc())
+        .limit(6)
     )
-    usage = [{"month": r.month, "ops_count": r.ops_count, "last_op_at": str(r.last_op_at) if r.last_op_at else None} for r in row.fetchall()]
+    usage = [
+        {"month": r.month, "ops_count": r.ops_count, "last_op_at": str(r.last_op_at) if r.last_op_at else None}
+        for r in result.fetchall()
+    ]
 
     # Current concurrent sessions
-    sessions_row = await db.execute(
-        text("""
-            SELECT COUNT(*) FROM org_sessions
-            WHERE org_id = :org_id AND last_active > NOW() - INTERVAL '5 minutes'
-        """),
-        {"org_id": str(user.org_id)},
+    from sqlalchemy import text
+    sessions_result = await db.execute(
+        select(func.count())
+        .select_from(OrgSession)
+        .where(
+            OrgSession.org_id == user.org_id,
+            OrgSession.last_active > text("NOW() - INTERVAL '5 minutes'"),
+        )
     )
-    active_sessions = sessions_row.scalar() or 0
+    active_sessions = sessions_result.scalar() or 0
 
     return {"usage": usage, "active_sessions": active_sessions}
