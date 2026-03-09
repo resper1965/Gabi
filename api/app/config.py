@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # Observability
     log_level: str = "INFO"
     sql_echo: bool = False  # Set True for SQL debug logging
+    enable_docs: bool = False  # Set True for staging to enable /docs
 
     model_config = {"env_file": ".env", "env_prefix": "GABI_", "extra": "ignore"}
 

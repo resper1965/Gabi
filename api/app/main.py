@@ -40,7 +40,7 @@ app = FastAPI(
     description="Unified AI Backend — nGhost + Law & Comply (Legal + Insurance) + nTalkSQL",
     version=__version__,
     lifespan=lifespan,
-    docs_url="/docs" if settings.gcp_project_id == "" else None,  # Disable docs in prod
+    docs_url="/docs" if settings.gcp_project_id == "" or settings.enable_docs else None,  # Enable locally or via GABI_ENABLE_DOCS=true
     redoc_url=None,
 )
 
