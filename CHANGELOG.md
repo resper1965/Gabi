@@ -2,7 +2,32 @@
 
 Todas as alterações significativas na plataforma Gabi.
 
-## [Unreleased]
+## [0.13.0] — 2026-03-09
+
+### Sprint 16 — Observability Dashboard
+- **feat(web):** Dashboard de observabilidade (`/admin/observability`) com gráfico de barras empilhadas, breakdown por módulo e top users
+- **feat(web):** Sidebar link "Observabilidade" (admin/superadmin)
+
+### Sprint 15 — Billing & Plans
+- **feat(api):** `GET /api/orgs/plans` — lista planos com preços e limites
+- **feat(api):** `GET /api/orgs/billing` — plano atual, dias de trial, uso mensal
+- **feat(api):** `POST /api/orgs/upgrade` — self-service upgrade (owner/admin)
+- **feat(web):** Página de billing (`/org/billing`) com grid de planos e upgrade
+- **feat(web):** `TrialBanner` — banner de expiração de trial em todas as páginas
+- **feat(web):** Sidebar link "Planos" (icon CreditCard)
+- **feat(web):** `/invite` adicionado a PUBLIC_PATHS (auth-gate)
+- **feat(api):** Interfaces `PlanInfo` + `BillingInfo` no API client
+
+### Sprint 14 — Onboarding UI
+- **feat(web):** Org Dashboard (`/org`) — membros, módulos, uso, convites
+- **feat(web):** Create Org Wizard (`/org/create`) — 3 passos
+- **feat(web):** Invite Page (`/invite?token=...`) — aceitar convite
+- **feat(web):** Platform Admin (`/admin/platform`) — stats, tabela paginada, troca de plano
+- **feat(web):** `gabiOrg` + `gabiPlatform` API clients
+- **feat(web):** `UserProfile`: `org_id`, `org_role` adicionados ao auth-provider
+- **feat(web):** Sidebar: "Minha Org" + "Plataforma" links
+
+## [0.12.0] — 2026-03-09
 
 ### Sprint 13 — Code Hygiene & Bug Fixes
 - **fix(org):** Import path corrigido (`app.core.database` → `app.database`) nos routers `org` e `platform`

@@ -61,11 +61,21 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 | Aspecto | Detalhe |
 |---------|---------|
 | **Função** | Gestão de organizações multi-tenant com controle de planos e limites |
-| **Self-service** | CRUD de organização, convites com token e sistema de join |
+| **Self-service** | CRUD de organização, convites com token, sistema de join, upgrade de plano |
 | **FinOps** | Limites de seats, operações/mês e sessões simultâneas por plano |
 | **Platform Admin** | Dashboard global, provisionamento enterprise, troca de planos |
+| **Billing** | Comparação de planos, self-service upgrade, trial countdown |
 | **Tabelas** | `organizations`, `plans`, `org_members`, `org_invites`, `org_modules`, `org_usage`, `org_sessions` |
 
+### 📊 Observabilidade
+**Dashboard de Métricas & Audit**
+
+| Aspecto | Detalhe |
+|---------|---------|
+| **Função** | Dashboard com gráficos de uso, breakdown por módulo e top users |
+| **Métricas** | Operações por dia (7 dias), total events, sessões ativas |
+| **Dados** | Baseado em `analytics_events` (cada op de IA é logada) |
+| **Acesso** | Admin e superadmin via `/admin/observability` |
 
 ---
 
