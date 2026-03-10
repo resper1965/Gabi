@@ -44,6 +44,12 @@ AGENCY_SEARCH_TERMS = {
         "Resolução CVM",
         "Instrução CVM",
     ],
+    "CADE": [
+        "Conselho Administrativo de Defesa Econômica",
+        "Resolução CADE",
+        "Portaria CADE",
+        "Regimento Interno CADE",
+    ],
 }
 
 

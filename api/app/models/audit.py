@@ -20,6 +20,9 @@ class IngestSource(str, enum.Enum):
     ANEEL_RSS = "ANEEL_RSS"
     ANEEL_NORM = "ANEEL_NORM"
     PLANALTO_NORM = "PLANALTO_NORM"
+    CADE_NORM = "CADE_NORM"
+    DATAJUD_STJ = "DATAJUD_STJ"
+    DATAJUD_STF = "DATAJUD_STF"
 
 class IngestStatus(str, enum.Enum):
     NEW = "NEW"
