@@ -1,0 +1,50 @@
+[
+  {
+    "query": "Quais são os direitos fundamentais da LGPD?",
+    "expected_doc_titles": ["LGPD", "Lei 13.709"],
+    "expected_content_keywords": ["dados pessoais", "tratamento", "consentimento", "titular"],
+    "module": "law"
+  },
+  {
+    "query": "O que diz o Art. 5 da Constituição Federal sobre direitos fundamentais?",
+    "expected_doc_titles": ["Constituição Federal"],
+    "expected_content_keywords": ["iguais perante a lei", "direitos", "garantias fundamentais"],
+    "module": "law"
+  },
+  {
+    "query": "Quais as exigências de compliance da Resolução BCB 355?",
+    "expected_doc_titles": ["Resolução BCB", "BACEN"],
+    "expected_content_keywords": ["compliance", "regulação", "financeiro", "instituição"],
+    "module": "law"
+  },
+  {
+    "query": "Como funciona o direito de arrependimento no CDC?",
+    "expected_doc_titles": ["Código de Defesa do Consumidor", "Lei 8.078", "CDC"],
+    "expected_content_keywords": ["arrependimento", "7 dias", "consumidor", "devolução"],
+    "module": "law"
+  },
+  {
+    "query": "Quais são as penalidades previstas na LGPD para vazamento de dados?",
+    "expected_doc_titles": ["LGPD", "Lei 13.709"],
+    "expected_content_keywords": ["multa", "sanção", "ANPD", "infração", "advertência"],
+    "module": "law"
+  },
+  {
+    "query": "O que estabelece o Código Civil sobre contratos?",
+    "expected_doc_titles": ["Código Civil", "Lei 10406"],
+    "expected_content_keywords": ["contrato", "obrigação", "partes", "acordo"],
+    "module": "law"
+  },
+  {
+    "query": "Quais são os requisitos da SUSEP para seguros?",
+    "expected_doc_titles": ["SUSEP", "Circular"],
+    "expected_content_keywords": ["seguro", "apólice", "sinistro", "cobertura"],
+    "module": "law"
+  },
+  {
+    "query": "Como funciona a prescrição no direito penal?",
+    "expected_doc_titles": ["Código Penal", "Decreto-Lei 2848"],
+    "expected_content_keywords": ["prescrição", "prazo", "pena", "crime"],
+    "module": "law"
+  }
+]
