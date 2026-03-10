@@ -157,6 +157,80 @@ graph LR
 
 ---
 
+## Banco de Dados & Infraestrutura
+
+> ⚠️ **AVISO: O projeto foi migrado do Supabase para o Google Cloud SQL em Fev/2025.**
+> Qualquer referência ao Supabase (URLs com `pooler.supabase.com`) está **desatualizada**.
+> O banco de dados de produção é o **Cloud SQL PostgreSQL** (instância `nghost-db`).
+
+### Arquitetura de Produção
+
+```mermaid
+graph TD
+    CR["Cloud Run<br/>gabi-api"] -->|Cloud SQL Proxy<br/>sidecar| CS["Cloud SQL<br/>nghost-db"]
+    SM["Secret Manager<br/>database-url:latest"] -->|inject| CR
+    CB["Cloud Build"] -->|deploy| CR
+    CB -->|run migrations| CS
+```
+
+| Componente | Recurso GCP | Detalhes |
+|------------|-------------|---------|
+| **Banco de dados** | Cloud SQL PostgreSQL | Instância: `nghost-db`, Região: `southamerica-east1` |
+| **Conexão (prod)** | Cloud SQL Proxy (sidecar) | Injetado via `--add-cloudsql-instances` no Cloud Run |
+| **Credenciais** | Secret Manager | Secret: `database-url`, versão: `latest` |
+| **Migrations** | Alembic (auto no boot) | `entrypoint.sh` executa `alembic upgrade head` |
+| **Projeto GCP** | `nghost-gabi` | Firebase: `nghost-gabi.firebaseapp.com` |
+
+### Desenvolvimento Local
+
+Para conectar ao banco de produção/staging localmente:
+
+```bash
+# 1. Autentique no GCP
+gcloud auth application-default login
+
+# 2. Rode o Cloud SQL Proxy (porta 5433 para não colidir com Postgres local)
+cloud-sql-proxy nghost-gabi:southamerica-east1:nghost-db --port=5433
+
+# 3. Configure o .env (já pré-configurado)
+#    GABI_DATABASE_URL=postgresql+asyncpg://postgres:YOUR_DB_PASSWORD@localhost:5433/postgres
+
+# 4. Rode a API normalmente
+cd api && .venv/bin/uvicorn app.main:app --reload --port 8080
+```
+
+> 💡 **Dica**: A senha do banco está no Secret Manager. Para obter:
+> ```bash
+> gcloud secrets versions access latest --secret=database-url --project=nghost-gabi
+> ```
+
+### Migrações (Alembic)
+
+```bash
+# Ver status atual
+cd api && PYTHONPATH=. .venv/bin/alembic current
+
+# Aplicar todas as migrações pendentes
+cd api && PYTHONPATH=. .venv/bin/alembic upgrade head
+
+# Criar uma nova migração
+cd api && PYTHONPATH=. .venv/bin/alembic revision -m "descricao_da_mudanca"
+```
+
+**Fluxo de migrações no deploy:**
+1. `entrypoint.sh` executa `alembic upgrade head` no boot do container
+2. Se a migration falhar, o container **continua** (non-blocking, timeout 300s)
+3. Logs de migration aparecem nos logs do Cloud Run
+
+### ⛔ Supabase (Depreciado)
+
+O Supabase foi usado apenas na fase de prototipação (antes de Fev/2025).
+**NÃO use URLs do Supabase** no `.env` ou em qualquer configuração.
+
+Se encontrar referências ao Supabase no código, remova-as.
+
+---
+
 ## Links Úteis
 
 | Recurso | URL |
@@ -167,3 +241,5 @@ graph LR
 | Firebase Console | https://console.firebase.google.com/project/nghost-gabi |
 | Cloud Build | https://console.cloud.google.com/cloud-build/builds?project=nghost-gabi |
 | Cloud Run | https://console.cloud.google.com/run?project=nghost-gabi |
+| Cloud SQL | https://console.cloud.google.com/sql/instances/nghost-db?project=nghost-gabi |
+| Secret Manager | https://console.cloud.google.com/security/secret-manager?project=nghost-gabi |
