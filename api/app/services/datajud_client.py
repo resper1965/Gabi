@@ -36,12 +36,19 @@ COMPLIANCE_QUERIES = {
         "plano de saúde cobertura negativa",
         "consumidor código defesa",
         "mercado de capitais CVM",
+        # Open Finance / Pix — relevant since 2021
+        "Pix fraude responsabilidade banco",
+        "Open Finance dados compartilhamento consentimento",
+        # AML
+        "lavagem de dinheiro operação suspeita",
     ],
     "STF": [
         "LGPD constitucionalidade",
         "sigilo bancário inconstitucional",
         "proteção de dados pessoais",
         "regulação financeira competência",
+        # Open Finance / digital payments
+        "Open Banking regulação constitucional",
     ],
 }
 
