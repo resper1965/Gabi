@@ -5,6 +5,7 @@ Each pack corresponds to a regulatory body (ANS, CVM, SUSEP, BACEN, LGPD).
 """
 
 import asyncio
+import json
 import os
 import uuid
 import logging
@@ -176,18 +177,18 @@ async def seed_pack(
 
     doc_model, chunk_model = _get_models(module)
 
-    # Discover seed files
-    seed_files = sorted(seed_dir.glob("*.txt"))
-    if not seed_files:
-        return {"error": f"No .txt files found in {seed_dir}"}
+    # Discover seed files — .txt and .jsonl
+    txt_files = sorted(seed_dir.glob("*.txt"))
+    jsonl_files = sorted(seed_dir.glob("*.jsonl"))
+    if not txt_files and not jsonl_files:
+        return {"error": f"No .txt or .jsonl files found in {seed_dir}"}
 
     docs_created = 0
     total_chunks = 0
 
-    for filepath in seed_files:
-        title = f"[SEED:{pack_id.upper()}] {filepath.stem.replace('_', ' ').title()}"
-
-        # Skip if this exact doc already exists (idempotent)
+    # Helper to create and persist a single document record
+    async def _seed_document(text: str, title: str, filename: str) -> int:
+        """Chunk, embed, and persist one document. Returns number of chunks created."""
         existing_doc = await db.execute(
             select(doc_model).where(
                 doc_model.title == title,
@@ -196,53 +197,76 @@ async def seed_pack(
         )
         if existing_doc.scalars().first() is not None:
             logger.info(f"Skipping existing seed doc: {title}")
-            continue
+            return 0
 
-        # Read and chunk the file
-        text = filepath.read_text(encoding="utf-8")
         if not text.strip():
-            continue
+            return 0
 
         chunks = chunk_text(text, chunk_size=1000, overlap=200)
         if not chunks:
-            continue
+            return 0
 
-        # Generate embeddings (run in thread pool to avoid blocking the event loop)
         embeddings = await asyncio.to_thread(embed_batch, chunks)
 
-        # Create document record
         doc_id = uuid.uuid4()
         doc_fields = {
             "id": doc_id,
-            "filename": filepath.name,
+            "filename": filename,
             "title": title,
             "file_size": len(text.encode("utf-8")),
             "chunk_count": len(chunks),
             "is_shared": True,
         }
-
-        # Module-specific fields (LegalDocument uses user_id, InsuranceDocument uses tenant_id)
         if module == "law":
             doc_fields["user_id"] = "system"
             doc_fields["doc_type"] = "regulation"
 
-        doc_record = doc_model(**doc_fields)
-        db.add(doc_record)
-
-        # Create chunk records
+        db.add(doc_model(**doc_fields))
         for i, (content, emb) in enumerate(zip(chunks, embeddings)):
-            chunk_kwargs = {
+            db.add(chunk_model(**{
                 "id": uuid.uuid4(),
                 "document_id": doc_id,
                 "content": content,
                 "chunk_index": i,
                 "embedding": emb,
-            }
-            db.add(chunk_model(**chunk_kwargs))
+            }))
 
-        docs_created += 1
-        total_chunks += len(chunks)
         logger.info(f"Seeded: {title} ({len(chunks)} chunks)")
+        return len(chunks)
+
+    # Process .txt files
+    for filepath in txt_files:
+        title = f"[SEED:{pack_id.upper()}] {filepath.stem.replace('_', ' ').title()}"
+        text = filepath.read_text(encoding="utf-8")
+        n = await _seed_document(text, title, filepath.name)
+        if n:
+            docs_created += 1
+            total_chunks += n
+
+    # Process .jsonl files — each line is a regulatory document with `texto_integral`
+    for filepath in jsonl_files:
+        with open(filepath, encoding="utf-8") as fh:
+            for line_no, line in enumerate(fh, start=1):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    logger.warning(f"Skipping malformed JSONL line {line_no} in {filepath.name}")
+                    continue
+
+                texto = record.get("texto_integral", "")
+                if not texto or len(texto.strip()) < 50:
+                    continue
+
+                tipo = record.get("tipo_ato", "Ato")
+                numero = record.get("numero", str(line_no))
+                title = f"[SEED:{pack_id.upper()}] {tipo} {numero}"
+                n = await _seed_document(texto, title, filepath.name)
+                if n:
+                    docs_created += 1
+                    total_chunks += n
 
     await db.commit()
 

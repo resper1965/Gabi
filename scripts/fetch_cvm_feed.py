@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """
 Fetch updates from the CVM legislative RSS feed.
-Implements a "compliance-grade" RAG architecture layer by storing metadata, 
+Implements a "compliance-grade" RAG architecture layer by storing metadata,
 content hashing, and full text for regulatory changes.
-Outputs to api/seeds/regulatory/cvm/cvm_atos_continuo.jsonl
+Outputs to api/seeds/regulatory/cvm/cvm_atos_continuo.jsonl and persists to DB.
 """
 
+import asyncio
 import os
 import re
 import html
 import json
 import hashlib
+import sys
 import urllib.request
 import xml.etree.ElementTree as ET
 from urllib.error import URLError
@@ -20,10 +22,13 @@ from datetime import datetime, timezone
 try:
     from fetch_regulatory import HEADERS, html_to_text, clean_legal_text
 except ImportError:
-    # Fallback in case fetch_regulatory is not in python path
-    import sys
     sys.path.append(os.path.dirname(__file__))
     from fetch_regulatory import HEADERS, html_to_text, clean_legal_text
+
+# Make the api package importable from this script location
+_API_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "api")
+if _API_DIR not in sys.path:
+    sys.path.insert(0, _API_DIR)
 
 RSS_URL = "https://conteudo.cvm.gov.br/feed/legislacao.xml"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "..", "api", "seeds", "regulatory", "cvm", "cvm_atos_continuo.jsonl")
@@ -139,7 +144,8 @@ def append_record(file_path: str, record: dict):
     with open(file_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-def process_feed():
+def process_feed() -> list:
+    """Fetch RSS feed, persist new/updated records to JSONL, and return changed records."""
     print(f"Fetching RSS Feed: {RSS_URL}")
     req = urllib.request.Request(RSS_URL, headers=HEADERS)
     try:
@@ -152,9 +158,10 @@ def process_feed():
     existing = load_existing_records(OUTPUT_FILE)
     items = tree.findall('.//item')
     print(f"Found {len(items)} items in feed.")
-    
+
     new_count = 0
     upd_count = 0
+    changed_records = []
     
     for item in items:
         title = item.find("title").text if item.find("title") is not None else ""
@@ -200,7 +207,7 @@ def process_feed():
                 "numero": numero,
                 "data_publicacao": pubDate,
                 "ementa": desc.strip(),
-                "status": "Vigente", # Placeholder, would need NLP or specific checks to detect revogados
+                "status": "Vigente",  # Placeholder, would need NLP or specific checks to detect revogados
                 "texto_integral": text,
                 "versao_hash": current_hash,
                 "capturado_em": datetime.now(timezone.utc).isoformat() + "Z"
@@ -208,17 +215,71 @@ def process_feed():
             append_record(OUTPUT_FILE, record)
             # Update local memory
             existing[link] = record
-            
+            changed_records.append(record)
+
             if is_new:
                 new_count += 1
-                print(f"  -> ✅ NEW record saved.")
+                print(f"  -> NEW record saved.")
             else:
                 upd_count += 1
-                print(f"  -> 🔄 UPDATED record saved (hash changed).")
+                print(f"  -> UPDATED record saved (hash changed).")
         else:
-            print(f"  -> ✅ Unchanged.")
-            
+            print(f"  -> Unchanged.")
+
     print(f"\nDone! Added {new_count} new, updated {upd_count}. Total tracked in memory: {len(existing)}.")
+    return changed_records
+
+
+async def persist_to_db(records: list) -> None:
+    """Persist new/updated CVM acts from the RSS feed into the regulatory database."""
+    if not records:
+        print("[DB] No new records to persist.")
+        return
+
+    from app.database import async_session
+    from app.services.db_ingest import DBIngester
+    from app.services.chunker import extract_provisions
+    from app.models.audit import IngestRun, IngestSource
+    from app.schemas.ingest import RegulatoryDocumentSchema, RegulatoryAuthority
+
+    print(f"[DB] Persisting {len(records)} record(s) to database...")
+
+    async with async_session() as session:
+        run = IngestRun(source=IngestSource.CVM_FEED, started_at=datetime.now(timezone.utc))
+        session.add(run)
+        await session.commit()
+        await session.refresh(run)
+
+        ingester = DBIngester(session)
+
+        for record in records:
+            texto = record.get("texto_integral", "")
+            if not texto or len(texto.strip()) < 100:
+                continue
+
+            provisions = extract_provisions(texto)
+            schema = RegulatoryDocumentSchema(
+                authority=RegulatoryAuthority.CVM,
+                tipo_ato=record.get("tipo_ato", "Ato"),
+                numero=record.get("numero", "N/A"),
+                id_fonte=record["id_fonte"],
+                titulo=record.get("ementa", record["id_fonte"])[:200],
+                status=record.get("status", "Vigente"),
+                version_hash=record["versao_hash"],
+                texto_integral=texto,
+                provisions=provisions,
+            )
+            await ingester.ingest_regulatory_document(run, schema)
+
+        run.finished_at = datetime.now(timezone.utc)
+        await session.commit()
+
+    print(
+        f"[DB] CVM feed ingestao concluida. "
+        f"Novos: {run.itens_novos}, Atualizados: {run.itens_atualizados}, Erros: {run.erros}"
+    )
+
 
 if __name__ == "__main__":
-    process_feed()
+    changed = process_feed()
+    asyncio.run(persist_to_db(changed))

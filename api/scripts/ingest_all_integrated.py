@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ingest_bcb_normativos import run_ingestion as run_bcb_ingest
 from ingest_cmn_normativos import run_ingestion as run_cmn_ingest
 from bkj_cli import run_cli as run_bkj_cli
+from ingest_cvm import run_cvm_ingestion
 from ingest_susep import run_susep_ingestion
 from ingest_ans import run_ans_ingestion
 from ingest_anpd import run_anpd_ingestion
@@ -37,10 +38,11 @@ async def run_integrated_pipeline():
     except Exception as e:
         print(f" [!] Error in Financial Ingestion: {e}")
 
-    # 3. Specific Regulatory Agencies (SUSEP, ANS, ANPD, ANEEL)
+    # 3. Specific Regulatory Agencies (CVM, SUSEP, ANS, ANPD, ANEEL)
     print("\n[STEP 3/4] Ingesting Regulatory Agency Acts (Multi-Agency)...")
     try:
         # These could potentially run in parallel if DB connections are handled
+        await run_cvm_ingestion()
         await run_susep_ingestion()
         await run_ans_ingestion()
         await run_anpd_ingestion()
