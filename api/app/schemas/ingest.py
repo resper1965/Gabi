@@ -11,6 +11,8 @@ class RegulatoryAuthority(str, enum.Enum):
     SUSEP = "SUSEP"
     ANPD = "ANPD"
     ANEEL = "ANEEL"
+    PLANALTO = "PLANALTO"
+    CADE = "CADE"
 
 class IngestStatus(str, enum.Enum):
     NEW = "NEW"
