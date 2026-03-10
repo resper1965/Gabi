@@ -44,7 +44,7 @@ async def run_ingestion(days: int = 30):
         await db.refresh(run)
 
         ingester = DBIngester(db)
-        docs = await client.fetch_por_data(days=days, top=100)
+        docs = await client.fetch_por_data(days=days)
 
         # Keep only BACEN act types (exclude CMN resolutions)
         docs = [d for d in docs if d.tipo in BACEN_TIPOS]
@@ -56,6 +56,7 @@ async def run_ingestion(days: int = 30):
             texto = await client.fetch_content(doc)
             if not texto or len(texto.strip()) < 100:
                 print(f" [!] Texto insuficiente para {doc.tipo} {doc.numero}")
+                run.erros += 1
                 continue
 
             content_hash = generate_hash(texto)

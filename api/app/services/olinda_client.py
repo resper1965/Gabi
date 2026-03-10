@@ -47,10 +47,11 @@ class OlindaClient:
         self,
         days: int = 30,
         tipo_filter: Optional[str] = None,
-        top: int = 100,
+        page_size: int = 100,
     ) -> List[NormativoItem]:
         """
         Return normatives published in the last `days` days.
+        Paginates via $skip until the API returns an empty page.
         Optionally filter by exact Tipo (e.g. 'Resolução CMN').
         """
         end_date = datetime.now(timezone.utc)
@@ -58,34 +59,52 @@ class OlindaClient:
         start_str = start_date.strftime("%Y-%m-%d")
         end_str = end_date.strftime("%Y-%m-%d")
 
-        url = (
+        base_url = (
             f"{OLINDA_BASE}/NormativosPorData("
             f"datainicial=@datainicial,datafinal=@datafinal)"
             f"?@datainicial='{start_str}'"
             f"&@datafinal='{end_str}'"
-            f"&$top={top}"
+            f"&$top={page_size}"
             f"&$format=json"
         )
         if tipo_filter:
-            url += f"&$filter=Tipo eq '{quote(tipo_filter, safe='')}'"
+            base_url += f"&$filter=Tipo eq '{quote(tipo_filter, safe='')}'"
 
-        try:
-            raw = await self.http.fetch_async(url)
-            data = json.loads(raw)
-            return [
-                NormativoItem(
-                    tipo=item.get("Tipo", ""),
-                    numero=str(item.get("Numero", "")).split(".")[0],
-                    data=item.get("Data", ""),
-                    assunto=item.get("Assunto", ""),
-                    link=item.get("Link", ""),
-                )
-                for item in data.get("value", [])
-                if item.get("Numero")
-            ]
-        except Exception as e:
-            logger.error("OlindaClient fetch_por_data error: %s", e)
-            return []
+        all_items: List[NormativoItem] = []
+        skip = 0
+
+        while True:
+            url = base_url + f"&$skip={skip}"
+            try:
+                raw = await self.http.fetch_async(url)
+                page = json.loads(raw).get("value", [])
+            except Exception as e:
+                logger.error("OlindaClient fetch_por_data error (skip=%d): %s", skip, e)
+                break
+
+            if not page:
+                break
+
+            for item in page:
+                if item.get("Numero"):
+                    all_items.append(NormativoItem(
+                        tipo=item.get("Tipo", ""),
+                        numero=str(item.get("Numero", "")).split(".")[0],
+                        data=item.get("Data", ""),
+                        assunto=item.get("Assunto", ""),
+                        link=item.get("Link", ""),
+                    ))
+
+            if len(page) < page_size:
+                break  # Last page — no need for another request
+
+            skip += page_size
+
+        logger.info(
+            "OlindaClient: %d normatives fetched (days=%d, tipo=%s)",
+            len(all_items), days, tipo_filter or "all",
+        )
+        return all_items
 
     async def fetch_content(self, normativo: NormativoItem) -> str:
         """

@@ -37,7 +37,6 @@ async def run_ingestion(days: int = 90):
         docs = await client.fetch_por_data(
             days=days,
             tipo_filter="Resolução CMN",
-            top=100,
         )
         print(f"[*] {len(docs)} Resoluções CMN encontradas.")
 
@@ -47,6 +46,7 @@ async def run_ingestion(days: int = 90):
             texto = await client.fetch_content(doc)
             if not texto or len(texto.strip()) < 100:
                 print(f" [!] Texto insuficiente para {doc.tipo} {doc.numero}")
+                run.erros += 1
                 continue
 
             content_hash = generate_hash(texto)

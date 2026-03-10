@@ -77,11 +77,16 @@ class DataJudClient:
         stop=stop_after_attempt(3),
         retry=retry_if_exception_type((httpx.RequestError, httpx.TimeoutException)),
     )
-    async def _search(self, tribunal: str, query: str, days: int, size: int) -> list:
+    async def _search_page(
+        self,
+        tribunal: str,
+        query: str,
+        since: str,
+        size: int,
+        search_after: Optional[list] = None,
+    ) -> list:
         url = TRIBUNAL_ENDPOINTS[tribunal]
-        since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
-
-        body = {
+        body: dict = {
             "query": {
                 "bool": {
                     "must": [{"match": {"ementa": query}}],
@@ -89,12 +94,14 @@ class DataJudClient:
                 }
             },
             "size": size,
-            "sort": [{"dataJulgamento": {"order": "desc"}}],
+            "sort": [{"dataJulgamento": {"order": "desc"}}, {"_id": "asc"}],
             "_source": [
                 "numeroProcesso", "classe", "assunto",
                 "ementa", "dataJulgamento", "relator", "orgaoJulgador",
             ],
         }
+        if search_after:
+            body["search_after"] = search_after
 
         async with httpx.AsyncClient(headers=self.headers, timeout=self.timeout) as client:
             resp = await client.post(url, content=json.dumps(body))
@@ -139,28 +146,52 @@ class DataJudClient:
         self,
         tribunal: str,
         days: int = 180,
-        size_per_query: int = 10,
+        page_size: int = 50,
+        max_per_query: int = 500,
     ) -> List[JurisprudenciaItem]:
         """
         Fetch recent compliance-relevant decisions from the given tribunal.
+        Paginates each query via search_after until exhausted or max_per_query reached.
         Returns deduplicated results across all configured queries.
         """
         if tribunal not in TRIBUNAL_ENDPOINTS:
             raise ValueError(f"Unknown tribunal: {tribunal}. Use 'STJ' or 'STF'.")
 
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
         seen: set[str] = set()
         results: List[JurisprudenciaItem] = []
 
         for query in COMPLIANCE_QUERIES[tribunal]:
-            try:
-                hits = await self._search(tribunal, query, days, size_per_query)
+            fetched = 0
+            search_after: Optional[list] = None
+
+            while fetched < max_per_query:
+                try:
+                    hits = await self._search_page(
+                        tribunal, query, since, page_size, search_after
+                    )
+                except Exception as e:
+                    logger.warning("DataJud query '%s' (%s) failed: %s", query, tribunal, e)
+                    break
+
+                if not hits:
+                    break
+
                 for hit in hits:
                     item = self._hit_to_item(tribunal, hit)
                     if item and item.numero_processo not in seen:
                         seen.add(item.numero_processo)
                         results.append(item)
-            except Exception as e:
-                logger.warning("DataJud query '%s' (%s) failed: %s", query, tribunal, e)
+
+                fetched += len(hits)
+
+                if len(hits) < page_size:
+                    break  # Last page
+
+                # Cursor for next page — sort values of the last hit
+                search_after = hits[-1].get("sort")
+                if not search_after:
+                    break
 
         logger.info("DataJud %s: %d unique decisions retrieved", tribunal, len(results))
         return results
