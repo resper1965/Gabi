@@ -179,6 +179,16 @@ export const gabiLegal = {
     uploadFile<UploadResult>("/api/law/upload", file, { doc_type: docType, ...(title ? { title } : {}) }),
   insights: (authority?: string) =>
     request<InsightInfo[]>(`/api/law/insights${authority ? `?authority=${authority}` : ""}`),
+  insightStats: () =>
+    request<{
+      total_docs: number
+      total_insights: number
+      risk_counts: { Alto: number; "Médio": number; Baixo: number }
+      authority_counts: Record<string, number>
+      new_7d: number
+      last_update: string | null
+      timeline: Array<{ label: string; week_start: string; week_end: string; alto: number; medio: number; baixo: number; total: number }>
+    }>("/api/law/insights/stats"),
 }
 
 // ── gabi.data ──

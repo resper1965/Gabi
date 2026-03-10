@@ -17,6 +17,9 @@ class RegulatoryAuthority(str, enum.Enum):
     ANPD = "ANPD"
     PLANALTO = "PLANALTO"
     ANEEL = "ANEEL"
+    CADE = "CADE"
+    DATAJUD_STJ = "DATAJUD_STJ"
+    DATAJUD_STF = "DATAJUD_STF"
 
 class RssItem(Base):
     __tablename__ = "rss_items"
