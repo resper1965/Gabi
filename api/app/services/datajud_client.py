@@ -4,11 +4,17 @@ Free public API provided by Conselho Nacional de Justiça (CNJ).
 
 Docs: https://datajud-wiki.cnj.jus.br/api-publica/
 Base: https://api-publica.datajud.cnj.jus.br
-Auth: Public API key (no registration required)
+Auth: Public API key — ROTATED PERIODICALLY by CNJ.
+
+IMPORTANT: The CNJ rotates the public API key without prior notice.
+If ingestion starts returning 401/403, get the current key from:
+  https://datajud-wiki.cnj.jus.br/api-publica/
+and update the DATAJUD_API_KEY environment variable.
 """
 
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
@@ -19,8 +25,12 @@ from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_excep
 logger = logging.getLogger("gabi.datajud")
 
 DATAJUD_BASE = "https://api-publica.datajud.cnj.jus.br"
-# Public API key published in CNJ docs
-DATAJUD_API_KEY = "cDZHYzlZa0JadVREZDJCendFbGFsRXFEbXFESXdmTHI6IG5HLVVjNFpHb0o0WXlMd1o1"
+
+# API key sourced from environment — MUST be kept current (CNJ rotates it).
+# Fallback to last known public key; update DATAJUD_API_KEY in env when rotated.
+# Current key: https://datajud-wiki.cnj.jus.br/api-publica/
+_DATAJUD_API_KEY_FALLBACK = "cDZHYzlZa0JadVREZDJCendFbGFsRXFEbXFESXdmTHI6IG5HLVVjNFpHb0o0WXlMd1o1"
+DATAJUD_API_KEY: str = os.getenv("DATAJUD_API_KEY", _DATAJUD_API_KEY_FALLBACK)
 
 TRIBUNAL_ENDPOINTS = {
     "STJ": f"{DATAJUD_BASE}/api_publica_stj/_search",
