@@ -74,6 +74,26 @@ PLANALTO_LAWS = [
         "Numero": "12965",
         "Titulo": "Marco Civil da Internet",
     },
+    # ── AML / financial crimes ────────────────────────────────────────────────
+    {
+        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l9613.htm",
+        "Tipo": "Lei",
+        "Numero": "9613",
+        "Titulo": "Lei de Lavagem de Dinheiro (Lei 9.613/1998)",
+    },
+    {
+        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l7492.htm",
+        "Tipo": "Lei",
+        "Numero": "7492",
+        "Titulo": "Lei de Crimes contra o Sistema Financeiro Nacional (Lei 7.492/1986)",
+    },
+    # ── BCB/CVM administrative sanctions ─────────────────────────────────────
+    {
+        "Url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13506.htm",
+        "Tipo": "Lei",
+        "Numero": "13506",
+        "Titulo": "Lei do Processo Sancionador BCB e CVM (Lei 13.506/2017)",
+    },
 ]
 
 
