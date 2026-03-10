@@ -5,7 +5,7 @@ import hashlib
 def html_to_text(raw_html: str) -> str:
     """Convert HTML to clean text."""
     text = re.sub(r"<style[^>]*>.*?</style>", "", raw_html, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<script[^>]*>.*?</script>", "", raw_html, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<script[^>]*>.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
     text = re.sub(r"</(p|div|h[1-6]|li|tr|dt|dd|blockquote)>", "\n\n", text, flags=re.IGNORECASE)

@@ -3,7 +3,9 @@ from typing import List
 from app.schemas.ingest import ProvisionSchema
 
 # Maximum characters per provision chunk before sub-splitting.
-_MAX_CHUNK = 1200
+# text-multilingual-embedding-002 supports ~2048 tokens (~8000 chars in PT).
+# 2400 chars ≈ 600 tokens — well within limits while preserving semantic context.
+_MAX_CHUNK = 2400
 
 # Splits at any line that starts a new article OR a structural header.
 # Using a lookahead so the delimiter stays at the start of each chunk.
@@ -54,7 +56,9 @@ def _split_long_chunk(text: str, parent_path: str | None) -> List[ProvisionSchem
                 )
             else:
                 sub_path = f"{parent_path} > parte {idx + 1}" if parent_path else f"parte {idx + 1}"
-            results.extend(_split_long_chunk(stripped, sub_path))
+            # Prepend parent context for sub-chunks to preserve article context
+            prefix = f"[{parent_path}] " if parent_path and not stripped.startswith(parent_path or "") else ""
+            results.extend(_split_long_chunk(f"{prefix}{stripped}" if prefix else stripped, sub_path))
     else:
         # Hard-split at word boundary
         start = 0

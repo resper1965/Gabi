@@ -102,7 +102,9 @@ async def _search_provisions(
                 rp.structure_path,
                 rd.authority || ' ' || rd.tipo_ato || ' nº ' || rd.numero AS title,
                 'regulation'         AS doc_type,
-                rv.id                AS version_id
+                rv.id                AS version_id,
+                rd.authority         AS authority,
+                rd.data_publicacao   AS data_publicacao
             FROM regulatory_provisions rp
             JOIN regulatory_versions   rv ON rp.version_id  = rv.id
             JOIN regulatory_documents  rd ON rv.document_id = rd.id
@@ -328,8 +330,20 @@ async def retrieve_if_needed(
         chunk_map[cid] = entry
 
     fused_ids = sorted(scores, key=lambda c: scores[c], reverse=True)
-    fused_chunks = [chunk_map[cid] for cid in fused_ids][:expanded_limit]
+    fused_chunks_raw = [chunk_map[cid] for cid in fused_ids][:expanded_limit]
+
+    # Content-level deduplication: same text may appear in both law_chunks
+    # and regulatory_provisions with different IDs. Deduplicate by content hash.
+    _seen_hashes: set[str] = set()
+    fused_chunks: list[dict] = []
+    for ck in fused_chunks_raw:
+        h = hashlib.md5(ck["content"][:300].encode()).hexdigest()
+        if h not in _seen_hashes:
+            _seen_hashes.add(h)
+            fused_chunks.append(ck)
+
     trace["rrf_fused_count"] = len(fused_chunks)
+    trace["rrf_deduped"] = len(fused_chunks_raw) - len(fused_chunks)
 
     # ── Phase 6: LLM re-ranking (top-40 → best N) ────────────────────────────
     t0 = time.perf_counter()

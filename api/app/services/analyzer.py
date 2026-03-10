@@ -4,6 +4,7 @@ Uses Vertex AI to extract obligations, risks, and entities.
 """
 
 from typing import Any
+from tenacity import retry, wait_exponential, stop_after_attempt
 from app.core.ai import generate_json
 
 ANALYZER_SYSTEM_PROMPT = """
@@ -38,9 +39,11 @@ ANALYZER_SYSTEM_PROMPT = """
 }
 """
 
+@retry(wait=wait_exponential(multiplier=2, min=2, max=30), stop=stop_after_attempt(3))
 async def analyze_normative(text_content: str) -> dict[str, Any]:
     """
     Analyzes a normative text using Gemini 1.5 Pro to extract structured intelligence.
+    Retries on transient failures with exponential backoff.
     """
     prompt = f"""
 [TEXTO NORMATIVO PARA ANÁLISE]
