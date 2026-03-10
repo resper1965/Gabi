@@ -56,14 +56,14 @@ CORE_LAWS = [
 FINANCIAL_LAWS = [
     {
         "name": "Lei Anticorrupção",
-        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846.htm",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846compilado.htm",
         "act_type": "Lei",
         "number": "12846",
         "domain": LegalDomain.ADMINISTRATIVO
     },
     {
         "name": "Lei de Lavagem de Dinheiro",
-        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9613.htm",
+        "url": "https://www.planalto.gov.br/ccivil_03/leis/l9613compilado.htm",
         "act_type": "Lei",
         "number": "9613",
         "domain": LegalDomain.ADMINISTRATIVO

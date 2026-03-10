@@ -24,12 +24,14 @@ AUTHORITY = RegulatoryAuthority.BACEN
 SOURCE = IngestSource.BACEN_NORM
 
 # Act types issued by BACEN (excludes CMN resolutions — those go to ingest_cmn)
+# "Decisão Conjunta" = acts issued jointly by BCB and CMN — captured here under BACEN
 BACEN_TIPOS = {
     "Resolução BCB",
     "Instrução Normativa BCB",
     "Carta Circular",
     "Comunicado",
     "Circular",
+    "Decisão Conjunta",
 }
 
 

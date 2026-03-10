@@ -41,7 +41,7 @@ PLANALTO_LAWS = [
     },
     # ── Financial system foundation ───────────────────────────────────────────
     {
-        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l4595.htm",
+        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l4595compilado.htm",
         "Tipo": "Lei",
         "Numero": "4595",
         "Titulo": "Lei do Sistema Financeiro Nacional — cria BCB e CMN",
@@ -62,24 +62,24 @@ PLANALTO_LAWS = [
     },
     # ── Anti-corruption / compliance ─────────────────────────────────────────
     {
-        "Url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846.htm",
+        "Url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846compilado.htm",
         "Tipo": "Lei",
         "Numero": "12846",
         "Titulo": "Lei Anticorrupção (Lei de Integridade Empresarial)",
     },
     # ── Internet / cybersecurity ──────────────────────────────────────────────
     {
-        "Url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm",
+        "Url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965compilado.htm",
         "Tipo": "Lei",
         "Numero": "12965",
-        "Titulo": "Marco Civil da Internet",
+        "Titulo": "Marco Civil da Internet (inclui alterações Lei 14.155/2021)",
     },
     # ── AML / financial crimes ────────────────────────────────────────────────
     {
-        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l9613.htm",
+        "Url": "https://www.planalto.gov.br/ccivil_03/leis/l9613compilado.htm",
         "Tipo": "Lei",
         "Numero": "9613",
-        "Titulo": "Lei de Lavagem de Dinheiro (Lei 9.613/1998)",
+        "Titulo": "Lei de Lavagem de Dinheiro (texto consolidado pós-Lei 12.683/2012)",
     },
     {
         "Url": "https://www.planalto.gov.br/ccivil_03/leis/l7492.htm",
