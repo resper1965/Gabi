@@ -88,10 +88,8 @@ async def _search_provisions(
     limit: int = 40,
 ) -> tuple[list[dict], list[int]]:
     """
-    Vector search on regulatory_provisions (current versions only).
-
-    Joins provisions → versions → documents to pull authority/tipo/numero for titles.
-    Returns (provision_chunks, matched_version_ids).
+    Search regulatory provisions by vector similarity.
+    Returns provisions as content chunks + list of version IDs.
     Version IDs are used later to fetch pre-computed AI analyses.
     """
     results = await db.execute(
@@ -119,6 +117,42 @@ async def _search_provisions(
     # Deduplicate version IDs (multiple provisions may belong to the same norm)
     version_ids = list({r["version_id"] for r in rows})
     return rows, version_ids
+
+
+async def _search_legal_provisions(
+    query_embedding: list[float],
+    db: AsyncSession,
+    limit: int = 20,
+) -> list[dict]:
+    """
+    TD-1: Search BKJ legal_provisions by vector similarity.
+    Unifies BKJ pipeline data with the regulatory pipeline in RRF fusion.
+    """
+    try:
+        results = await db.execute(
+            text("""
+                SELECT
+                    lp.id,
+                    lp.text              AS content,
+                    lp.structure_path,
+                    ld.act_type || ' nº ' || ld.law_number AS title,
+                    'legislation'        AS doc_type,
+                    lp.article_number,
+                    ld.authority
+                FROM legal_provisions lp
+                JOIN legal_documents  ld ON lp.doc_id = ld.id
+                WHERE lp.embedding IS NOT NULL
+                  AND lp.embedding_status = 'READY'
+                ORDER BY lp.embedding <=> :emb::vector
+                LIMIT :lim
+            """),
+            {"emb": str(query_embedding), "lim": limit},
+        )
+        return [dict(r._mapping) for r in results]
+    except Exception as e:
+        # Table may not exist in all environments
+        logger.debug("BKJ legal_provisions search skipped: %s", e)
+        return []
 
 
 async def _get_insights_for_versions(
@@ -289,15 +323,21 @@ async def retrieve_if_needed(
     # 4-C: Regulatory provisions (vector search — law module only)
     provision_chunks: list[dict] = []
     matched_version_ids: list[int] = []
+    legal_prov_chunks: list[dict] = []
     if module == "law":
         provision_chunks, matched_version_ids = await _search_provisions(
             query_embedding, db, expanded_limit
+        )
+        # TD-1: Also search BKJ legal_provisions for unified results
+        legal_prov_chunks = await _search_legal_provisions(
+            query_embedding, db, limit=20
         )
 
     trace["search"] = {
         "semantic_count": len(semantic_chunks),
         "lexical_count": len(lexical_chunks),
         "provision_count": len(provision_chunks),
+        "legal_prov_count": len(legal_prov_chunks),
         "ms": _ms(t0),
     }
 
@@ -321,11 +361,24 @@ async def retrieve_if_needed(
         cid = f"prov:{ck['id']}"
         entry = dict(ck)
         entry["id"] = cid
-        # Append structure path (Art. 5 > §2) to the title for display clarity
         if entry.get("structure_path"):
             entry["title"] = f"{entry['title']} — {entry['structure_path']}"
         entry.pop("structure_path", None)
         entry.pop("version_id", None)
+        scores[cid] = scores.get(cid, 0.0) + 1.0 / (K + rank + 1)
+        chunk_map[cid] = entry
+
+    # TD-1: BKJ legal provisions — same namespace prefix pattern
+    for rank, ck in enumerate(legal_prov_chunks):
+        cid = f"bkj:{ck['id']}"
+        entry = dict(ck)
+        entry["id"] = cid
+        if entry.get("structure_path"):
+            entry["title"] = f"{entry['title']} — {entry['structure_path']}"
+        if entry.get("article_number"):
+            entry["title"] = f"{entry['title']} Art. {entry['article_number']}"
+        entry.pop("structure_path", None)
+        entry.pop("article_number", None)
         scores[cid] = scores.get(cid, 0.0) + 1.0 / (K + rank + 1)
         chunk_map[cid] = entry
 

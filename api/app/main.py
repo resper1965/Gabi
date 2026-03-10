@@ -31,6 +31,14 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("Firebase init failed (non-fatal): %s", e)
 
+    # Validate optional dependencies at startup (TD-6)
+    try:
+        from app.core.startup_checks import check_dependencies, check_embedding_model
+        check_dependencies()
+        check_embedding_model()
+    except Exception as e:
+        logger.warning("Startup checks failed (non-fatal): %s", e)
+
     # Self-healing migration: ensure users.org_id column exists
     try:
         from app.database import engine

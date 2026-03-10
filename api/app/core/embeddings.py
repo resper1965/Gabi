@@ -2,6 +2,9 @@
 Gabi Hub — Embedding Service (Shared)
 Uses Vertex AI text-embedding (server-side). No local model, no PyTorch.
 LRU cache to avoid re-computing identical queries.
+
+TD-2: Embedding model versioning — model name is tracked as a constant
+and exposed via get_embedding_model_name() for migration/compatibility checks.
 """
 
 import hashlib
@@ -13,6 +16,10 @@ from tenacity import retry, wait_exponential, stop_after_attempt
 
 logger = logging.getLogger("gabi.embeddings")
 
+# ── TD-2: Single source of truth for embedding model ──
+EMBEDDING_MODEL = "text-multilingual-embedding-002"
+EMBEDDING_DIMENSIONS = 768
+
 _model = None
 
 
@@ -21,8 +28,14 @@ def _get_model():
     global _model
     if _model is None:
         from vertexai.language_models import TextEmbeddingModel
-        _model = TextEmbeddingModel.from_pretrained("text-multilingual-embedding-002")
+        _model = TextEmbeddingModel.from_pretrained(EMBEDDING_MODEL)
+        logger.info("Loaded embedding model: %s (%dd)", EMBEDDING_MODEL, EMBEDDING_DIMENSIONS)
     return _model
+
+
+def get_embedding_model_name() -> str:
+    """Return current embedding model name for versioning/migration."""
+    return EMBEDDING_MODEL
 
 
 @lru_cache(maxsize=2048)
@@ -50,7 +63,6 @@ def embed_batch(texts: list[str]) -> list[list[float]]:
     if not texts:
         return []
     results = []
-    # Vertex AI supports up to 250 texts per batch
     for i in range(0, len(texts), 250):
         batch = texts[i : i + 250]
         embeddings = _get_model().get_embeddings(batch)
