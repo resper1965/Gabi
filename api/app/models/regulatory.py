@@ -42,8 +42,10 @@ class RegulatoryDocument(Base):
     tipo_ato: Mapped[str] = mapped_column(String(100), index=True)
     numero: Mapped[str] = mapped_column(String(100), index=True)
     data_publicacao: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    data_vigencia: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     id_fonte: Mapped[str] = mapped_column(String(1024), unique=True, index=True)
-    status: Mapped[str] = mapped_column(String(100))
+    status: Mapped[str] = mapped_column(String(100), index=True)
+    revogada_por: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
     current_version_id: Mapped[Optional[int]] = mapped_column(ForeignKey("regulatory_versions.id"), nullable=True)
 
     # Relationships

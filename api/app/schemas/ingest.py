@@ -25,9 +25,11 @@ class ExtractedActMetadata(BaseModel):
     tipo_ato: str
     numero: str
     data_publicacao: Optional[datetime] = None
+    data_vigencia: Optional[datetime] = None
     id_fonte: str
     titulo: str
     status: str = "Vigente"
+    revogada_por: Optional[str] = None
 
 class RssItemSchema(BaseModel):
     feed_origem: str

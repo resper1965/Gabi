@@ -56,8 +56,10 @@ class DBIngester:
                     tipo_ato=doc_schema.tipo_ato,
                     numero=doc_schema.numero,
                     data_publicacao=doc_schema.data_publicacao,
+                    data_vigencia=doc_schema.data_vigencia,
                     id_fonte=doc_schema.id_fonte,
-                    status=doc_schema.status
+                    status=doc_schema.status,
+                    revogada_por=doc_schema.revogada_por,
                 )
                 self.session.add(doc)
                 await self.session.flush() # get doc.id
@@ -87,6 +89,13 @@ class DBIngester:
                 curr_ver_stmt = select(RegulatoryVersion).where(RegulatoryVersion.id == doc.current_version_id)
                 curr_version = (await self.session.execute(curr_ver_stmt)).scalars().first()
                 
+                # Sync mutable fields regardless of version change (status may be updated externally)
+                doc.status = doc_schema.status
+                if doc_schema.data_vigencia:
+                    doc.data_vigencia = doc_schema.data_vigencia
+                if doc_schema.revogada_por:
+                    doc.revogada_por = doc_schema.revogada_por
+
                 if not curr_version or curr_version.version_hash != doc_schema.version_hash:
                     # UPDATED
                     new_version = RegulatoryVersion(

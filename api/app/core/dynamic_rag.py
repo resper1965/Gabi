@@ -102,11 +102,13 @@ async def _search_provisions(
                 'regulation'         AS doc_type,
                 rv.id                AS version_id,
                 rd.authority         AS authority,
-                rd.data_publicacao   AS data_publicacao
+                rd.data_publicacao   AS data_publicacao,
+                rd.data_vigencia     AS data_vigencia
             FROM regulatory_provisions rp
             JOIN regulatory_versions   rv ON rp.version_id  = rv.id
             JOIN regulatory_documents  rd ON rv.document_id = rd.id
             WHERE rd.current_version_id = rv.id
+              AND rd.status = 'Vigente'
               AND rp.embedding IS NOT NULL
             ORDER BY rp.embedding <=> :emb::vector
             LIMIT :lim
@@ -363,8 +365,12 @@ async def retrieve_if_needed(
         entry["id"] = cid
         if entry.get("structure_path"):
             entry["title"] = f"{entry['title']} — {entry['structure_path']}"
+        # Append vigência date to title for LLM re-ranking context
+        if entry.get("data_vigencia"):
+            entry["title"] = f"{entry['title']} [vigente desde {entry['data_vigencia'].strftime('%d/%m/%Y')}]"
         entry.pop("structure_path", None)
         entry.pop("version_id", None)
+        entry.pop("data_vigencia", None)
         scores[cid] = scores.get(cid, 0.0) + 1.0 / (K + rank + 1)
         chunk_map[cid] = entry
 

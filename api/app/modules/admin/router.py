@@ -484,6 +484,49 @@ async def ingest_regulatory(
     return results
 
 
+class CVMHistoricoRequest(BaseModel):
+    tipo: str = "todos"        # "resolucoes" | "instrucoes" | "todos"
+    de: int | None = None      # start norm number (inclusive)
+    ate: int | None = None     # end norm number (inclusive)
+    concurrency: int = 3
+
+
+@router.post("/regulatory/ingest/cvm-historico")
+async def ingest_cvm_historico(
+    body: CVMHistoricoRequest,
+    user: CurrentUser = Depends(require_role("superadmin")),
+):
+    """
+    Trigger full historical CVM ingestion from conteudo.cvm.gov.br.
+    Ingests Resoluções CVM and/or Instruções CVM (legadas).
+    Hash-based dedup: only new/changed norms are reprocessed.
+    """
+    import asyncio
+    import os
+    import sys
+    from datetime import datetime, timezone
+
+    scripts_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "scripts",
+    )
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+
+    started_at = datetime.now(timezone.utc).isoformat()
+    try:
+        from scripts.ingest_cvm_historico import run_cvm_historico
+        await run_cvm_historico(
+            tipo=body.tipo,
+            de=body.de,
+            ate=body.ate,
+            concurrency=body.concurrency,
+        )
+        return {"started_at": started_at, "status": "ok", "tipo": body.tipo}
+    except Exception as e:
+        return {"started_at": started_at, "status": "error", "detail": str(e)}
+
+
 # ── Cron Endpoint (API Key auth for Cloud Scheduler) ──
 
 from fastapi import Request, Header
