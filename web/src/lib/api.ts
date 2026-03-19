@@ -21,6 +21,9 @@ export interface DocumentInfo {
   title: string | null
   type: string
   chunks: number
+  area_direito: string | null
+  tema: string | null
+  resumo_ia: string | null
 }
 
 export interface AlertInfo {
@@ -38,6 +41,12 @@ export interface UploadResult {
   char_count?: number
   file_size?: number
   error?: string
+  classification?: {
+    tipo: string
+    area_direito: string | null
+    tema: string | null
+    resumo_ia: string | null
+  }
 }
 
 export interface InsightInfo {
@@ -175,8 +184,23 @@ export const gabiLegal = {
     streamRequest("/api/law/agent-stream", data, signal),
   documents: () => request<DocumentInfo[]>("/api/law/documents"),
   alerts: () => request<AlertInfo[]>("/api/law/alerts"),
-  upload: (docType: string, file: File, title?: string) =>
-    uploadFile<UploadResult>("/api/law/upload", file, { doc_type: docType, ...(title ? { title } : {}) }),
+  upload: (file: File, docType?: string, title?: string) =>
+    uploadFile<UploadResult>("/api/law/upload", file, {
+      ...(docType ? { doc_type: docType } : {}),
+      ...(title ? { title } : {}),
+    }),
+  presentation: async (documentIds: string[], title?: string): Promise<Blob> => {
+    const user = auth.currentUser
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (user) headers["Authorization"] = `Bearer ${await user.getIdToken()}`
+    const res = await fetch(`${API_BASE}/api/law/presentation`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ document_ids: documentIds, ...(title ? { title } : {}) }),
+    })
+    if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`)
+    return res.blob()
+  },
   insights: (authority?: string) =>
     request<InsightInfo[]>(`/api/law/insights${authority ? `?authority=${authority}` : ""}`),
   insightStats: () =>

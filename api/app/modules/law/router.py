@@ -4,6 +4,7 @@ Delegates to sub-modules: agents, insights, insurance.
 Core endpoints: upload, agent invocation, documents, alerts.
 """
 
+import io
 import json
 from typing import Literal
 
@@ -60,14 +61,15 @@ class AgentRequest(BaseModel):
 
 @router.post("/upload")
 async def upload_document(
-    doc_type: LegalDocType = "law",
+    doc_type: LegalDocType | None = None,
     title: str | None = None,
     file: UploadFile = File(...),
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload a legal document for RAG indexing."""
+    """Upload a legal document with AI auto-classification."""
     from app.core.ingest import process_document
+    from app.services.doc_classifier import classify_document
 
     result = await process_document(
         file=file,
@@ -76,12 +78,76 @@ async def upload_document(
         chunk_model=LegalChunk,
         doc_fields={
             "user_id": user.uid,
-            "doc_type": doc_type,
+            "doc_type": doc_type or "law",  # temporary, overridden by classifier
             "title": title or file.filename,
         },
     )
 
+    # Auto-classify in background after chunks are created
+    doc_id = result.get("document_id")
+    if doc_id:
+        try:
+            doc = (await db.execute(
+                select(LegalDocument).where(LegalDocument.id == doc_id)
+            )).scalars().first()
+            if doc:
+                # Get text from first chunks for classification
+                chunks_res = await db.execute(
+                    select(LegalChunk.content)
+                    .where(LegalChunk.document_id == doc_id)
+                    .order_by(LegalChunk.chunk_index)
+                    .limit(5)
+                )
+                full_text = "\n".join(r[0] for r in chunks_res)
+
+                classification = await classify_document(full_text, fallback_type=doc_type or "law")
+                doc.doc_type = classification["tipo"]
+                doc.area_direito = classification["area_direito"]
+                doc.tema = classification["tema"]
+                doc.partes = classification["partes"]
+                doc.resumo_ia = classification["resumo"]
+                await db.commit()
+
+                result["classification"] = {
+                    "tipo": doc.doc_type,
+                    "area_direito": doc.area_direito,
+                    "tema": doc.tema,
+                    "resumo_ia": doc.resumo_ia,
+                }
+        except Exception as e:
+            import logging
+            logging.getLogger("gabi.law").warning("Auto-classification failed for %s: %s", doc_id, e)
+
     return result
+
+
+@router.post("/upload-batch")
+async def upload_batch(
+    files: list[UploadFile] = File(...),
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload multiple legal documents at once. Each is auto-classified by AI."""
+    results = []
+    for file in files:
+        try:
+            result = await upload_document(
+                doc_type=None,
+                title=file.filename,
+                file=file,
+                user=user,
+                db=db,
+            )
+            results.append({"filename": file.filename, "status": "ok", **result})
+        except Exception as e:
+            results.append({"filename": file.filename, "status": "error", "error": str(e)})
+
+    return {
+        "total": len(files),
+        "success": sum(1 for r in results if r["status"] == "ok"),
+        "errors": sum(1 for r in results if r["status"] == "error"),
+        "results": results,
+    }
 
 
 # ── Agent Invocation ──
@@ -295,8 +361,11 @@ async def list_documents(
         .order_by(LegalDocument.created_at.desc())
     )
     docs = result.scalars().all()
-    return [{"id": str(d.id), "filename": d.filename, "title": d.title,
-             "type": d.doc_type, "chunks": d.chunk_count} for d in docs]
+    return [{
+        "id": str(d.id), "filename": d.filename, "title": d.title,
+        "type": d.doc_type, "chunks": d.chunk_count,
+        "area_direito": d.area_direito, "tema": d.tema, "resumo_ia": d.resumo_ia,
+    } for d in docs]
 
 
 @router.get("/alerts")
@@ -314,6 +383,58 @@ async def list_alerts(
     alerts = result.scalars().all()
     return [{"id": str(a.id), "title": a.title, "source": a.source,
              "severity": a.severity, "is_read": a.is_read} for a in alerts]
+
+
+# ── Presentation ──
+
+class PresentationRequest(BaseModel):
+    document_ids: list[str]
+    title: str | None = None
+    theme: str = "professional"
+
+
+@router.post("/presentation")
+async def generate_doc_presentation(
+    req: PresentationRequest,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Generate a PowerPoint presentation from selected documents."""
+    from app.services.presentation import generate_presentation
+
+    if not req.document_ids:
+        raise HTTPException(400, "Nenhum documento selecionado")
+    if len(req.document_ids) > 10:
+        raise HTTPException(400, "Máximo 10 documentos por apresentação")
+
+    # Collect content from selected documents
+    contents = []
+    for doc_id in req.document_ids:
+        chunks_res = await db.execute(
+            select(LegalChunk.content)
+            .where(LegalChunk.document_id == doc_id)
+            .order_by(LegalChunk.chunk_index)
+        )
+        doc_content = "\n".join(r[0] for r in chunks_res)
+        if doc_content:
+            contents.append(doc_content)
+
+    if not contents:
+        raise HTTPException(404, "Nenhum conteúdo encontrado nos documentos selecionados")
+
+    full_content = "\n\n---\n\n".join(contents)
+    pptx_bytes = await generate_presentation(
+        content=full_content,
+        theme=req.theme,
+        custom_title=req.title,
+    )
+
+    return StreamingResponse(
+        io.BytesIO(pptx_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": "attachment; filename=apresentacao_gabi.pptx"},
+    )
+
 
 
 # ── Private helpers ──

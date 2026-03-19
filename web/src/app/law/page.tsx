@@ -7,7 +7,7 @@ import { MassUploadZone } from "@/components/mass-upload-zone"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { useChatStore } from "@/contexts/chat-context"
 import { gabi } from "@/lib/api"
-import { Scale, ChevronDown, ChevronUp, Sparkles, History } from "lucide-react"
+import { Scale, ChevronDown, ChevronUp, Sparkles, History, Presentation, Download } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -33,9 +33,9 @@ export default function LawPage() {
   const { messages, setMessages, clearMessages } = useChatStore("law")
   const [isLoading, setIsLoading] = useState(false)
   const [agent, setAgent] = useState("auto")
-  const [docType, setDocType] = useState("law")
   const [showUpload, setShowUpload] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [generatingPptx, setGeneratingPptx] = useState(false)
   const [recentInsights, setRecentInsights] = useState<
     Array<{ id: number; authority: string; numero: string; tipo_ato: string }>
   >([])
@@ -89,11 +89,35 @@ export default function LawPage() {
 
   const handleUpload = useCallback(
     async (file: File) => {
-      const res = await gabi.legal.upload(docType, file)
-      return res as { chunk_count?: number }
+      const res = await gabi.legal.upload(file)
+      return res as { chunk_count?: number; classification?: Record<string, unknown> }
     },
-    [docType],
+    [],
   )
+
+  const handleGeneratePresentation = useCallback(async () => {
+    setGeneratingPptx(true)
+    try {
+      const docs = await gabi.legal.documents()
+      if (docs.length === 0) {
+        toast.error("Nenhum documento na base para gerar apresentação")
+        return
+      }
+      const ids = docs.slice(0, 10).map((d) => d.id)
+      const blob = await gabi.legal.presentation(ids)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "apresentacao_gabi.pptx"
+      a.click()
+      URL.revokeObjectURL(url)
+      toast.success("Apresentação gerada com sucesso")
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Erro ao gerar apresentação")
+    } finally {
+      setGeneratingPptx(false)
+    }
+  }, [])
 
   return (
     <div className="h-full flex flex-col">
@@ -137,8 +161,25 @@ export default function LawPage() {
               <History className="w-4 h-4" />
             </button>
             <button
+              onClick={handleGeneratePresentation}
+              disabled={generatingPptx}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer disabled:opacity-50"
+              style={{
+                background: `color-mix(in srgb, #10B981 12%, transparent)`,
+                color: "#10B981",
+              }}
+              title="Gerar apresentação PPTX a partir dos documentos"
+            >
+              {generatingPptx ? (
+                <Download className="w-3 h-3 animate-pulse" />
+              ) : (
+                <Presentation className="w-3 h-3" />
+              )}
+              {generatingPptx ? "Gerando..." : "Apresentação"}
+            </button>
+            <button
               onClick={() => setShowUpload(!showUpload)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer"
               style={{
                 background: `color-mix(in srgb, var(--color-mod-law) 12%, transparent)`,
                 color: ACCENT,
@@ -159,18 +200,10 @@ export default function LawPage() {
           <div className="mb-3 animate-fade-in-up">
             <MassUploadZone
               onUpload={handleUpload}
-              docType={docType}
-              docTypeOptions={[
-                { key: "contract",   label: "📑 Contratos" },
-                { key: "regulation", label: "⚖️ Regulações" },
-                { key: "precedent",  label: "📋 Precedentes" },
-                { key: "law",        label: "📜 Legislação" },
-              ]}
-              onDocTypeChange={setDocType}
               moduleAccent={ACCENT}
               accept=".pdf,.docx,.txt"
-              acceptLabel="PDF, DOCX, TXT — múltiplos arquivos"
-              onComplete={() => toast.success("Base jurídica atualizada")}
+              acceptLabel="PDF, DOCX, TXT — IA classifica automaticamente"
+              onComplete={() => toast.success("Base jurídica atualizada — IA classificou seus documentos")}
             />
           </div>
         )}

@@ -8,6 +8,11 @@ interface UploadItem {
   file: File
   status: "pending" | "uploading" | "done" | "error"
   error?: string
+  classification?: {
+    tipo?: string
+    area_direito?: string | null
+    tema?: string | null
+  }
 }
 
 interface MassUploadZoneProps {
@@ -61,8 +66,9 @@ export function MassUploadZone({
             const res = await onUpload(item.file)
             results.success++
             results.totalChunks += res.chunk_count || 0
+            const classification = (res as Record<string, unknown>).classification as UploadItem["classification"] | undefined
             setQueue((prev) =>
-              prev.map((q, j) => (j === idx ? { ...q, status: "done" } : q))
+              prev.map((q, j) => (j === idx ? { ...q, status: "done", classification } : q))
             )
           } catch (e) {
             results.failed++
@@ -196,19 +202,38 @@ export function MassUploadZone({
           {/* File list */}
           <div className="max-h-[140px] overflow-y-auto space-y-1">
             {queue.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 text-[11px] px-2 py-1.5 rounded-lg bg-white/[0.03]"
-              >
-                <FileText className="w-3 h-3 shrink-0 text-slate-600" />
-                <span className="flex-1 truncate text-slate-400">{item.file.name}</span>
-                <span className="text-slate-600 shrink-0">{formatSize(item.file.size)}</span>
-                {item.status === "uploading" && <Loader2 className="w-3 h-3 animate-spin" style={{ color: moduleAccent }} />}
-                {item.status === "done" && <CheckCircle className="w-3 h-3 text-emerald-500" />}
-                {item.status === "error" && (
-                  <span title={item.error}>
-                    <AlertCircle className="w-3 h-3 text-red-500" />
-                  </span>
+              <div key={i} className="space-y-0.5">
+                <div
+                  className="flex items-center gap-2 text-[11px] px-2 py-1.5 rounded-lg bg-white/[0.03]"
+                >
+                  <FileText className="w-3 h-3 shrink-0 text-slate-600" />
+                  <span className="flex-1 truncate text-slate-400">{item.file.name}</span>
+                  <span className="text-slate-600 shrink-0">{formatSize(item.file.size)}</span>
+                  {item.status === "uploading" && <Loader2 className="w-3 h-3 animate-spin" style={{ color: moduleAccent }} />}
+                  {item.status === "done" && <CheckCircle className="w-3 h-3 text-emerald-500" />}
+                  {item.status === "error" && (
+                    <span title={item.error}>
+                      <AlertCircle className="w-3 h-3 text-red-500" />
+                    </span>
+                  )}
+                </div>
+                {/* Classification chips */}
+                {item.status === "done" && item.classification && (
+                  <div className="flex gap-1.5 pl-5 pb-1">
+                    {item.classification.area_direito && (
+                      <span
+                        className="text-[9px] px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: `color-mix(in srgb, ${moduleAccent} 15%, transparent)`, color: moduleAccent }}
+                      >
+                        {item.classification.area_direito}
+                      </span>
+                    )}
+                    {item.classification.tipo && (
+                      <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/5 text-slate-400">
+                        {item.classification.tipo}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             ))}

@@ -88,3 +88,78 @@ class TestShouldRetrieve:
         # Should default to needs_rag=True on error
         assert result["needs_rag"] is True
         assert result["reason"] == "fallback"
+        assert result["scope"] == "all"
+
+
+class TestValidScopes:
+    """Test scope validation."""
+
+    def test_valid_scopes_defined(self):
+        from app.core.dynamic_rag import VALID_SCOPES
+        assert "all" in VALID_SCOPES
+        assert "my_docs" in VALID_SCOPES
+        assert "regulatory" in VALID_SCOPES
+        assert "jurisprudence" in VALID_SCOPES
+
+    def test_invalid_scope_not_accepted(self):
+        from app.core.dynamic_rag import VALID_SCOPES
+        assert "invalid" not in VALID_SCOPES
+
+
+class TestScopeDetection:
+    """Test that should_retrieve returns scope."""
+
+    @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
+    @patch("app.core.dynamic_rag.generate")
+    async def test_regulatory_scope(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {
+            "needs_rag": True,
+            "refined_query": "novidades CVM março 2026",
+            "scope": "regulatory",
+            "reason": "regulatory query",
+        }
+        result = await should_retrieve("Novidades da CVM?")
+        assert result["scope"] == "regulatory"
+
+    @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
+    @patch("app.core.dynamic_rag.generate")
+    async def test_my_docs_scope(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {
+            "needs_rag": True,
+            "refined_query": "pareceres LGPD",
+            "scope": "my_docs",
+            "reason": "user docs query",
+        }
+        result = await should_retrieve("O que já escrevemos sobre LGPD?")
+        assert result["scope"] == "my_docs"
+
+    @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
+    @patch("app.core.dynamic_rag.generate")
+    async def test_invalid_scope_defaults_to_all(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {
+            "needs_rag": True,
+            "refined_query": "test",
+            "scope": "garbage_value",
+            "reason": "test",
+        }
+        result = await should_retrieve("test query")
+        assert result["scope"] == "all"
+
+    @pytest.mark.asyncio
+    @patch("app.core.dynamic_rag.safe_parse_json")
+    @patch("app.core.dynamic_rag.generate")
+    async def test_missing_scope_defaults_to_all(self, mock_generate, mock_parse):
+        mock_generate.return_value = "mock json"
+        mock_parse.return_value = {
+            "needs_rag": True,
+            "refined_query": "test",
+            "reason": "test",
+        }
+        result = await should_retrieve("test query")
+        assert result["scope"] == "all"

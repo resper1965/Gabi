@@ -21,6 +21,10 @@ class LegalDocument(Base):
     chunk_count = Column(Integer, default=0)
     summary = Column(Text, nullable=True)
     metadata_ = Column("metadata", Text, nullable=True)  # JSON
+    area_direito = Column(String(100), nullable=True, index=True)  # tributário, trabalhista, LGPD...
+    tema = Column(String(255), nullable=True)                       # short theme description
+    partes = Column(Text, nullable=True)                           # JSON list of parties
+    resumo_ia = Column(Text, nullable=True)                        # AI-generated executive summary
     is_active = Column(Boolean, default=True)
     is_shared = Column(Boolean, default=False, index=True)
     created_at = Column(DateTime, server_default=func.now())

@@ -42,12 +42,17 @@ ALLOWED_TABLE_PAIRS = {
 
 INTENT_PROMPT = """Analise esta pergunta do usuário e decida se precisa buscar documentos.
 
-RESPONDA EM JSON: {{"needs_rag": true/false, "refined_query": "...", "reason": "..."}}
+RESPONDA EM JSON: {{"needs_rag": true/false, "refined_query": "...", "scope": "...", "reason": "..."}}
 
 Regras:
 - needs_rag=true → pergunta factual sobre documentos, contratos, leis, dados, apólices
 - needs_rag=false → saudação, follow-up conversacional, pedido de reformulação, opinião genérica
 - refined_query → versão otimizada para busca semântica (só se needs_rag=true, senão "")
+- scope → escopo da busca:
+  • "my_docs" → quando pergunta sobre documentos Do PRÓPRIO USUÁRIO (pareceres, petições, contratos que ele já subiu)
+  • "regulatory" → quando pergunta sobre normas oficiais, regulamentações, novidades de órgãos (CVM, BACEN, ANS)
+  • "jurisprudence" → quando pergunta especificamente sobre jurisprudência, decisões de tribunais (STJ, STF)
+  • "all" → quando a busca precisa cruzar fontes, ou quando não está claro (DEFAULT)
 
 Histórico recente:
 {history}
@@ -55,11 +60,14 @@ Histórico recente:
 Pergunta atual: {question}"""
 
 
+VALID_SCOPES = {"all", "my_docs", "regulatory", "jurisprudence"}
+
+
 async def should_retrieve(
     question: str,
     chat_history: list[dict] | None = None,
 ) -> dict:
-    """Ask Gemini Flash whether RAG retrieval is needed."""
+    """Ask Gemini Flash whether RAG retrieval is needed and determine scope."""
     history_text = ""
     if chat_history:
         history_text = "\n".join(
@@ -72,14 +80,18 @@ async def should_retrieve(
     try:
         raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
         result = safe_parse_json(raw)
+        scope = result.get("scope", "all")
+        if scope not in VALID_SCOPES:
+            scope = "all"
         return {
             "needs_rag": bool(result.get("needs_rag", True)),
             "refined_query": result.get("refined_query", question),
+            "scope": scope,
             "reason": result.get("reason", ""),
         }
     except Exception:
         # Default to always searching if intent detection fails
-        return {"needs_rag": True, "refined_query": question, "reason": "fallback"}
+        return {"needs_rag": True, "refined_query": question, "scope": "all", "reason": "fallback"}
 
 
 async def _search_provisions(
@@ -208,6 +220,7 @@ async def retrieve_if_needed(
     user_id: str | None = None,
     profile_id: str | None = None,
     limit: int = 8,
+    scope: str | None = None,
 ) -> tuple[list[dict], bool]:
     """
     Dynamic RAG: classify intent → retrieve only if needed.
@@ -232,10 +245,13 @@ async def retrieve_if_needed(
     # ── Phase 1: Intent classification ──────────────────────────────────────
     t0 = time.perf_counter()
     intent = await should_retrieve(question, chat_history)
+    # Use explicit scope if provided, otherwise use AI-detected scope
+    effective_scope = scope or intent.get("scope", "all")
     trace["intent"] = {
         "needs_rag": intent["needs_rag"],
         "reason": intent.get("reason", ""),
         "refined_query": intent.get("refined_query", ""),
+        "scope": effective_scope,
         "ms": _ms(t0),
     }
 
@@ -288,47 +304,57 @@ async def retrieve_if_needed(
 
     t0 = time.perf_counter()
 
-    # 4-A: Semantic search (pgvector IVFFlat cosine)
-    semantic_res = await db.execute(
-        text(f"""
-            SELECT c.id, c.content, d.title, d.{doc_type_col} AS doc_type
-            FROM {chunks_table} c
-            JOIN {docs_table} d ON c.document_id = d.id
-            WHERE {ownership_filter}
-              AND d.is_active = true
-              AND c.embedding IS NOT NULL
-            ORDER BY c.embedding <=> :emb::vector
-            LIMIT :lim
-        """),
-        semantic_params,
-    )
-    semantic_chunks = [dict(r._mapping) for r in semantic_res]
+    # Scope-aware search: skip irrelevant sources
+    skip_user_docs = effective_scope in ("regulatory", "jurisprudence")
+    skip_regulatory = effective_scope == "my_docs"
+    skip_jurisprudence = effective_scope in ("my_docs", "regulatory")
 
-    # 4-B: Lexical search (TSVECTOR Portuguese)
-    lexical_res = await db.execute(
-        text(f"""
-            SELECT c.id, c.content, d.title, d.{doc_type_col} AS doc_type
-            FROM {chunks_table} c
-            JOIN {docs_table} d ON c.document_id = d.id
-            WHERE {ownership_filter}
-              AND d.is_active = true
-              AND c.content_tsvector @@ websearch_to_tsquery('portuguese', :fts_query)
-            ORDER BY ts_rank_cd(c.content_tsvector, websearch_to_tsquery('portuguese', :fts_query)) DESC
-            LIMIT :lim
-        """),
-        fts_params,
-    )
-    lexical_chunks = [dict(r._mapping) for r in lexical_res]
+    # 4-A: Semantic search (pgvector IVFFlat cosine) — user docs
+    semantic_chunks: list[dict] = []
+    if not skip_user_docs:
+        semantic_res = await db.execute(
+            text(f"""
+                SELECT c.id, c.content, d.title, d.{doc_type_col} AS doc_type
+                FROM {chunks_table} c
+                JOIN {docs_table} d ON c.document_id = d.id
+                WHERE {ownership_filter}
+                  AND d.is_active = true
+                  AND c.embedding IS NOT NULL
+                ORDER BY c.embedding <=> :emb::vector
+                LIMIT :lim
+            """),
+            semantic_params,
+        )
+        semantic_chunks = [dict(r._mapping) for r in semantic_res]
+
+    # 4-B: Lexical search (TSVECTOR Portuguese) — user docs
+    lexical_chunks: list[dict] = []
+    if not skip_user_docs:
+        lexical_res = await db.execute(
+            text(f"""
+                SELECT c.id, c.content, d.title, d.{doc_type_col} AS doc_type
+                FROM {chunks_table} c
+                JOIN {docs_table} d ON c.document_id = d.id
+                WHERE {ownership_filter}
+                  AND d.is_active = true
+                  AND c.content_tsvector @@ websearch_to_tsquery('portuguese', :fts_query)
+                ORDER BY ts_rank_cd(c.content_tsvector, websearch_to_tsquery('portuguese', :fts_query)) DESC
+                LIMIT :lim
+            """),
+            fts_params,
+        )
+        lexical_chunks = [dict(r._mapping) for r in lexical_res]
 
     # 4-C: Regulatory provisions (vector search — law module only)
     provision_chunks: list[dict] = []
     matched_version_ids: list[int] = []
     legal_prov_chunks: list[dict] = []
-    if module == "law":
+    if module == "law" and not skip_regulatory:
         provision_chunks, matched_version_ids = await _search_provisions(
             query_embedding, db, expanded_limit
         )
-        # TD-1: Also search BKJ legal_provisions for unified results
+    if module == "law" and not skip_jurisprudence:
+        # TD-1: BKJ legal_provisions for unified results
         legal_prov_chunks = await _search_legal_provisions(
             query_embedding, db, limit=20
         )
