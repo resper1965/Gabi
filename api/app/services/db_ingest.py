@@ -49,6 +49,8 @@ class DBIngester:
             )
             doc = (await self.session.execute(stmt)).scalars().first()
 
+            version_id_to_dispatch = None
+
             if not doc:
                 # NEW Document
                 doc = RegulatoryDocument(
@@ -73,11 +75,8 @@ class DBIngester:
                 
                 doc.current_version_id = version.id
                 
-                # AI Analysis
-                await self._analyze_and_store(version.id, doc_schema.texto_integral)
-
-                # Add provisions
-                await self._add_provisions(version.id, doc_schema.provisions)
+                # Mark for background AI / Embeddings processing
+                version_id_to_dispatch = version.id
                 
                 run.itens_novos += 1
                 self._log_item(run.id, IngestStatus.NEW, doc_schema.id_fonte, doc_schema.version_hash)
@@ -98,10 +97,8 @@ class DBIngester:
                     await self.session.flush()
                     doc.current_version_id = new_version.id
                     
-                    # AI Analysis
-                    await self._analyze_and_store(new_version.id, doc_schema.texto_integral)
-
-                    await self._add_provisions(new_version.id, doc_schema.provisions)
+                    # Mark for background AI / Embeddings processing
+                    version_id_to_dispatch = new_version.id
                     
                     run.itens_atualizados += 1
                     self._log_item(run.id, IngestStatus.UPDATED, doc_schema.id_fonte, doc_schema.version_hash)
@@ -110,53 +107,17 @@ class DBIngester:
                     self._log_item(run.id, IngestStatus.SKIPPED, doc_schema.id_fonte, doc_schema.version_hash)
             
             await self.session.commit()
+
+            # Now that the transaction is committed, dispatch background AI tasks
+            if version_id_to_dispatch:
+                from app.services.processing_worker import dispatch_regulatory_processing
+                dispatch_regulatory_processing(version_id_to_dispatch, doc_schema.texto_integral, doc_schema.provisions)
             
         except Exception as e:
             await self.session.rollback()
             run.erros += 1
             self._log_item(run.id, IngestStatus.FAILED, doc_schema.id_fonte, error_msg=str(e))
             await self.session.commit()
-
-    async def _analyze_and_store(self, version_id: int, text_content: str):
-        try:
-            analysis_data = await analyze_normative(text_content)
-            analysis = RegulatoryAnalysis(
-                version_id=version_id,
-                resumo_executivo=analysis_data.get("resumo_executivo"),
-                risco_nivel=analysis_data.get("risco_nivel", "Médio"),
-                risco_justificativa=analysis_data.get("risco_justificativa"),
-                extra_data=analysis_data
-            )
-            self.session.add(analysis)
-        except Exception as e:
-            # We don't want to fail the whole ingestion if AI fails
-            logger.warning("AI Analysis failed for version %s: %s", version_id, e, exc_info=True)
-
-    async def _add_provisions(self, version_id: int, provisions: List[ProvisionSchema]) -> None:
-        """Persist provisions with embeddings. Embedding generation runs in a thread pool."""
-        if not provisions:
-            return
-        from app.core.embeddings import embed_batch
-
-        texts = [prov.texto_chunk for prov in provisions]
-        try:
-            embeddings: List[List[float]] = await asyncio.to_thread(embed_batch, texts)
-        except Exception as e:
-            logger.warning(
-                "Embedding generation failed for provisions (version %s): %s — storing without vectors",
-                version_id, e,
-            )
-            embeddings = [None] * len(provisions)
-
-        for prov, emb in zip(provisions, embeddings):
-            db_prov = RegulatoryProvision(
-                version_id=version_id,
-                structure_path=prov.structure_path,
-                texto_chunk=prov.texto_chunk,
-                embedding=emb,
-            )
-            self.session.add(db_prov)
-        logger.debug("Added %d provisions (version %s)", len(provisions), version_id)
 
     def _log_item(self, run_id: int, status: IngestStatus, url: str, hash_calc: Optional[str] = None, error_msg: Optional[str] = None):
         item = IngestRunItem(

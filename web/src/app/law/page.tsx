@@ -9,7 +9,7 @@ import { useChatStore } from "@/contexts/chat-context"
 import { gabi } from "@/lib/api"
 import { Scale, ChevronDown, ChevronUp, Sparkles, History, Presentation, Download } from "lucide-react"
 import { toast } from "sonner"
-import Link from "next/link"
+
 
 const ACCENT = "var(--color-mod-law)"
 const CTX_WINDOW = 10
@@ -130,13 +130,10 @@ export default function LawPage() {
                 {recentInsights.length > 0 && (
                   <>
                     <span className="w-1 h-1 rounded-full bg-zinc-700" />
-                    <Link
-                      href="/law/insights"
-                      className="flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-400 font-medium transition-colors"
-                    >
+                    <span className="flex items-center gap-1 text-[10px] text-amber-500 font-medium">
                       <Sparkles className="w-2.5 h-2.5" />
                       {recentInsights.length} análises hoje
-                    </Link>
+                    </span>
                   </>
                 )}
               </div>

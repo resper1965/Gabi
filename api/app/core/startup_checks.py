@@ -83,3 +83,43 @@ def check_embedding_model() -> None:
         EMBEDDING_MODEL,
         EMBEDDING_DIMENSIONS,
     )
+
+
+async def check_datajud_key() -> bool:
+    """
+    Test DataJud API key validity with a minimal request.
+    Non-blocking: logs a WARNING if the key is expired, never raises.
+    """
+    import httpx
+    from app.services.datajud_client import DATAJUD_API_KEY, TRIBUNAL_ENDPOINTS
+
+    url = TRIBUNAL_ENDPOINTS["STJ"]
+    headers = {
+        "Authorization": f"ApiKey {DATAJUD_API_KEY}",
+        "Content-Type": "application/json",
+    }
+    body = '{"query":{"match_all":{}},"size":1}'
+
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(10)) as client:
+            resp = await client.post(url, content=body, headers=headers)
+
+        if resp.status_code in (401, 403):
+            logger.warning(
+                "⚠️  DATAJUD_API_KEY EXPIRADA! O CNJ rotacionou a chave. "
+                "Atualize a variável DATAJUD_API_KEY no .env. "
+                "Chave atual: https://datajud-wiki.cnj.jus.br/api-publica/"
+            )
+            return False
+
+        if resp.status_code == 200:
+            logger.info("✅ DataJud API key válida (STJ respondeu 200)")
+            return True
+
+        logger.warning("⚠️  DataJud retornou status inesperado: %s", resp.status_code)
+        return False
+
+    except Exception as e:
+        logger.warning("⚠️  DataJud health check falhou (rede?): %s", e)
+        return False
+

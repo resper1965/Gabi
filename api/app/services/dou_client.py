@@ -160,24 +160,48 @@ class DOUClient:
         except (json.JSONDecodeError, KeyError):
             pass
 
-        # Fallback: parse HTML with simple string matching
-        # Look for result entries in the DOU HTML structure
+        # Fallback: parse HTML with multiple pattern strategies
         import re
 
-        # Pattern: <a class="title-marker" href="/web/dou/-/...">TITLE</a>
+        # Strategy 1: Standard DOU link pattern
         title_pattern = re.compile(
             r'href="(/web/dou/-/[^"]+)"[^>]*>([^<]+)</a>', re.IGNORECASE
         )
         matches = title_pattern.findall(html)
+
+        # Strategy 2: Alternative DOU link pattern (layout changes)
+        if not matches:
+            alt_pattern = re.compile(
+                r'href="(https?://www\.in\.gov\.br/web/dou/-/[^"]+)"[^>]*>([^<]+)</a>',
+                re.IGNORECASE,
+            )
+            matches = [
+                (href.replace("https://www.in.gov.br", ""), title)
+                for href, title in alt_pattern.findall(html)
+            ]
+
+        # Strategy 3: Data-attribute based (newer DOU layouts)
+        if not matches:
+            data_pattern = re.compile(
+                r'data-url="(/web/dou/-/[^"]+)"[^>]*>.*?<span[^>]*>([^<]+)</span>',
+                re.IGNORECASE | re.DOTALL,
+            )
+            matches = data_pattern.findall(html)
+
+        if not matches:
+            logger.warning(
+                "DOU parser: no results matched any pattern for term '%s'. "
+                "The in.gov.br layout may have changed.",
+                orgao_term,
+            )
 
         for href, title in matches:
             title = title.strip()
             if not title:
                 continue
 
-            # Extract tipo_ato and numero from title
             tipo_ato, numero = self._extract_type_number(title)
-            full_url = f"https://www.in.gov.br{href}"
+            full_url = f"https://www.in.gov.br{href}" if not href.startswith("http") else href
 
             docs.append(
                 DOUDocument(

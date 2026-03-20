@@ -16,7 +16,7 @@ import {
   ChevronRight,
   Settings,
   BookOpen,
-  Sparkles,
+
 } from "lucide-react"
 import { useState } from "react"
 
@@ -120,15 +120,8 @@ export function Sidebar() {
           collapsed={collapsed}
         />
 
-        {/* Radar Regulatório */}
-        <NavItem
-          href="/regulatory/insights"
-          icon={Sparkles}
-          label="Radar Regulatório"
-          isActive={pathname === "/regulatory/insights"}
-          activeColor="#f59e0b"
-          collapsed={collapsed}
-        />
+
+
 
         {/* Section: Módulos de IA */}
         <SectionHeader label="Inteligência" collapsed={collapsed} />
