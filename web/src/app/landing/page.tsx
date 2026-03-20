@@ -175,7 +175,7 @@ export default function LandingPage() {
         {/* Left Column (Text & CTA) */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
           <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-slate-800/50 border border-slate-700 backdrop-blur-md mb-8 shadow-inner">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 motion-safe:animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
             <span className="text-xs font-medium text-slate-200 tracking-wide">
               <span className="brand-mark">Gabi<span className="text-[#00ade8]">.</span></span> by <span className="brand-mark">ness<span className="text-[#00ade8]">.</span></span>
             </span>
@@ -197,7 +197,7 @@ export default function LandingPage() {
             <Link
               href="mailto:contato@ness.com.br?subject=Demo%20Gabi"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
-                         transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0369A1]/30"
+                         transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0369A1]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ade8] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               style={{ backgroundColor: "#0369A1" }}
             >
               Agendar Demonstração
@@ -207,7 +207,7 @@ export default function LandingPage() {
             <Link
               href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-sm font-bold text-white
-                         transition-all duration-300 bg-white/5 hover:bg-white/10 border border-white/10"
+                         transition-all duration-300 bg-white/5 hover:bg-white/10 border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             >
               Acessar Plataforma
             </Link>
@@ -222,10 +222,10 @@ export default function LandingPage() {
         {/* Right Column (Avatar & Icon Composition) */}
         <div className="relative w-full max-w-lg mx-auto aspect-square md:aspect-4/5 flex items-center justify-center">
            {/* Glow Effects */}
-           <div className="absolute inset-0 bg-linear-to-tr from-[#0369A1]/60 to-[#00ade8]/30 rounded-[2.5rem] opacity-30 blur-3xl mix-blend-screen animate-pulse"></div>
+           <div className="absolute inset-0 bg-linear-to-tr from-[#0369A1]/60 to-[#00ade8]/30 rounded-[2.5rem] opacity-30 blur-3xl mix-blend-screen motion-safe:animate-pulse"></div>
            
            {/* Floating App Icon */}
-           <div className="absolute -top-6 -right-6 z-30 p-4 bg-slate-900 border border-slate-700/50 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl animate-float">
+           <div className="absolute -top-6 -right-6 z-30 p-4 bg-slate-900 border border-slate-700/50 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl motion-safe:animate-float">
              <NextImage src="/logo.png" alt="App Icon" width={72} height={72} unoptimized className="rounded-xl object-contain drop-shadow-sm" />
            </div>
 
@@ -296,7 +296,7 @@ export default function LandingPage() {
           {painPoints.map((p, i) => (
             <div
               key={i}
-              className="group relative rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1 bg-slate-900 border border-slate-800 hover:border-slate-700"
+              className="group relative rounded-2xl p-8 transition-colors duration-300 bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-default"
             >
               {/* Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -351,7 +351,7 @@ export default function LandingPage() {
           {regulatoryAgencies.map((a) => (
             <div
               key={a.name}
-              className={`rounded-xl p-6 border transition-all duration-300 hover:-translate-y-1 hover:border-slate-600 group ${
+              className={`rounded-xl p-6 border transition-colors duration-300 hover:border-slate-600 cursor-default group ${
                 a.featured ? "md:col-span-2 bg-slate-800/30 border-slate-700/50 backdrop-blur-sm" : "bg-slate-900/30 border-white/5 hover:bg-slate-800/40 backdrop-blur-sm"
               }`}
             >
@@ -478,7 +478,7 @@ export default function LandingPage() {
             <Link
               href="mailto:contato@ness.com.br?subject=Demo%20Gabi"
               className="inline-flex items-center gap-2 px-10 py-5 rounded-xl text-base font-bold text-white
-                         transition-all duration-300 hover:scale-[1.03] shadow-2xl hover:shadow-cyan-500/30"
+                         transition-all duration-300 hover:scale-[1.03] shadow-2xl hover:shadow-cyan-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               style={{ backgroundColor: "#0369A1" }}
             >
               Falar com Especialistas
@@ -495,7 +495,8 @@ export default function LandingPage() {
             <div className="rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
               <button
                 onClick={() => setShowPrivacy(!showPrivacy)}
-                className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+                className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500"
+                aria-expanded={showPrivacy}
               >
                 Política de Privacidade
                 {showPrivacy ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
@@ -515,7 +516,8 @@ export default function LandingPage() {
             <div className="rounded-xl overflow-hidden bg-slate-900 border border-slate-800">
               <button
                 onClick={() => setShowTerms(!showTerms)}
-                className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+                className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold text-slate-300 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-500"
+                aria-expanded={showTerms}
               >
                 Termos de Serviço
                 {showTerms ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
@@ -536,10 +538,10 @@ export default function LandingPage() {
           {/* Bottom */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-800 pt-8 text-xs text-slate-500">
             <div className="flex items-center gap-6 font-medium uppercase tracking-wider">
-              <Link href="/trust" className="text-emerald-400 hover:text-emerald-300 transition-colors">Trust Center</Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacidade</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Termos</Link>
-              <Link href="/login" className="hover:text-white transition-colors">Login</Link>
+              <Link href="/trust" className="text-emerald-400 hover:text-emerald-300 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-900 rounded-xs">Trust Center</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-slate-900 rounded-xs">Privacidade</Link>
+              <Link href="/terms" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-slate-900 rounded-xs">Termos</Link>
+              <Link href="/login" className="hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-slate-900 rounded-xs">Login</Link>
             </div>
             
             <div className="flex items-center gap-2">
