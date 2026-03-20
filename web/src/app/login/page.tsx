@@ -48,22 +48,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center cyber-grid">
-      <div className="w-full max-w-sm animate-fade-in-up relative">
-        <Link href="/landing" className="absolute -top-12 left-0 flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-[#020617] relative overflow-hidden selection:bg-[color:var(--color-gabi-primary)] selection:text-white">
+      {/* Background Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none z-0"></div>
+      
+      {/* Aurora Ambient Glow */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px] mix-blend-screen pointer-events-none opacity-20 motion-reduce:hidden z-0"
+        style={{ background: `radial-gradient(circle, var(--color-gabi-primary) 0%, transparent 70%)` }}
+      />
+
+      <div className="w-full max-w-md animate-fade-in-up relative z-10 px-6 sm:px-10 py-12 bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-3xl shadow-[0_40px_80px_rgba(0,0,0,0.6)]">
+        <Link href="/landing" className="absolute top-6 left-6 flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-md px-2 py-1">
           <ArrowLeft className="w-4 h-4" />
           Voltar
         </Link>
         {/* Brand */}
-        <div className="text-center mb-10">
-          <NextImage
-            src="/logo.png"
-            alt="Gabi Logo"
-            width={64}
-            height={64}
-            unoptimized
-            className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg"
-          />
+        <div className="text-center mb-10 mt-6">
+          <div className="relative inline-block mb-4">
+            <div className="absolute inset-0 blur-xl opacity-40 motion-safe:animate-pulse" style={{ background: "var(--color-gabi-primary)" }}></div>
+            <NextImage
+              src="/logo.png"
+              alt="Gabi Logo"
+              width={64}
+              height={64}
+              unoptimized
+              className="relative w-16 h-16 rounded-2xl mx-auto object-cover shadow-xl ring-1 ring-white/10"
+            />
+          </div>
           <h1
             className="text-3xl text-white font-medium tracking-tight"
             style={{ fontFamily: "Montserrat, sans-serif" }}
@@ -80,10 +92,10 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full py-3 rounded-xl text-sm font-semibold
-                     bg-white text-gray-800 hover:bg-gray-100
-                     transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
-                     flex items-center justify-center gap-3 mb-6"
+          className="w-full py-3.5 rounded-xl text-sm font-semibold
+                     bg-white text-gray-900 hover:bg-gray-100 hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]
+                     transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+                     flex items-center justify-center gap-3 mb-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
         >
           <svg width="18" height="18" viewBox="0 0 48 48">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -112,8 +124,9 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-(--color-surface-card)
-                         tech-border text-sm text-white placeholder:text-slate-600 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-950/50 backdrop-blur-sm
+                         border border-white/5 text-sm text-white placeholder:text-slate-500 
+                         focus:outline-none focus:ring-2 focus:ring-[color:var(--color-gabi-primary)] focus:border-transparent transition-all duration-300"
               style={{ fontFamily: "var(--font-ui)" }}
               placeholder="voce@empresa.com"
               required
@@ -128,8 +141,9 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-(--color-surface-card)
-                         tech-border text-sm text-white placeholder:text-slate-600 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl bg-slate-950/50 backdrop-blur-sm
+                         border border-white/5 text-sm text-white placeholder:text-slate-500 
+                         focus:outline-none focus:ring-2 focus:ring-[color:var(--color-gabi-primary)] focus:border-transparent transition-all duration-300"
               style={{ fontFamily: "var(--font-ui)" }}
               placeholder="••••••••"
               required
@@ -145,9 +159,10 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl text-sm font-semibold text-white
-                       transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: "linear-gradient(135deg, var(--color-gabi-primary), var(--color-gabi-hover))" }}
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-white
+                       transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+                       hover:shadow-[0_0_20px_color-mix(in_srgb,var(--color-gabi-primary)_40%,transparent)] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            style={{ background: "linear-gradient(135deg, var(--color-gabi-primary), color-mix(in srgb, var(--color-gabi-primary) 70%, #000))" }}
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
