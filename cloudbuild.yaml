@@ -118,7 +118,7 @@ substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
   _TAG: latest
-  _API_URL: https://gabi-api-fbbwlzhdlq-rj.a.run.app
+  _API_URL: https://api-gabi.ness.com.br
   _FIREBASE_API_KEY: "AIzaSyAUMsVa5PBniJzU3yB9_JB9kaMAJGPvayE"
   _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
   _FIREBASE_PROJECT_ID: "nghost-gabi"
