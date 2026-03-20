@@ -23,18 +23,22 @@ logger = logging.getLogger("gabi.auth")
 
 ALL_MODULES = ["ghost", "law", "ntalk"]
 
-# Hardcoded superadmin emails — ALWAYS promoted regardless of env var parsing.
-# This is the definitive source of truth for superadmin status.
-SUPERADMIN_EMAILS = {"resper@ness.com.br", "resper@bekaa.eu"}
 
+def _is_superadmin(email: str, decoded_token: dict | None = None) -> bool:
+    """Check if user should be superadmin.
 
-def _is_superadmin(email: str) -> bool:
-    """Check if email should be superadmin (hardcoded + config-based)."""
+    Priority:
+    1. Firebase Custom Claim 'role' == 'superadmin' (set via Firebase Admin SDK)
+    2. Config-based check (env var GABI_ADMIN_EMAILS, fallback)
+    """
+    # Primary: Firebase Custom Claims (survives deploys, DB resets, everything)
+    if decoded_token:
+        token_role = decoded_token.get("role", "")
+        if token_role == "superadmin":
+            return True
+
+    # Fallback: Config-based check (env var GABI_ADMIN_EMAILS)
     email_lower = email.lower().strip()
-    # Hardcoded check (always works, immune to env var parsing)
-    if email_lower in SUPERADMIN_EMAILS:
-        return True
-    # Config-based check (env var GABI_ADMIN_EMAILS)
     try:
         if email_lower in [e.lower().strip() for e in settings.admin_emails]:
             return True
@@ -91,6 +95,7 @@ class CurrentUser:
 
 
 async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
+    # Note: `decoded` is the Firebase JWT token dict, which includes custom claims
     """Find or create user from Firebase token, applying domain-based authorization policy."""
     uid = decoded["uid"]
     email = decoded.get("email", "")
@@ -119,7 +124,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
             logger.info("Creating new user: %s", email)
             domain = email.split("@")[-1].lower() if "@" in email else ""
 
-            if _is_superadmin(email):
+            if _is_superadmin(email, decoded):
                 role = "superadmin"
                 user_status = "approved"
                 modules = ALL_MODULES
@@ -156,7 +161,7 @@ async def _upsert_user(decoded: dict, db: AsyncSession) -> User:
         # ALWAYS enforce role policy on existing users
         domain = email.split("@")[-1].lower() if "@" in email else ""
 
-        if _is_superadmin(email):
+        if _is_superadmin(email, decoded):
             logger.info("SUPERADMIN match for %s — promoting", email)
             if user.role != "superadmin" or user.status != "approved" or set(user.allowed_modules or []) != set(ALL_MODULES):
                 user.role = "superadmin"
