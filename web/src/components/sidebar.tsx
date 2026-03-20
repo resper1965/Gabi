@@ -15,7 +15,7 @@ import {
   Settings,
   BookOpen,
   Building2,
-  Globe,
+
   CreditCard,
   BarChart3,
 } from "lucide-react"
@@ -204,23 +204,8 @@ export function Sidebar() {
             >
               <BarChart3 className="w-5 h-5 shrink-0" style={{ color: pathname === "/admin/observability" ? "#34d399" : undefined }} />
               {!collapsed && <span className="text-sm font-medium">Observabilidade</span>}
-            </Link>
-          </>
-        )}
-
-        {/* Platform Admin — superadmin only */}
-        {profile?.role === "superadmin" && (
-          <Link
-            href="/admin/platform"
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-tech transition-all duration-200 ${
-              pathname === "/admin/platform"
-                ? "nav-link-active bg-white/5 text-white"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            <Globe className="w-5 h-5 shrink-0" style={{ color: pathname === "/admin/platform" ? "var(--color-gabi-primary)" : undefined }} />
-            {!collapsed && <span className="text-sm font-medium">Plataforma</span>}
           </Link>
+          </>
         )}
       </nav>
 

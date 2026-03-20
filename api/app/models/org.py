@@ -156,3 +156,42 @@ class OrgSession(Base):
     last_active = Column(DateTime, server_default=func.now())
 
     organization = relationship("Organization", back_populates="sessions")
+
+
+# ═══════════════════════════════════════════
+# FinOps: Per-Request Token Tracking
+# ═══════════════════════════════════════════
+
+# Gemini pricing (USD per 1M tokens) — as of 2025
+GEMINI_PRICING = {
+    "gemini-2.0-flash-001": {"input": 0.10, "output": 0.40},
+    "gemini-2.5-pro-preview-05-06": {"input": 1.25, "output": 10.00},
+    "gemini-1.5-pro": {"input": 1.25, "output": 5.00},
+}
+DEFAULT_PRICING = {"input": 0.50, "output": 2.00}
+
+
+def calc_cost_usd(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+    """Calculate cost in USD for a single LLM call."""
+    pricing = GEMINI_PRICING.get(model, DEFAULT_PRICING)
+    input_cost = (prompt_tokens / 1_000_000) * pricing["input"]
+    output_cost = (completion_tokens / 1_000_000) * pricing["output"]
+    return round(input_cost + output_cost, 6)
+
+
+class TokenUsage(Base):
+    __tablename__ = "token_usage"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(String(128), nullable=False, index=True)
+    org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True)
+    module = Column(String(30), nullable=False, index=True)   # ghost, law, ntalk
+    model = Column(String(100), nullable=False)                # gemini-2.5-pro-preview-05-06
+    prompt_tokens = Column(Integer, nullable=False, default=0)
+    completion_tokens = Column(Integer, nullable=False, default=0)
+    total_tokens = Column(Integer, nullable=False, default=0)
+    cost_usd = Column(Float, nullable=False, default=0.0)
+    created_at = Column(DateTime, server_default=func.now(), index=True)
+
+    organization = relationship("Organization", backref="token_records")
+

@@ -367,6 +367,19 @@ export const gabiPlatform = {
     request("/api/platform/orgs", { method: "POST", body: JSON.stringify(data) }),
   changePlan: (orgId: string, planName: string) =>
     request(`/api/platform/orgs/${orgId}/plan`, { method: "PATCH", body: JSON.stringify({ plan_name: planName }) }),
+  getOrg: (orgId: string) =>
+    request(`/api/platform/orgs/${orgId}`),
+  deactivateOrg: (orgId: string) =>
+    request(`/api/platform/orgs/${orgId}/deactivate`, { method: "PATCH" }),
+  activateOrg: (orgId: string) =>
+    request(`/api/platform/orgs/${orgId}/activate`, { method: "PATCH" }),
+  getOrgMembers: (orgId: string) =>
+    request(`/api/platform/orgs/${orgId}/members`),
+  // FinOps
+  finopsSummary: () =>
+    request("/api/platform/finops/summary"),
+  finopsByOrg: () =>
+    request("/api/platform/finops/by-org"),
 }
 
 // Unified export — 3 modules: writer, legal, data

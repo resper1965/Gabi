@@ -2,8 +2,10 @@
 Gabi Hub — AI Service with intelligent model routing.
 Each module uses the optimal model for its task.
 Protected by circuit breaker against Vertex AI outages.
+Includes FinOps token usage tracking.
 """
 
+import asyncio
 import json
 import logging
 import time
@@ -16,6 +18,52 @@ from app.config import get_settings
 from app.core.circuit_breaker import vertex_ai_breaker
 
 logger = logging.getLogger("gabi.ai")
+
+# ── Token usage tracking (fire-and-forget) ──
+_usage_queue: list[dict] = []
+
+
+def _queue_token_usage(module: str, model_name: str, prompt_tokens: int, completion_tokens: int) -> None:
+    """Queue token usage for async DB write. Non-blocking."""
+    try:
+        from app.models.org import calc_cost_usd
+        cost = calc_cost_usd(model_name, prompt_tokens, completion_tokens)
+        _usage_queue.append({
+            "module": module,
+            "model": model_name,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": prompt_tokens + completion_tokens,
+            "cost_usd": cost,
+        })
+        logger.debug(
+            "Token usage: module=%s model=%s in=%d out=%d cost=$%.6f",
+            module, model_name, prompt_tokens, completion_tokens, cost,
+        )
+    except Exception:
+        pass  # Never block on FinOps logging
+
+
+async def flush_token_usage(user_id: str, org_id: str | None = None) -> None:
+    """Flush queued token usage to DB. Called from request handlers."""
+    global _usage_queue
+    if not _usage_queue:
+        return
+    batch = _usage_queue.copy()
+    _usage_queue = []
+    try:
+        from app.database import async_session
+        from app.models.org import TokenUsage
+        async with async_session() as db:
+            for entry in batch:
+                db.add(TokenUsage(
+                    user_id=user_id,
+                    org_id=org_id,
+                    **entry,
+                ))
+            await db.commit()
+    except Exception as e:
+        logger.warning("Failed to flush token usage: %s", e)
 settings = get_settings()
 
 _initialized = False
@@ -95,6 +143,15 @@ async def generate(
         await vertex_ai_breaker.record_success()
         duration_ms = round((time.perf_counter() - start) * 1000, 1)
         logger.info("AI generate: module=%s, duration=%sms", module, duration_ms)
+
+        # FinOps: capture token usage
+        try:
+            um = response.usage_metadata
+            if um:
+                _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), um.prompt_token_count or 0, um.candidates_token_count or 0)
+        except Exception:
+            pass
+
         return response.text
     except Exception as e:
         await vertex_ai_breaker.record_failure()
@@ -118,10 +175,23 @@ async def generate_stream(
         model = get_model(module, system_instruction)
         contents = _build_contents(prompt, chat_history)
         response = model.generate_content(contents, stream=True)
+        total_prompt = 0
+        total_completion = 0
         for chunk in response:
             if chunk.text:
                 yield chunk.text
+            try:
+                um = chunk.usage_metadata
+                if um:
+                    total_prompt = um.prompt_token_count or total_prompt
+                    total_completion = um.candidates_token_count or total_completion
+            except Exception:
+                pass
         await vertex_ai_breaker.record_success()
+
+        # FinOps: capture token usage from stream
+        if total_prompt or total_completion:
+            _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), total_prompt, total_completion)
     except Exception as e:
         await vertex_ai_breaker.record_failure()
         logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
