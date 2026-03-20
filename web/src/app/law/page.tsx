@@ -14,14 +14,6 @@ import Link from "next/link"
 const ACCENT = "var(--color-mod-law)"
 const CTX_WINDOW = 10
 
-const AGENTS = [
-  { key: "auto",       label: "Auto",       desc: "A Gabi decide os agentes ideais para sua pergunta",               icon: "✨" },
-  { key: "auditor",    label: "Compliance",  desc: "Cruza contratos com normativos e identifica não-conformidades",   icon: "🔍" },
-  { key: "researcher", label: "Pesquisa",    desc: "Busca precedentes, jurisprudência e fundamentação na base",       icon: "📚" },
-  { key: "drafter",    label: "Parecer",     desc: "Redige pareceres, minutas e relatórios regulatórios",            icon: "✍️" },
-  { key: "watcher",    label: "Radar",       desc: "Monitora publicações do DOU e avalia impacto nos seus contratos", icon: "📡" },
-]
-
 const SUGGESTED_PROMPTS = [
   "Analise a conformidade deste contrato com as normas BACEN",
   "Quais são as obrigações de compliance para seguros?",
@@ -31,8 +23,7 @@ const SUGGESTED_PROMPTS = [
 
 export default function LawPage() {
   const { messages, setMessages, clearMessages } = useChatStore("law")
-  const [isLoading, setIsLoading] = useState(false)
-  const [agent, setAgent] = useState("auto")
+  const agent = "auto"
   const [showUpload, setShowUpload] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const [generatingPptx, setGeneratingPptx] = useState(false)
@@ -49,7 +40,7 @@ export default function LawPage() {
       .catch(console.error)
   }, [])
 
-  const selectedAgent = AGENTS.find((a) => a.key === agent)
+
 
   // ── Streaming handler ──────────────────────────────────────────────────────
   const handleSendStream = useCallback(
@@ -64,7 +55,7 @@ export default function LawPage() {
         .map((m) => ({ role: m.role, content: m.content }))
       return gabi.legal.agentStream({ agent, query: text, chat_history: history }, signal)
     },
-    [agent, messages, setMessages],
+    [messages, setMessages],
   )
 
   // ── Stream complete: add final assistant message ───────────────────────────
@@ -208,33 +199,7 @@ export default function LawPage() {
           </div>
         )}
 
-        {/* Agent selector */}
-        <div className="flex gap-2 flex-wrap">
-          {AGENTS.map((a) => {
-            const isActive = agent === a.key
-            return (
-              <button
-                key={a.key}
-                onClick={() => setAgent(a.key)}
-                title={a.desc}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide
-                            transition-all duration-200 flex items-center gap-1.5 border
-                            ${isActive
-                              ? "text-white border-amber-500/40"
-                              : "bg-[#1E293B] text-slate-400 hover:text-white border-transparent hover:border-[#334155]"
-                            }`}
-                style={isActive ? { background: `color-mix(in srgb, var(--color-mod-law) 25%, #1E293B)`, color: ACCENT } : undefined}
-              >
-                <span className="text-[11px]">{a.icon}</span>
-                {a.label}
-              </button>
-            )
-          })}
-        </div>
 
-        {selectedAgent && (
-          <p className="mt-2 text-[11px] text-slate-500">{selectedAgent.desc}</p>
-        )}
       </header>
 
       {/* ── Chat ── */}
@@ -246,12 +211,8 @@ export default function LawPage() {
             onStreamComplete={handleStreamComplete}
             onNewConversation={clearMessages}
             suggestedPrompts={SUGGESTED_PROMPTS}
-            isLoading={isLoading}
-            placeholder={
-              agent === "auto"
-                ? "Pergunte qualquer coisa — a Gabi decide os melhores agentes..."
-                : `Pergunte à ${selectedAgent?.label}...`
-            }
+            isLoading={false}
+            placeholder="Pergunte qualquer coisa — a Gabi orquestra os agentes ideais..."
             moduleAccent={ACCENT}
           />
         </div>
