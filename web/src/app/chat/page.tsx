@@ -133,9 +133,12 @@ export default function UnifiedChatPage() {
   }, [])
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-[#020617] relative selection:bg-[color:var(--color-gabi-primary)] selection:text-white">
+      {/* Background Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none z-0"></div>
+
       {/* ── Header ── */}
-      <header className="px-6 py-4 border-b border-[#1E293B]">
+      <header className="px-6 py-4 border-b border-white/5 bg-slate-900/40 backdrop-blur-xl relative z-10 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div
@@ -164,7 +167,7 @@ export default function UnifiedChatPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setHistoryOpen(true)}
-              className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors"
+              className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-all duration-300 relative z-10"
               title="Histórico de conversas"
             >
               <History className="w-4 h-4" />
@@ -173,7 +176,7 @@ export default function UnifiedChatPage() {
             {/* Style Profile toggle */}
             <button
               onClick={() => setStyleOpen(!styleOpen)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-mod-ghost)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-mod-ghost)] relative z-10"
               style={{
                 background: `color-mix(in srgb, var(--color-mod-ghost) 12%, transparent)`,
                 color: "var(--color-mod-ghost)",
@@ -187,7 +190,7 @@ export default function UnifiedChatPage() {
             <button
               onClick={handleGeneratePresentation}
               disabled={generatingPptx}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer disabled:opacity-50 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10B981] relative z-10"
               style={{
                 background: `color-mix(in srgb, #10B981 12%, transparent)`,
                 color: "#10B981",
@@ -204,7 +207,7 @@ export default function UnifiedChatPage() {
 
             <button
               onClick={() => setShowUpload(!showUpload)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-gabi-primary)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-gabi-primary)] relative z-10"
               style={{
                 background: `color-mix(in srgb, var(--color-gabi-primary) 12%, transparent)`,
                 color: ACCENT,
@@ -235,7 +238,7 @@ export default function UnifiedChatPage() {
       </header>
 
       {/* ── Chat + Panels ── */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative z-10">
         <div className="flex-1 min-w-0">
           <ChatPanel
             messages={messages}
