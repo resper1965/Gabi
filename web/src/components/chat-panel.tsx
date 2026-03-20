@@ -7,7 +7,7 @@ import {
   useCallback,
   type FormEvent,
 } from "react"
-import { Send, Loader2, Square, Copy, Check, Plus, Paperclip, X, FileText } from "lucide-react"
+import { Send, Loader2, Square, Copy, Check, Plus, Paperclip, X, FileText, Sparkles } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { DataTable } from "@/components/data-table"
 import { DataChart } from "@/components/data-chart"
@@ -478,22 +478,81 @@ export function ChatPanel({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
         {/* Empty state */}
         {messages.length === 0 && !isStreaming && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 pb-16">
-            <div className="text-center">
-              <p className="text-slate-500 text-sm">Comece uma conversa com a</p>
-              <p className="brand-mark text-3xl mt-1 text-white">
-                gabi<span className="dot">.</span>
+          <div className="flex flex-col items-center justify-center h-full gap-8 pb-16 px-4">
+            {/* Hero */}
+            <div className="text-center space-y-3">
+              <div
+                className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center mb-4"
+                style={{ background: `color-mix(in srgb, ${moduleAccent} 15%, transparent)` }}
+              >
+                <Sparkles className="w-7 h-7" style={{ color: moduleAccent }} />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                Como posso te ajudar{" "}
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, ${moduleAccent}, color-mix(in srgb, ${moduleAccent} 60%, #fff))`,
+                  }}
+                >
+                  hoje?
+                </span>
+              </h2>
+              <p className="text-sm text-slate-500 max-w-md mx-auto">
+                Orquesto agentes jurídicos, de redação e compliance para resolver qualquer demanda.
               </p>
             </div>
+
+            {/* Action Cards */}
             {suggestedPrompts && suggestedPrompts.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2 max-w-lg">
-                {suggestedPrompts.map((p, i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl w-full">
+                {[
+                  {
+                    icon: "⚖️",
+                    title: "Compliance",
+                    desc: "Contratos, normativos & auditoria regulatória",
+                    prompt: suggestedPrompts[0],
+                  },
+                  {
+                    icon: "✍️",
+                    title: "Redação",
+                    desc: "Pareceres, relatórios & textos com estilo",
+                    prompt: suggestedPrompts[1] || suggestedPrompts[0],
+                  },
+                  {
+                    icon: "📊",
+                    title: "Análise Regulatória",
+                    desc: "Radar de normas, impacto & mudanças",
+                    prompt: suggestedPrompts[2] || suggestedPrompts[0],
+                  },
+                ].map((card, i) => (
+                  <button
+                    key={i}
+                    onClick={() => fillPrompt(card.prompt)}
+                    className="group p-4 rounded-xl text-left transition-all duration-200
+                               bg-[#1E293B]/60 hover:bg-[#263145] border border-[#334155]
+                               hover:border-slate-500 hover:scale-[1.02] hover:shadow-lg"
+                  >
+                    <span className="text-2xl block mb-2">{card.icon}</span>
+                    <span className="text-sm font-semibold text-white block mb-1">{card.title}</span>
+                    <span className="text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
+                      {card.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Quick prompt chips */}
+            {suggestedPrompts && suggestedPrompts.length > 3 && (
+              <div className="flex flex-wrap justify-center gap-2 max-w-2xl">
+                {suggestedPrompts.slice(3).map((p, i) => (
                   <button
                     key={i}
                     onClick={() => fillPrompt(p)}
-                    className="px-3 py-2 rounded-xl text-xs text-slate-400 hover:text-white
-                               bg-[#1E293B] hover:bg-[#263145] border border-[#334155]
-                               hover:border-slate-500 transition-all duration-200 text-left"
+                    className="px-3 py-1.5 rounded-full text-xs text-slate-500 hover:text-white
+                               bg-[#1E293B]/40 hover:bg-[#263145] border border-[#334155]/50
+                               hover:border-slate-500 transition-all duration-200"
                   >
                     {p}
                   </button>
