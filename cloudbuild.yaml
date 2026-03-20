@@ -46,10 +46,10 @@ steps:
     args:
       - "-c"
       - |
-        apt-get update -qq && apt-get install -y -qq --no-install-recommends gcc libpq-dev > /dev/null 2>&1 && \
+        (apt-get update -qq && apt-get install -y -qq --no-install-recommends gcc libpq-dev > /dev/null 2>&1 && \
         cd api && \
         pip install -q -e '.[dev]' && \
-        python -m pytest tests/ --tb=short -q --no-header 2>&1 | tail -30 || echo "⚠️ Tests failed but deploy continues"
+        python -m pytest tests/ --tb=short -q --no-header 2>&1 | tail -30) || echo "⚠️ Tests failed but deploy continues"
     waitFor: ["-"] # parallel with builds
 
   # ── Push Images ──
