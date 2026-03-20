@@ -33,7 +33,7 @@ const painPoints = [
     impact: "+80% Produtividade",
     icon: Radar,
     accent: "#10b981", // Emerald
-    module: "radar regulatório",
+    module: "monitoramento",
   },
   {
     before: "Leitura manual de dezenas de diários oficiais",
@@ -42,7 +42,7 @@ const painPoints = [
     impact: "Análise em Segundos",
     icon: Scale,
     accent: "#f59e0b", // Amber
-    module: "gabi.legal",
+    module: "análise jurídica",
   },
   {
     before: "Redação morosa de pareceres padronizados",
@@ -51,7 +51,7 @@ const painPoints = [
     impact: "Zero Copy/Paste",
     icon: PenTool,
     accent: "#06b6d4", // Cyan
-    module: "gabi.writer",
+    module: "redação inteligente",
   },
   {
     before: "Dificuldade em cruzar dados de conformidade",
@@ -60,7 +60,7 @@ const painPoints = [
     impact: "Decisões Data-Driven",
     icon: BarChart3,
     accent: "#8b5cf6", // Violet
-    module: "gabi.data",
+    module: "inteligência de dados",
   },
 ]
 
@@ -186,12 +186,12 @@ export default function LandingPage() {
             className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white tracking-tight leading-tight"
             style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}
           >
-            A inteligência <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">regulatória</span><br />
-            para o seu jurídico.
+            Sua assistente de IA <span className="text-transparent bg-clip-text bg-linear-to-r from-[#00ade8] to-[#0369A1]">regulatória</span>.<br />
+            Uma conversa. Tudo resolvido.
           </h1>
 
           <p className="mt-6 text-lg tracking-wide md:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
-            A <span className="brand-mark text-slate-200">Gabi<span className="text-[#00ade8]">.</span></span> transforma a gestão normativa para <strong>escritórios de advocacia</strong>, <strong>gestoras de ativos</strong>, <strong>fundos de infraestrutura (FIP/FII)</strong> e <strong>departamentos de compliance</strong>. Monitoramento ativo, análise avançada de leis por IA e pareceres automáticos para a sua operação.
+            A <span className="brand-mark text-slate-200">Gabi<span className="text-[#00ade8]">.</span></span> monitora normativos, analisa impactos, redige pareceres e cruza dados regulatórios — tudo em uma única conversa. Para <strong>escritórios de advocacia</strong>, <strong>gestoras de ativos</strong>, <strong>fundos de infraestrutura</strong> e <strong>departamentos de compliance</strong>.
           </p>
 
           <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
@@ -344,7 +344,7 @@ export default function LandingPage() {
             O Ecossistema Normativo Integrado
           </h2>
           <p className="text-slate-400 text-base max-w-2xl mx-auto">
-            Ingestão direta dos diários oficiais e APIs governamentais. Nossa infraestrutura centralizada alimenta todos os módulos da plataforma simultaneamente.
+            Ingestão direta dos diários oficiais e APIs governamentais. Nossa infraestrutura centralizada alimenta toda a inteligência da Gabi simultaneamente.
           </p>
         </div>
 
@@ -380,10 +380,10 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 py-24 border-t border-white/5">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-            Arquitetura desenhada para o seu negócio
+            Uma assistente para cada realidade
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            A <span className="brand-mark text-slate-300">Gabi<span className="text-[#00ade8]">.</span></span> adapta-se às exigências específicas do seu ambiente corporativo, seja na defesa de clientes ou na mitigação de riscos internos.
+            A <span className="brand-mark text-slate-300">Gabi<span className="text-[#00ade8]">.</span></span> entende as exigências específicas do seu setor e responde como especialista — seja na defesa de clientes ou na mitigação de riscos internos.
           </p>
         </div>
 
@@ -394,9 +394,9 @@ export default function LandingPage() {
             <Gavel className="w-10 h-10 text-cyan-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Escritórios Privados</h3>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Monitore as publicações do BCB e CVM que afetam seus clientes em tempo real.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Gere rascunhos de pareceres com o estilo rigoroso do seu escritório.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Esmague as horas gastas em pesquisas circulares na jurisprudência administrativa.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Peça à Gabi para monitorar publicações do BCB e CVM que afetam seus clientes.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Peça para redigir pareceres no estilo rigoroso do seu escritório.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Pergunte sobre jurisprudência administrativa — a Gabi pesquisa e sintetiza em segundos.</span></li>
             </ul>
           </div>
 
@@ -406,9 +406,9 @@ export default function LandingPage() {
             <TrendingUp className="w-10 h-10 text-amber-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Fundos & Asset Management</h3>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Rastreamento automático de Instruções CVM impactando FIPs, FIIs e FIDCs.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Geração de relatórios de impacto regulatório para cotistas e investidores institucionais.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Cruzamento inteligente entre normas BCB/CMN e políticas internas de gestão de risco.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Pergunte à Gabi sobre Instruções CVM que impactam FIPs, FIIs e FIDCs.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Peça relatórios de impacto regulatório prontos para cotistas e investidores institucionais.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">A Gabi cruza normas BCB/CMN com suas políticas internas e aponta gaps automaticamente.</span></li>
             </ul>
           </div>
 
@@ -418,9 +418,9 @@ export default function LandingPage() {
             <ShieldCheck className="w-10 h-10 text-emerald-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Compliance Interno</h3>
             <ul className="space-y-4 mb-8 relative z-10">
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Cruze automaticamente normativas contra as suas políticas operacionais.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Receba alertas emergenciais de gaps apontados por novas resoluções.</span></li>
-              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Exporte dashboards executivos de risco para a diretoria em segundos.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Peça à Gabi para cruzar novas normativas contra suas políticas operacionais.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">A Gabi alerta sobre gaps de conformidade assim que novas resoluções são publicadas.</span></li>
+              <li className="flex items-start gap-3"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" /><span className="text-slate-300 font-light text-sm">Gere dashboards executivos de risco para a diretoria com uma pergunta.</span></li>
             </ul>
           </div>
         </div>
@@ -470,10 +470,10 @@ export default function LandingPage() {
          
          <div className="relative z-10 max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
-              Pronto para elevar seu compliance?
+              Pronto para ter sua assistente regulatória?
             </h2>
             <p className="text-slate-400 text-lg mb-10">
-              Junte-se à nova era de gestão regulatória. Segurança nível enterprise com a melhor inteligência artificial do mercado.
+              Uma conversa com a Gabi substitui horas de trabalho manual. Segurança enterprise. IA de ponta.
             </p>
             
             <Link
