@@ -178,9 +178,9 @@ export const gabiWriter = {
 // ── gabi.legal ──
 
 export const gabiLegal = {
-  agent: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[] }) =>
+  agent: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[]; style_profile_id?: string }) =>
     request<AgentResponse>("/api/law/agent", { method: "POST", body: JSON.stringify(data) }),
-  agentStream: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[] }, signal?: AbortSignal) =>
+  agentStream: (data: { agent: string; query: string; document_text?: string; chat_history?: ChatMessage[]; style_profile_id?: string }, signal?: AbortSignal) =>
     streamRequest("/api/law/agent-stream", data, signal),
   documents: () => request<DocumentInfo[]>("/api/law/documents"),
   alerts: () => request<AlertInfo[]>("/api/law/alerts"),

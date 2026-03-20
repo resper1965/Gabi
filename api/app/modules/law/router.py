@@ -47,10 +47,11 @@ LegalDocType = Literal["law", "regulation", "contract", "policy", "precedent", "
 
 
 class AgentRequest(BaseModel):
-    agent: str  # auto, auditor, researcher, drafter, watcher, policy_analyst, claims_analyst, regulatory_consultant
+    agent: str  # auto, auditor, researcher, drafter, watcher, writer, policy_analyst, claims_analyst, regulatory_consultant
     query: str
     document_text: str | None = None
     chat_history: list[dict] | None = None
+    style_profile_id: str | None = None  # For writer agent — references ghost style profile
     # Insurance-specific fields
     tenant_id: str | None = None
     client_id: str | None = None

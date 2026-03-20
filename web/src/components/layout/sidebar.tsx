@@ -7,9 +7,7 @@ import { useAuth } from "@/components/auth-provider"
 import { NessBrand } from "@/components/ness-brand"
 import { signOut, auth } from "@/lib/firebase"
 import {
-  PenTool,
-  Scale,
-  Database,
+  Sparkles,
   LayoutDashboard,
   LogOut,
   ChevronLeft,
@@ -21,9 +19,7 @@ import {
 import { useState } from "react"
 
 const modules = [
-  { key: "ghost", label: "gabi.writer", icon: PenTool, href: "/ghost", accent: "var(--color-mod-ghost)" },
-  { key: "law", label: "gabi.legal", icon: Scale, href: "/law", accent: "var(--color-mod-law)" },
-  { key: "ntalk", label: "gabi.data", icon: Database, href: "/ntalk", accent: "var(--color-mod-ntalk)" },
+  { key: "gabi", label: "Gabi", icon: Sparkles, href: "/chat", accent: "var(--color-gabi-primary)" },
 ]
 
 const ENV_LABEL = process.env.NEXT_PUBLIC_ENV || (
@@ -38,7 +34,8 @@ export function Sidebar() {
   const isSuperadmin = profile?.role === "superadmin"
   const allowedModules = profile?.allowed_modules || []
   const visibleModules = modules.filter(
-    (m) => isSuperadmin || allowedModules.includes(m.key)
+    (m) => isSuperadmin || allowedModules.includes(m.key) ||
+      (m.key === "gabi" && (allowedModules.includes("law") || allowedModules.includes("ghost")))
   )
 
   const displayName = profile?.name || user?.displayName || user?.email?.split("@")[0] || "Usuário"

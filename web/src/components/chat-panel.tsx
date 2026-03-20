@@ -77,6 +77,7 @@ const AGENT_LABELS: Record<string, string> = {
   researcher: "Pesquisa",
   drafter: "Parecer",
   watcher: "Radar",
+  writer: "Redação",
 }
 
 function formatTime(ts: number) {
