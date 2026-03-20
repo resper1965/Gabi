@@ -7,7 +7,7 @@ import {
   useCallback,
   type FormEvent,
 } from "react"
-import { Send, Loader2, Square, Copy, Check, Plus } from "lucide-react"
+import { Send, Loader2, Square, Copy, Check, Plus, Paperclip, X, FileText } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { DataTable } from "@/components/data-table"
 import { DataChart } from "@/components/data-chart"
@@ -35,7 +35,7 @@ export interface ChatPanelProps {
    * Non-streaming handler (ntalk).
    * The parent does: add user msg → call API → add assistant msg.
    */
-  onSend?: (text: string) => void
+  onSend?: (text: string, attachedFileText?: string) => void
 
   /**
    * Streaming handler (law, ghost).
@@ -50,6 +50,7 @@ export interface ChatPanelProps {
   onSendStream?: (
     text: string,
     signal: AbortSignal,
+    attachedFileText?: string,
   ) => Promise<ReadableStreamDefaultReader<Uint8Array>>
 
   /** Called by ChatPanel when streaming finishes (or is stopped). */
@@ -66,6 +67,9 @@ export interface ChatPanelProps {
 
   placeholder?: string
   moduleAccent?: string
+
+  /** Backend URL for extracting text from PDF/DOCX files. If not set, only .txt files work. */
+  fileExtractUrl?: string
 }
 
 const AGENT_LABELS: Record<string, string> = {
@@ -280,12 +284,16 @@ export function ChatPanel({
   isLoading,
   placeholder = "Digite sua mensagem...",
   moduleAccent = "var(--color-gabi-primary)",
+  fileExtractUrl,
 }: ChatPanelProps) {
   const [input, setInput] = useState("")
   const [streamingContent, setStreamingContent] = useState<string | null>(null)
+  const [attachedFile, setAttachedFile] = useState<{ name: string; text: string } | null>(null)
+  const [fileLoading, setFileLoading] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Auto-scroll when messages or streaming content changes
   useEffect(() => {
@@ -299,8 +307,49 @@ export function ChatPanel({
     abortRef.current?.abort()
   }, [])
 
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (e.target) e.target.value = ""
+
+    const maxSize = 10 * 1024 * 1024 // 10MB
+    if (file.size > maxSize) {
+      toast.error("Arquivo muito grande (máx 10MB)")
+      return
+    }
+
+    setFileLoading(true)
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase()
+
+      if (ext === "txt" || ext === "md" || ext === "csv") {
+        const text = await file.text()
+        setAttachedFile({ name: file.name, text })
+      } else if (fileExtractUrl && (ext === "pdf" || ext === "docx")) {
+        const formData = new FormData()
+        formData.append("file", file)
+        const res = await fetch(fileExtractUrl, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        })
+        if (!res.ok) throw new Error("Falha ao extrair texto")
+        const data = await res.json()
+        setAttachedFile({ name: file.name, text: data.text || "" })
+      } else {
+        toast.error(`Tipo não suportado: .${ext}. Use PDF, DOCX ou TXT.`)
+        return
+      }
+      toast.success(`📎 ${file.name} anexado`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao ler arquivo")
+    } finally {
+      setFileLoading(false)
+    }
+  }, [fileExtractUrl])
+
   const handleStream = useCallback(
-    async (text: string) => {
+    async (text: string, docText?: string) => {
       if (!onSendStream) return
 
       const controller = new AbortController()
@@ -311,7 +360,7 @@ export function ChatPanel({
       const streamMeta: StreamMeta = {}
 
       try {
-        const reader = await onSendStream(text, controller.signal)
+        const reader = await onSendStream(text, controller.signal, docText)
         const decoder = new TextDecoder()
 
         while (true) {
@@ -372,13 +421,15 @@ export function ChatPanel({
     const text = input.trim()
     if (!text || busy) return
 
+    const docText = attachedFile?.text
     setInput("")
+    setAttachedFile(null)
     if (textareaRef.current) textareaRef.current.style.height = "auto"
 
     if (onSendStream) {
-      handleStream(text)
+      handleStream(text, docText)
     } else {
-      onSend?.(text)
+      onSend?.(text, docText)
     }
   }
 
@@ -533,17 +584,62 @@ export function ChatPanel({
 
       {/* ── Input area ── */}
       <form onSubmit={handleSubmit} className="p-4 border-t border-[#1E293B]">
+        {/* Attached file chip */}
+        {attachedFile && (
+          <div className="mb-2 flex items-center gap-2">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+              <FileText className="w-3.5 h-3.5" />
+              <span className="truncate max-w-[200px]">{attachedFile.name}</span>
+              <span className="text-amber-500/50 text-[10px]">({(attachedFile.text.length / 1024).toFixed(0)}KB)</span>
+              <button
+                type="button"
+                onClick={() => setAttachedFile(null)}
+                className="p-0.5 rounded hover:bg-amber-500/20 transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* File loading indicator */}
+        {fileLoading && (
+          <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            Extraindo texto do arquivo...
+          </div>
+        )}
+
         <div
           className="flex items-end gap-2 border rounded-xl px-4 py-3 bg-[#1E293B] shadow-sm
                      transition-all duration-200 focus-within:border-slate-500"
           style={{ borderColor: "#334155" }}
         >
+          {/* File attachment button */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.docx,.txt,.md,.csv"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={busy || fileLoading}
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5
+                       transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            title="Anexar documento (PDF, DOCX, TXT)"
+          >
+            <Paperclip className="w-4 h-4" />
+          </button>
+
           <textarea
             ref={textareaRef}
             value={input}
             onChange={autoGrow}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={attachedFile ? `Pergunte sobre ${attachedFile.name}...` : placeholder}
             disabled={busy && !isStreaming}
             className="flex-1 bg-transparent resize-none text-[0.9rem] text-slate-100
                        placeholder:text-slate-500 focus:outline-none max-h-[200px]

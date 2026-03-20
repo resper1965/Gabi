@@ -57,6 +57,25 @@ class AgentRequest(BaseModel):
     summary: str | None = None
 
 
+# ── Text extraction (ephemeral — for inline chat analysis) ──
+
+@router.post("/extract-text")
+async def extract_text_endpoint(
+    file: UploadFile = File(...),
+    user: CurrentUser = Depends(get_current_user),
+):
+    """Extract text from a file without storing it. Used by inline chat upload."""
+    from app.core.ingest import extract_text
+
+    data = await file.read()
+    if len(data) > 10 * 1024 * 1024:
+        raise HTTPException(413, "Arquivo muito grande (máx 10MB)")
+    text = extract_text(data, file.filename or "file.txt")
+    if not text.strip():
+        raise HTTPException(422, "Não foi possível extrair texto do arquivo")
+    return {"text": text, "filename": file.filename, "size": len(text)}
+
+
 # ── Upload ──
 
 @router.post("/upload")

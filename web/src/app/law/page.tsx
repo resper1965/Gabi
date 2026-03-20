@@ -44,16 +44,24 @@ export default function LawPage() {
 
   // ── Streaming handler ──────────────────────────────────────────────────────
   const handleSendStream = useCallback(
-    async (text: string, signal: AbortSignal) => {
+    async (text: string, signal: AbortSignal, attachedFileText?: string) => {
       // Add user message immediately
       setMessages((prev) => [
         ...prev,
-        { id: Date.now().toString(), role: "user", content: text, createdAt: Date.now() },
+        {
+          id: Date.now().toString(),
+          role: "user",
+          content: attachedFileText ? `📎 [documento anexado]\n\n${text}` : text,
+          createdAt: Date.now(),
+        },
       ])
       const history = messages
         .slice(-CTX_WINDOW)
         .map((m) => ({ role: m.role, content: m.content }))
-      return gabi.legal.agentStream({ agent, query: text, chat_history: history }, signal)
+      return gabi.legal.agentStream(
+        { agent, query: text, document_text: attachedFileText, chat_history: history },
+        signal,
+      )
     },
     [messages, setMessages],
   )
@@ -211,6 +219,7 @@ export default function LawPage() {
             isLoading={false}
             placeholder="Pergunte qualquer coisa — a Gabi orquestra os agentes ideais..."
             moduleAccent={ACCENT}
+            fileExtractUrl="/api/law/extract-text"
           />
         </div>
 
