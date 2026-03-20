@@ -815,10 +815,10 @@ export default function AdminPage() {
                       <div key={idx} className="bg-slate-900 rounded-lg p-4 border border-[#334155]/50 text-xs">
                         <div className="flex items-center gap-2 mb-2 text-emerald-300">
                           <span className="font-mono bg-emerald-500/20 px-1.5 py-0.5 rounded">#{idx+1}</span>
-                          <span className="truncate max-w-[300px]">{ck.metadata?.source || "Doc"}</span>
-                          {ck.distance !== undefined && <span className="ml-auto text-emerald-400">Score: {(1 - ck.distance).toFixed(3)}</span>}
+                          <span className="truncate max-w-[300px]">{(ck.metadata as Record<string, unknown>)?.source as string || "Doc"}</span>
+                          {ck.distance !== undefined && <span className="ml-auto text-emerald-400">Score: {(1 - Number(ck.distance)).toFixed(3)}</span>}
                         </div>
-                        <p className="text-slate-300 leading-relaxed max-h-[150px] overflow-y-auto">{ck.page_content}</p>
+                        <p className="text-slate-300 leading-relaxed max-h-[150px] overflow-y-auto">{String(ck.page_content || "")}</p>
                       </div>
                     ))}
                   </div>
@@ -839,20 +839,20 @@ export default function AdminPage() {
                 <tbody>
                   {ragBases?.regulatory_insights.map((insight: Record<string, unknown>, i: number) => (
                     <tr key={`reg-${i}`}>
-                      <td className="text-white text-xs font-medium">{insight.authority || 'BACEN'}</td>
+                      <td className="text-white text-xs font-medium">{String(insight.authority || 'BACEN')}</td>
                       <td>
-                        <p className="text-sm text-white">{insight.tipo_ato} {insight.numero}</p>
-                        <p className="text-[0.65rem] text-slate-500 max-w-sm truncate">{insight.resumo_executivo}</p>
+                        <p className="text-sm text-white">{String(insight.tipo_ato || '')} {String(insight.numero || '')}</p>
+                        <p className="text-[0.65rem] text-slate-500 max-w-sm truncate">{String(insight.resumo_executivo || '')}</p>
                       </td>
-                      <td><span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[0.65rem]">Insight (Risco: {insight.risco_nivel})</span></td>
+                      <td><span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 text-[0.65rem]">Insight (Risco: {String(insight.risco_nivel || 'N/A')})</span></td>
                       <td><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[0.65rem] flex items-center gap-1 w-max"><CheckCircle2 className="w-3 h-3" /> Indexado</span></td>
                     </tr>
                   ))}
                   {ragBases?.law_documents.map((doc: Record<string, unknown>) => (
                     <tr key={`law-${doc.id}`}>
                       <td className="text-slate-400 text-xs font-medium">Seed Pack</td>
-                      <td><p className="text-sm text-slate-300">{doc.title}</p></td>
-                      <td><span className="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 text-[0.65rem]">{doc.doc_type || 'PDF'}</span></td>
+                      <td><p className="text-sm text-slate-300">{String(doc.title || '')}</p></td>
+                      <td><span className="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 text-[0.65rem]">{String(doc.doc_type || 'PDF')}</span></td>
                       <td><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[0.65rem] flex items-center gap-1 w-max"><CheckCircle2 className="w-3 h-3" /> Indexado</span></td>
                     </tr>
                   ))}
