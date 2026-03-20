@@ -31,6 +31,8 @@ const AuthContext = createContext<AuthContextType>({
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 const PROFILE_CACHE_KEY = "gabi_profile_cache"
 const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const MAX_RETRIES = 3
+const RETRY_DELAY_MS = 2000
 
 function getCachedProfile(): UserProfile | null {
   try {
@@ -70,28 +72,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasCache = cached !== null
 
   const fetchProfile = useCallback(async (firebaseUser: User) => {
-    try {
-      const token = await firebaseUser.getIdToken()
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 8000)
+    let lastError: unknown = null
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
+        const token = await firebaseUser.getIdToken()
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 8000)
+
         const res = await fetch(`${API_BASE}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal,
         })
         clearTimeout(timeoutId)
+
         if (res.ok) {
           const data = await res.json()
           setProfile(data)
           setCachedProfile(data)
+          return // Success — exit
         }
+
+        // Non-OK response — retry if attempts remain
+        console.warn(`AuthProvider: API returned ${res.status} (attempt ${attempt + 1}/${MAX_RETRIES + 1})`)
+        lastError = new Error(`API ${res.status}`)
       } catch (err) {
-        clearTimeout(timeoutId)
-        console.error("AuthProvider: Could not fetch user profile from API:", err)
+        lastError = err
+        console.warn(`AuthProvider: fetch failed (attempt ${attempt + 1}/${MAX_RETRIES + 1})`, err)
       }
-    } catch (err) {
-      console.error("AuthProvider: Could not get Firebase token:", err)
+
+      // Wait before next attempt (exponential backoff)
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS * (attempt + 1)))
+      }
     }
+
+    console.error("AuthProvider: Could not fetch user profile after all retries:", lastError)
   }, [])
 
   const refreshInterval = useRef<ReturnType<typeof setInterval> | null>(null)
