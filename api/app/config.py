@@ -24,7 +24,8 @@ class Settings(BaseSettings):
     firebase_project_id: str = ""
     firebase_admin_service_account: str = ""  # JSON string or path
 
-    # CORS
+    # CORS — override via GABI_CORS_ORIGINS env var (comma-separated)
+    # Production: set to your domain(s), e.g. "https://gabi.ness.com.br"
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # nTalkSQL specific
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     query_timeout_seconds: int = 30
 
     # Authorization
+    # TODO: migrate admin_emails → Firebase Custom Claims (used by auth.py + admin/router.py)
     admin_emails: list[str] = ["resper@ness.com.br", "resper@bekaa.eu", "rsarlerno@ness.com.br", "myoshida@ness.com.br", "dajzen@ness.com.br"]
     auto_approve_domains: list[str] = ["ness.com.br", "bekaa.eu"]
 
