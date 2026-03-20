@@ -161,16 +161,14 @@ export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false)
 
   return (
-    <div className="min-h-screen bg-surface-base selection:bg-[#0369A1] selection:text-white">
+    <div className="min-h-screen bg-[#020617] selection:bg-[#0369A1] selection:text-white relative overflow-hidden">
+      {/* Background Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none"></div>
       {/* ── Hero Split View ── */}
-      <section className="relative w-full max-w-7xl mx-auto px-6 pt-24 pb-20 overflow-hidden flex flex-col-reverse md:grid md:grid-cols-2 gap-12 items-center">
-        {/* Glow background restricted to text side */}
-        <div
-          className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full pointer-events-none opacity-30"
-          style={{
-            background: "radial-gradient(circle, rgba(3,105,161,0.3) 0%, transparent 70%)",
-          }}
-        />
+      <section className="relative w-full max-w-7xl mx-auto px-6 pt-32 pb-24 overflow-hidden flex flex-col-reverse md:grid md:grid-cols-2 gap-12 items-center">
+        {/* Glow background restricted to text side (Aurora Effect) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-700/20 rounded-full blur-[120px] mix-blend-screen pointer-events-none animate-pulse"></div>
+        <div className="absolute top-[20%] left-[10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[100px] mix-blend-screen pointer-events-none animate-pulse" style={{ animationDelay: "2s" }}></div>
 
         {/* Left Column (Text & CTA) */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left relative z-10 w-full">
@@ -221,8 +219,9 @@ export default function LandingPage() {
 
         {/* Right Column (Avatar & Icon Composition) */}
         <div className="relative w-full max-w-lg mx-auto aspect-square md:aspect-4/5 flex items-center justify-center">
-           {/* Glow Effects */}
-           <div className="absolute inset-0 bg-linear-to-tr from-[#0369A1]/60 to-[#00ade8]/30 rounded-[2.5rem] opacity-30 blur-3xl mix-blend-screen motion-safe:animate-pulse"></div>
+           {/* Animated Gradient Ring Behind Avatar */}
+           <div className="absolute inset-2 bg-linear-to-tr from-cyan-500 via-blue-600 to-emerald-500 rounded-[2.5rem] opacity-30 blur-2xl animate-[spin_10s_linear_infinite] motion-reduce:animate-none"></div>
+           <div className="absolute inset-0 bg-linear-to-bl from-[#0369A1] to-emerald-400 rounded-[2.5rem] opacity-20 blur-3xl mix-blend-screen motion-safe:animate-pulse"></div>
            
            {/* Floating App Icon */}
            <div className="absolute -top-6 -right-6 z-30 p-4 bg-slate-900 border border-slate-700/50 rounded-3xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)] backdrop-blur-xl motion-safe:animate-float">
@@ -245,7 +244,8 @@ export default function LandingPage() {
       </section>
 
       {/* ── Stats Bar ── */}
-      <section className="border-y border-white/5 bg-slate-900/50 backdrop-blur-sm px-6 py-10 relative z-20">
+      <div className="h-px w-full max-w-6xl mx-auto bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+      <section className="bg-slate-900/20 backdrop-blur-md px-6 py-12 relative z-20 border-b border-white/5">
         <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-white/5">
           <div className="text-center px-4">
             <h3 className="text-4xl font-semibold text-white mb-1"><AnimatedCounter end={8} /></h3>
@@ -296,8 +296,10 @@ export default function LandingPage() {
           {painPoints.map((p, i) => (
             <div
               key={i}
-              className="group relative rounded-2xl p-8 transition-colors duration-300 bg-slate-900 border border-slate-800 hover:border-slate-700 cursor-default"
+              className="group relative rounded-2xl p-8 transition-all duration-500 bg-slate-900/60 backdrop-blur-sm border border-slate-800 hover:border-slate-600 hover:shadow-[0_0_40px_rgba(6,182,212,0.1)] hover:-translate-y-1 cursor-default overflow-hidden"
             >
+              {/* Card internal glow on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
               {/* Header */}
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
@@ -337,8 +339,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── Regulatory Monitoring ── */}
-      <section className="max-w-6xl mx-auto px-6 py-20 bg-slate-900/40 rounded-3xl border border-white/5 mb-24">
-        <div className="text-center mb-12">
+      <section className="max-w-6xl mx-auto px-6 py-24 relative mb-12">
+        <div className="absolute inset-0 bg-slate-900/40 rounded-3xl border border-white/5 backdrop-blur-xs"></div>
+        <div className="relative z-10 text-center mb-16 pt-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
             A Base de Conhecimento Regulatória
           </h2>
@@ -388,8 +391,8 @@ export default function LandingPage() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {/* Law Firms */}
-          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-cyan-500/10"></div>
+          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-600 hover:shadow-[0_0_40px_rgba(6,182,212,0.15)] hover:-translate-y-1 transition-all duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px] -mr-20 -mt-20 transition-all duration-700 group-hover:bg-cyan-500/20 group-hover:scale-110"></div>
             <Gavel className="w-10 h-10 text-cyan-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Escritórios Privados</h3>
             <ul className="space-y-4 mb-8 relative z-10">
@@ -400,8 +403,8 @@ export default function LandingPage() {
           </div>
 
           {/* Funds & Asset Management */}
-          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-amber-500/10"></div>
+          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-600 hover:shadow-[0_0_40px_rgba(245,158,11,0.1)] hover:-translate-y-1 transition-all duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] -mr-20 -mt-20 transition-all duration-700 group-hover:bg-amber-500/20 group-hover:scale-110"></div>
             <TrendingUp className="w-10 h-10 text-amber-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Fundos & Asset Management</h3>
             <ul className="space-y-4 mb-8 relative z-10">
@@ -412,8 +415,8 @@ export default function LandingPage() {
           </div>
 
           {/* Compliance Depts */}
-          <div className="bg-surface-base rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-20 -mt-20 transition-all group-hover:bg-emerald-500/10"></div>
+          <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-800 relative overflow-hidden group hover:border-slate-600 hover:shadow-[0_0_40px_rgba(16,185,129,0.1)] hover:-translate-y-1 transition-all duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -mr-20 -mt-20 transition-all duration-700 group-hover:bg-emerald-500/20 group-hover:scale-110"></div>
             <ShieldCheck className="w-10 h-10 text-emerald-500 mb-6 relative z-10" />
             <h3 className="text-xl font-bold text-white mb-4 relative z-10 tracking-tight">Compliance Interno</h3>
             <ul className="space-y-4 mb-8 relative z-10">
@@ -463,9 +466,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── CTA Final (Full Width) ── */}
-      <section className="relative px-6 py-24 text-center overflow-hidden border-t border-white/10 bg-surface-base">
+      <section className="relative px-6 py-32 text-center overflow-hidden border-t border-slate-800 bg-[#020617]">
          {/* Background accent */}
-         <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: "radial-gradient(circle at center, #0369A1 0%, transparent 70%)" }} />
+         <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ background: "radial-gradient(circle at center, rgba(3,105,161,0.4) 0%, transparent 60%)" }} />
+         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
          
          <div className="relative z-10 max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6" style={{ fontFamily: "Plus Jakarta Sans, sans-serif" }}>
