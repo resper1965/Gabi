@@ -45,6 +45,7 @@ steps:
     args:
       - "-c"
       - |
+        apt-get update -qq && apt-get install -y -qq --no-install-recommends gcc libpq-dev > /dev/null 2>&1 && \
         cd api && \
         pip install -q -e '.[dev]' 2>/dev/null && \
         python -m pytest tests/ --tb=short -q --no-header 2>&1 | tail -20
