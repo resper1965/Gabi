@@ -157,16 +157,12 @@ async function streamRequest(
   return res.body.getReader()
 }
 
-// ── gabi.writer ──
+// ── gabi.writer (style profiles & knowledge docs) ──
 
 export const gabiWriter = {
   profiles: () => request("/api/ghost/profiles"),
   createProfile: (data: { name: string }) => request("/api/ghost/profiles", { method: "POST", body: JSON.stringify(data) }),
   extractStyle: (profileId: string) => request(`/api/ghost/profiles/${profileId}/extract-style`, { method: "POST" }),
-  generate: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }) =>
-    request("/api/ghost/generate", { method: "POST", body: JSON.stringify(data) }),
-  generateStream: (data: { profile_id: string; prompt: string; chat_history?: Array<{ role: string; content: string }> }, signal?: AbortSignal) =>
-    streamRequest("/api/ghost/generate-stream", data, signal),
   upload: (profileId: string, docType: string, file: File) =>
     uploadFile("/api/ghost/upload", file, { profile_id: profileId, doc_type: docType }),
   documents: (profileId?: string) =>

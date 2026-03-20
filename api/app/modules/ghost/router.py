@@ -1,14 +1,13 @@
 """
-nGhost Module — Ghost Writer with Style Signature + Dual RAG
+nGhost Module — Style Profile Management & Knowledge Documents
 
-Improvements implemented:
- 1. Few-shot exemplars: top-3 representative excerpts injected in generation prompt
- 2. Full chunk context: no more 500-char truncation on RAG results
- 3. Differentiated chunking: style=3000 chars, content=2000 chars
- 4. Incremental style refinement: auto-suggest re-extraction after new style uploads
- 5. Style compliance score: post-generation fidelity check (opt-in)
+Provides endpoints for:
+ - Style profile CRUD (create, list)
+ - Style extraction / refinement (forensic analysis of author voice)
+ - Document upload & management (style + content docs with differentiated chunking)
 
-Also includes all P0/P1/P2 fixes from previous audit.
+Text generation now runs through the unified Gabi orchestrator (law/router.py)
+using the 'writer' agent with style_profile_id.
 """
 
 import logging
@@ -20,25 +19,21 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.core.analytics import log_event
 from app.core.auth import CurrentUser, get_current_user
-from app.core.ai import generate, generate_json
-from app.core.embeddings import embed
-from app.core.rate_limit import check_rate_limit
-from app.core.memory import summarize, should_summarize
+from app.core.ai import generate
 from app.models.ghost import StyleProfile, KnowledgeDocument, DocumentChunk
 
 logger = logging.getLogger("gabi.ghost")
 
 router = APIRouter()
 
-# ── Chunking parameters by doc type (Improvement #3) ──
+# ── Chunking parameters by doc type ──
 CHUNK_PARAMS = {
-    "style":   {"chunk_size": 3000, "overlap": 100},   # Preserve natural flow
-    "content": {"chunk_size": 2000, "overlap": 300},    # Maximize fact retrieval
+    "style":   {"chunk_size": 3000, "overlap": 100},
+    "content": {"chunk_size": 2000, "overlap": 300},
 }
 
-# ── System Prompts ──
+# ── Prompts ──
 
 STYLE_EXTRACTION_PROMPT = """\
 Aja como um linguista forense especializado em textos corporativos e jurídicos.
@@ -95,64 +90,12 @@ Entregue em JSON:
 }}
 """
 
-GHOST_WRITER_PROMPT = """\
-[PERSONA] Você é a Gabi, Ghost Writer profissional de elite.
-Você é INVISÍVEL. O leitor não deve perceber que uma IA escreveu.
-
-[MANUAL DE ESTILO DO AUTOR]
-{style_signature}
-
-[EXEMPLOS REPRESENTATIVOS DO ESTILO DO AUTOR — use como referência literária]
-{exemplars_block}
-
-[REGRAS]
-1. Siga o manual de estilo FIELMENTE — tom, vocabulário, ritmo.
-2. Use APENAS os fatos da base de conteúdo abaixo.
-3. Se um dado factual não estiver na base: "[⚠️ Dado não encontrado — preencher]"
-4. NUNCA invente dados factuais (nomes, datas, números, citações, estatísticas).
-5. Prefira deixar lacunas marcadas do que fabricar informações.
-6. Mantenha a voz autoral consistente do início ao fim do texto.
-7. Imite a estrutura de frases e parágrafos dos exemplos acima.
-"""
-
-STYLE_VERIFY_PROMPT = """\
-Compare o texto gerado com o Manual de Estilo do autor abaixo.
-Avalie a fidelidade estilística.
-
-MANUAL DE ESTILO:
-{style_signature}
-
-TEXTO GERADO:
-{generated_text}
-
-Responda em JSON:
-{{
-  "score": 85,
-  "deviations": [
-    "No parágrafo 2, o tom é mais formal que o padrão do autor.",
-    "Excesso de frases longas — o autor prefere frases curtas."
-  ],
-  "suggestions": [
-    "Reescrever parágrafo 2 em tom mais direto.",
-    "Quebrar a frase X em duas."
-  ]
-}}
-"""
-
 # ── Constants ──
 MIN_STYLE_DOCS = 3
 MIN_STYLE_CHARS = 3000
-REFRESH_INTERVAL = 3  # Re-suggest extraction every N new style docs
-
+REFRESH_INTERVAL = 3
 
 # ── Request Models ──
-
-class GenerateRequest(BaseModel):
-    profile_id: str
-    prompt: str
-    chat_history: list[dict] | None = None
-    verify_style: bool = False  # Opt-in style compliance check (#5)
-
 
 class ProfileCreate(BaseModel):
     name: str
@@ -163,7 +106,6 @@ class ProfileCreate(BaseModel):
 async def _get_owned_profile(
     profile_id: str, user_uid: str, db: AsyncSession
 ) -> StyleProfile:
-    """Fetch a profile and verify ownership. Raises 404/403."""
     result = await db.execute(
         select(StyleProfile).where(StyleProfile.id == profile_id)
     )
@@ -175,115 +117,45 @@ async def _get_owned_profile(
     return profile
 
 
-def _build_exemplars_block(exemplars: list[str] | None) -> str:
-    """Format exemplars for injection into the generation prompt."""
-    if not exemplars:
-        return "(Nenhum exemplar disponível)"
-    parts = []
-    for i, ex in enumerate(exemplars[:3], 1):
-        parts.append(f'Exemplo {i}:\n"""\n{ex}\n"""')
-    return "\n\n".join(parts)
+# ── Profile Management ──
 
-
-def _build_system_prompt(profile: StyleProfile) -> str:
-    """Build the full system prompt with signature + exemplars."""
-    return GHOST_WRITER_PROMPT.format(
-        style_signature=profile.style_signature or "",
-        exemplars_block=_build_exemplars_block(profile.style_exemplars),
+@router.get("/profiles")
+async def list_profiles(
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(StyleProfile)
+        .where(StyleProfile.user_id == user.uid, StyleProfile.is_active == True)
+        .order_by(StyleProfile.updated_at.desc())
     )
-
-
-async def _build_generation_context(
-    prompt: str,
-    profile: StyleProfile,
-    chat_history: list[dict] | None,
-    user_uid: str,
-    db: AsyncSession,
-) -> tuple[str, list[dict], str]:
-    """
-    Shared helper for /generate and /generate-stream.
-    Returns (full_prompt, sources_list, system_prompt).
-    """
-    if not profile.style_signature:
-        raise HTTPException(
-            400, "Perfil sem Style Signature. Execute /extract-style primeiro."
-        )
-
-    system_prompt = _build_system_prompt(profile)
-
-    # Memory: summarize long conversations to cut tokens
-    history = chat_history or []
-    if should_summarize(len(history)):
-        summary = await summarize(history)
-        if summary:
-            history = [{"role": "model", "content": f"[Resumo da conversa]: {summary}"}] + history[-4:]
-
-    # RAG: search content documents
-    from app.core.dynamic_rag import retrieve_if_needed
-
-    raw_chunks, _ = await retrieve_if_needed(
-        question=prompt,
-        chat_history=history,
-        db=db,
-        module="ghost",
-        user_id=user_uid,
-        profile_id=str(profile.id),
-        limit=5,
-    )
-
-    # Deduplicate sources by title
-    seen_titles: set[str] = set()
-    sources: list[dict] = []
-    for c in raw_chunks:
-        title = c.get("title", "")
-        if title and title not in seen_titles:
-            seen_titles.add(title)
-            sources.append({"title": title, "type": c.get("doc_type", "")})
-
-    # Improvement #2: Use FULL chunk content — no truncation
-    # Gemini Flash supports 1M context, so full chunks are fine
-    if raw_chunks:
-        context_parts = []
-        for c in raw_chunks:
-            source_label = c.get("title", "Documento")
-            context_parts.append(f"[Fonte: {source_label}]\n{c['content']}")
-        context = "\n\n---\n\n".join(context_parts)
-    else:
-        context = "Nenhum conteúdo encontrado na base."
-
-    full_prompt = f"""\
-[CONTEÚDO FACTUAL (Base RAG)]
-{context}
-
-[PEDIDO DO USUÁRIO]
-{prompt}
-"""
-    return full_prompt, sources, system_prompt
-
-
-async def _verify_style_compliance(
-    generated_text: str, style_signature: str
-) -> dict | None:
-    """Improvement #5: Post-generation style fidelity check."""
-    try:
-        result = await generate_json(
-            module="ntalk",  # Flash — cheap
-            prompt=STYLE_VERIFY_PROMPT.format(
-                style_signature=style_signature[:2000],
-                generated_text=generated_text[:3000],
-            ),
-        )
-        return {
-            "score": result.get("score", 0),
-            "deviations": result.get("deviations", []),
-            "suggestions": result.get("suggestions", []),
+    profiles = result.scalars().all()
+    return [
+        {
+            "id": str(p.id),
+            "name": p.name,
+            "samples": p.sample_count,
+            "has_signature": p.style_signature is not None,
+            "needs_refresh": p.needs_refresh,
         }
-    except Exception as e:
-        logger.warning("Style verification failed: %s", e)
-        return None
+        for p in profiles
+    ]
 
 
-# ── Document Upload ──
+@router.post("/profiles")
+async def create_profile(
+    profile: ProfileCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    new_profile = StyleProfile(user_id=user.uid, name=profile.name)
+    db.add(new_profile)
+    await db.commit()
+    await db.refresh(new_profile)
+    return {"id": str(new_profile.id), "name": new_profile.name}
+
+
+# ── Document Upload & Management ──
 
 @router.post("/upload")
 async def upload_document(
@@ -293,7 +165,6 @@ async def upload_document(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Upload a style or content document to a profile."""
     if doc_type not in ("style", "content"):
         raise HTTPException(400, "doc_type deve ser 'style' ou 'content'")
 
@@ -301,7 +172,6 @@ async def upload_document(
 
     from app.core.ingest import process_document
 
-    # Improvement #3: Differentiated chunking parameters
     params = CHUNK_PARAMS.get(doc_type, CHUNK_PARAMS["content"])
 
     result = await process_document(
@@ -322,16 +192,13 @@ async def upload_document(
     if "error" in result:
         raise HTTPException(422, result["error"])
 
-    # Update sample count
     profile.sample_count = (profile.sample_count or 0) + 1
 
-    # Improvement #4: Flag for incremental refinement
     if doc_type == "style" and profile.style_signature:
         profile.needs_refresh = True
 
     await db.commit()
 
-    # Notify if refresh is recommended
     response = {**result}
     if profile.needs_refresh and profile.sample_count % REFRESH_INTERVAL == 0:
         response["style_refresh_recommended"] = True
@@ -343,15 +210,12 @@ async def upload_document(
     return response
 
 
-# ── Document Management ──
-
 @router.get("/documents")
 async def list_documents(
     profile_id: str | None = None,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all knowledge documents for the current user."""
     query = (
         select(KnowledgeDocument)
         .where(KnowledgeDocument.user_id == user.uid)
@@ -389,7 +253,6 @@ async def delete_document(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Delete a document and all its chunks."""
     result = await db.execute(
         select(KnowledgeDocument).where(
             KnowledgeDocument.id == doc_id,
@@ -409,46 +272,6 @@ async def delete_document(
     return {"deleted": True, "document_id": doc_id}
 
 
-# ── Profile Management ──
-
-@router.get("/profiles")
-async def list_profiles(
-    user: CurrentUser = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """List user's style profiles."""
-    result = await db.execute(
-        select(StyleProfile)
-        .where(StyleProfile.user_id == user.uid, StyleProfile.is_active == True)
-        .order_by(StyleProfile.updated_at.desc())
-    )
-    profiles = result.scalars().all()
-    return [
-        {
-            "id": str(p.id),
-            "name": p.name,
-            "samples": p.sample_count,
-            "has_signature": p.style_signature is not None,
-            "needs_refresh": p.needs_refresh,
-        }
-        for p in profiles
-    ]
-
-
-@router.post("/profiles")
-async def create_profile(
-    profile: ProfileCreate,
-    user: CurrentUser = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Create a new style profile."""
-    new_profile = StyleProfile(user_id=user.uid, name=profile.name)
-    db.add(new_profile)
-    await db.commit()
-    await db.refresh(new_profile)
-    return {"id": str(new_profile.id), "name": new_profile.name}
-
-
 # ── Style Extraction ──
 
 @router.post("/profiles/{profile_id}/extract-style")
@@ -457,13 +280,8 @@ async def extract_style(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Extract (or refine) Style Signature + Exemplars.
-    If a signature already exists and new docs were added, performs incremental refinement.
-    """
     profile = await _get_owned_profile(profile_id, user.uid, db)
 
-    # Get all style chunks
     chunks_result = await db.execute(
         text("""
             SELECT c.content FROM ghost_doc_chunks c
@@ -481,7 +299,6 @@ async def extract_style(
             422, "Nenhum documento de estilo encontrado. Faça upload primeiro."
         )
 
-    # Minimum threshold
     doc_count_result = await db.execute(
         text("""
             SELECT COUNT(DISTINCT d.id) FROM ghost_knowledge_docs d
@@ -500,11 +317,9 @@ async def extract_style(
             f"com no mínimo {MIN_STYLE_CHARS} caracteres. Atual: {doc_count} docs, {len(combined)} chars.",
         )
 
-    # Improvement #4: Incremental refinement vs first-time extraction
     is_refinement = bool(profile.style_signature and profile.needs_refresh)
 
     if is_refinement:
-        # Refinement: send old signature + new texts
         raw = await generate(
             module="ghost",
             prompt=STYLE_REFINEMENT_PROMPT.format(
@@ -513,27 +328,21 @@ async def extract_style(
             ),
         )
     else:
-        # First extraction: forensic analysis
         raw = await generate(
             module="ghost",
             prompt=f"Textos do autor:\n\n{combined}",
             system_instruction=STYLE_EXTRACTION_PROMPT,
         )
 
-    # Parse structured response (manual + exemplars)
     from app.core.ai import safe_parse_json
     parsed = safe_parse_json(raw)
 
-    signature = parsed.get("manual", raw)  # Fallback to full text if parsing fails
+    signature = parsed.get("manual", raw)
     exemplars = parsed.get("exemplars", [])
-
-    # Ensure exemplars are strings and non-empty
     exemplars = [e.strip() for e in exemplars if isinstance(e, str) and len(e.strip()) > 50][:3]
 
-    # Save to profile
     profile.style_signature = signature
     profile.style_exemplars = exemplars
-    profile.system_prompt = _build_system_prompt(profile)
     profile.needs_refresh = False
     await db.commit()
 
@@ -546,96 +355,3 @@ async def extract_style(
         result["changes"] = parsed.get("changes", "")
 
     return result
-
-
-# ── Generation ──
-
-@router.post("/generate")
-async def generate_text(
-    req: GenerateRequest,
-    user: CurrentUser = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Generate text using Style Signature + Few-Shot Exemplars + Content RAG."""
-    await check_rate_limit(user.uid, "ghost_generate", max_requests=30, window_seconds=60)
-
-    profile = await _get_owned_profile(req.profile_id, user.uid, db)
-    full_prompt, sources, system_prompt = await _build_generation_context(
-        req.prompt, profile, req.chat_history, user.uid, db
-    )
-
-    response = await generate(
-        module="ghost",
-        prompt=full_prompt,
-        system_instruction=system_prompt,
-        chat_history=req.chat_history,
-    )
-
-    await log_event(
-        db, user.uid, "ghost", "query",
-        metadata={"profile": profile.name, "sources": len(sources)},
-    )
-
-    result = {"text": response, "profile": profile.name, "sources": sources}
-
-    # Improvement #5: Optional style compliance score
-    if req.verify_style and profile.style_signature:
-        compliance = await _verify_style_compliance(response, profile.style_signature)
-        if compliance:
-            result["style_compliance"] = compliance
-
-    return result
-
-
-@router.post("/generate-stream")
-async def generate_text_stream(
-    req: GenerateRequest,
-    user: CurrentUser = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """Stream text generation using Style Signature + Few-Shot Exemplars + Content RAG (SSE)."""
-    from fastapi.responses import StreamingResponse
-    from app.core.ai import generate_stream
-    import json as _json
-
-    await check_rate_limit(user.uid, "ghost_generate", max_requests=30, window_seconds=60)
-
-    profile = await _get_owned_profile(req.profile_id, user.uid, db)
-    full_prompt, sources, system_prompt = await _build_generation_context(
-        req.prompt, profile, req.chat_history, user.uid, db
-    )
-
-    async def event_generator():
-        collected_text = []
-        try:
-            async for chunk_text in generate_stream(
-                module="ghost",
-                prompt=full_prompt,
-                system_instruction=system_prompt,
-                chat_history=req.chat_history,
-            ):
-                collected_text.append(chunk_text)
-                yield f"data: {_json.dumps({'text': chunk_text})}\n\n"
-
-            # Send sources
-            yield f"data: {_json.dumps({'sources': sources})}\n\n"
-
-            # Improvement #5: Optional style verification after streaming
-            if req.verify_style and profile.style_signature:
-                full_text = "".join(collected_text)
-                compliance = await _verify_style_compliance(full_text, profile.style_signature)
-                if compliance:
-                    yield f"data: {_json.dumps({'style_compliance': compliance})}\n\n"
-
-            yield "data: [DONE]\n\n"
-        except Exception as stream_err:
-            logger.error("Ghost stream error: %s", stream_err, exc_info=True)
-            yield f'data: {_json.dumps({"error": str(stream_err)})}\n\n'
-            yield "data: [DONE]\n\n"
-
-    await log_event(
-        db, user.uid, "ghost", "query_stream",
-        metadata={"profile": profile.name, "sources": len(sources)},
-    )
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
