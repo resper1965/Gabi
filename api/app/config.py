@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # Model routing per module
     model_ghost: str = "gemini-2.0-flash-001"   # Creativity + low latency
-    model_law: str = "gemini-1.5-pro"            # Long context + precision
+    model_law: str = "gemini-2.5-pro-preview-05-06"  # Best reasoning for legal
     model_ntalk: str = "gemini-2.0-flash-001"   # SQL generation
     
     # LLM Settings

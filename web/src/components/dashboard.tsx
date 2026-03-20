@@ -4,8 +4,9 @@ import { PenTool, Scale, Database, ArrowRight, Lock, Clock, FileText, Activity }
 import Link from "next/link"
 import NextImage from "next/image"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAuth } from "@/components/auth-provider"
+import { gabi } from "@/lib/api"
 
 const allModules = [
   {
@@ -56,9 +57,21 @@ export default function DashboardPage() {
   }, [profile, loading, router])
 
   const isSuperadmin = profile?.role === "superadmin"
+  const isAdmin = profile?.role === "admin" || isSuperadmin
   const allowedModules = profile?.allowed_modules || []
   const firstName = profile?.name?.split(" ")[0] || user?.displayName?.split(" ")[0] || user?.email?.split("@")[0] || "Usuário"
   const avatarUrl = profile?.picture || user?.photoURL || null
+
+  // ── Dynamic KPIs ──
+  const [stats, setStats] = useState<{ users: number; documents: { total: number }; database_size_mb: number } | null>(null)
+
+  useEffect(() => {
+    if (isAdmin) {
+      gabi.admin.stats()
+        .then((data) => setStats(data as { users: number; documents: { total: number }; database_size_mb: number }))
+        .catch(() => {})
+    }
+  }, [isAdmin])
 
   const visible = allModules.filter(
     (m) => isSuperadmin || allowedModules.includes(m.key)
@@ -101,27 +114,31 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Executive KPIs (Swiss Style) ── */}
+      {/* ── Executive KPIs (Dynamic) ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
         <div className="glass-panel p-6 rounded-xl flex flex-col justify-between">
           <div className="flex items-center gap-3 mb-4">
             <Clock className="w-4 h-4 text-emerald-500" />
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Tempo Economizado</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Usuários</span>
           </div>
           <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-white tracking-tighter">142h</span>
-            <span className="text-sm font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">+12%</span>
+            <span className="text-3xl font-bold text-white tracking-tighter">
+              {stats ? stats.users : "—"}
+            </span>
+            {stats && <span className="text-sm font-medium text-slate-400">registrados</span>}
           </div>
         </div>
         
         <div className="glass-panel p-6 rounded-xl flex flex-col justify-between">
           <div className="flex items-center gap-3 mb-4">
             <FileText className="w-4 h-4 text-cyan-500" />
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Normativos Lidos</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Documentos</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-white tracking-tighter">1.2k</span>
-            <span className="text-sm font-medium text-slate-400">Nesta semana</span>
+            <span className="text-3xl font-bold text-white tracking-tighter">
+              {stats ? stats.documents.total : "—"}
+            </span>
+            {stats && <span className="text-sm font-medium text-slate-400">indexados</span>}
           </div>
         </div>
 

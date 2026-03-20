@@ -220,6 +220,8 @@ export const gabiLegal = {
 export const gabiData = {
   ask: (data: { tenant_id: string; question: string; chat_history?: Array<{ role: string; content: string }>; summary?: string }) =>
     request("/api/ntalk/ask", { method: "POST", body: JSON.stringify(data) }),
+  askStream: (data: { tenant_id: string; question: string; chat_history?: Array<{ role: string; content: string }>; summary?: string }, signal?: AbortSignal) =>
+    streamRequest("/api/ntalk/ask-stream", data, signal),
   addTerm: (tenantId: string, term: string, definition: string) =>
     request("/api/ntalk/dictionary", { method: "POST", body: JSON.stringify({ tenant_id: tenantId, term, definition }) }),
   registerConnection: (data: { tenant_id: string; name: string; host: string; port?: number; db_name: string; username: string; secret_manager_ref: string }) =>

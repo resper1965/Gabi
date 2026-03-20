@@ -50,43 +50,78 @@ export default function NTalkPage() {
       ])
       setIsLoading(true)
 
+      const assistantId = (Date.now() + 1).toString()
+
       try {
         const history = messages
           .slice(-CTX_WINDOW)
           .map((m) => ({ role: m.role, content: m.content }))
 
-        const res = (await gabi.ntalk.ask({
+        const controller = new AbortController()
+        const reader = await gabi.ntalk.askStream({
           tenant_id: "default",
           question: text,
           chat_history: history,
           summary: summary || undefined,
-        })) as {
-          analysis: string
-          sql?: string
-          results?: { columns: string[]; rows: Record<string, string | number | null>[]; row_count: number }
-          summary?: string
-        }
+        }, controller.signal)
 
-        let content = res.analysis || "Sem resposta"
-        if (res.sql)
-          content = `**SQL Gerado:**\n\`\`\`sql\n${res.sql}\n\`\`\`\n\n${content}`
+        let fullText = ""
+        let sqlPrefix = ""
+        let resultsMeta: Record<string, unknown> | undefined
 
+        // Add empty assistant message to stream into
         setMessages((prev) => [
           ...prev,
-          {
-            id: Date.now().toString(),
-            role: "assistant",
-            content,
-            createdAt: Date.now(),
-            metadata: res.results ? { results: res.results } : undefined,
-          },
+          { id: assistantId, role: "assistant", content: "⏳", createdAt: Date.now() },
         ])
 
-        if (res.summary) setSummary(res.summary)
+        const decoder = new TextDecoder()
+        let buffer = ""
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split("\n")
+          buffer = lines.pop() || ""
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue
+            const payload = line.slice(6).trim()
+            if (payload === "[DONE]") continue
+
+            try {
+              const event = JSON.parse(payload)
+              if (event.type === "meta") {
+                if (event.sql) sqlPrefix = `**SQL Gerado:**\n\`\`\`sql\n${event.sql}\n\`\`\`\n\n`
+                if (event.results) resultsMeta = event.results
+              } else if (event.type === "text") {
+                fullText += event.text
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? { ...m, content: sqlPrefix + fullText, metadata: resultsMeta ? { results: resultsMeta } : undefined }
+                      : m
+                  )
+                )
+              }
+            } catch {
+              // skip malformed events
+            }
+          }
+        }
+
+        // Final update
+        if (!fullText && !sqlPrefix) {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === assistantId ? { ...m, content: "Sem resposta" } : m))
+          )
+        }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Erro ao processar"
         setMessages((prev) => [
-          ...prev,
+          ...prev.filter((m) => m.id !== assistantId),
           {
             id: Date.now().toString(),
             role: "assistant",

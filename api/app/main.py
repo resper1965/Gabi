@@ -31,6 +31,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning("Firebase init failed (non-fatal): %s", e)
 
+    # Initialize OpenTelemetry (non-blocking)
+    try:
+        from app.core.telemetry import init_telemetry
+        init_telemetry()
+    except Exception as e:
+        logger.info("Telemetry init skipped: %s", e)
+
     # Validate optional dependencies at startup (TD-6)
     try:
         from app.core.startup_checks import check_dependencies, check_embedding_model
