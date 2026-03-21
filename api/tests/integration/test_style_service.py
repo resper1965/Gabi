@@ -1,5 +1,5 @@
 """
-Integration tests — nGhost Router
+Integration tests — Style Service (formerly ghost module)
 Tests: style profiles, document upload, style extraction, text generation.
 """
 

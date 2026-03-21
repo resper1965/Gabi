@@ -22,8 +22,8 @@ class TestAllowedTablePairs:
         assert chunks == "law_chunks"
         assert docs == "law_documents"
 
-    def test_ghost_module_exists(self):
-        assert "ghost" in ALLOWED_TABLE_PAIRS
+    def test_style_module_exists(self):
+        assert "style" in ALLOWED_TABLE_PAIRS
 
 
     def test_invalid_module_not_in_pairs(self):

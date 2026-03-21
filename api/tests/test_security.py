@@ -16,7 +16,7 @@ class TestBOLA:
         # This test validates the pattern is present
         import ast
         import inspect
-        from app.modules.ghost.router import list_profiles
+        from app.modules.law.style_service import list_profiles
         source = inspect.getsource(list_profiles)
         assert "user.uid" in source or "user_id" in source, "list_profiles must filter by user"
 
@@ -65,7 +65,7 @@ class TestSQLInjection:
         """Only whitelisted table pairs should be allowed."""
         from app.core.dynamic_rag import ALLOWED_TABLE_PAIRS
         assert "law" in ALLOWED_TABLE_PAIRS
-        assert "ghost" in ALLOWED_TABLE_PAIRS
+        assert "style" in ALLOWED_TABLE_PAIRS
         # Injection attempt
         assert "'; DROP TABLE users; --" not in ALLOWED_TABLE_PAIRS
 
@@ -80,12 +80,12 @@ class TestAntiHallucination:
 
 
 
-    def test_ghost_has_citations_rule(self):
-        """GhostWriter should cite sources."""
+    def test_style_service_has_router(self):
+        """Style service should have a router."""
         # Verify the pattern exists in the module
         import importlib
-        ghost = importlib.import_module("app.modules.ghost.router")
-        assert hasattr(ghost, "router"), "Ghost module must have router"
+        style = importlib.import_module("app.modules.law.style_service")
+        assert hasattr(style, "router"), "Style service must have router"
 
 
 class TestAuthMiddleware:
