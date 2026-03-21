@@ -10,9 +10,14 @@
 
 | Campo | Valor |
 | --- | --- |
-| **Controlador** | Ness Tecnologia Ltda. |
-| **CNPJ** | [A definir] |
-| **Endereço** | [A definir] |
+| **Controlador** | Ness Processos e Tecnologia Ltda. |
+| **Nome Fantasia** | Ness |
+| **CNPJ** | 72.027.097/0001-37 |
+| **IE SP** | 113.905.499.118 |
+| **Endereço** | Rua George Ohm, 230 — Torre A, Cj. 82, Brooklin Paulista, São Paulo/SP, CEP 04576-020 |
+| **Natureza Jurídica** | Sociedade Empresária Limitada |
+| **Fundação** | 20/09/1993 |
+| **Situação** | Ativa |
 | **DPO / Encarregado** | `dpo@ness.com.br` |
 | **Contato Segurança** | `security@ness.com.br` |
 
