@@ -16,9 +16,9 @@ class TestBOLA:
         # This test validates the pattern is present
         import ast
         import inspect
-        from app.modules.ghost.router import generate_text
-        source = inspect.getsource(generate_text)
-        assert "profile" in source, "generate_text must filter by profile"
+        from app.modules.ghost.router import list_profiles
+        source = inspect.getsource(list_profiles)
+        assert "user.uid" in source or "user_id" in source, "list_profiles must filter by user"
 
     def test_chat_messages_scoped_to_user(self):
         """Chat history must be scoped to authenticated user."""

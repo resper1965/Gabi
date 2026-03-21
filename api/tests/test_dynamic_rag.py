@@ -83,7 +83,8 @@ class TestShouldRetrieve:
     @pytest.mark.asyncio
     @patch("app.core.dynamic_rag.generate")
     async def test_fallback_on_error(self, mock_generate):
-        mock_generate.side_effect = Exception("API error")
+        from google.api_core.exceptions import GoogleAPIError
+        mock_generate.side_effect = GoogleAPIError("API error")
         result = await should_retrieve("test query")
         # Should default to needs_rag=True on error
         assert result["needs_rag"] is True

@@ -13,6 +13,8 @@ from typing import AsyncGenerator, Literal
 
 import vertexai
 from vertexai.generative_models import GenerativeModel
+from google.api_core.exceptions import GoogleAPIError
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import get_settings
 from app.core.circuit_breaker import vertex_ai_breaker
@@ -62,7 +64,7 @@ async def flush_token_usage(user_id: str, org_id: str | None = None) -> None:
                     **entry,
                 ))
             await db.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.warning("Failed to flush token usage: %s", e)
 settings = get_settings()
 
@@ -153,7 +155,7 @@ async def generate(
             pass
 
         return response.text
-    except Exception as e:
+    except GoogleAPIError as e:
         await vertex_ai_breaker.record_failure()
         logger.error("AI generate failed: module=%s, error=%s", module, str(e), exc_info=True)
         raise
@@ -192,7 +194,7 @@ async def generate_stream(
         # FinOps: capture token usage from stream
         if total_prompt or total_completion:
             _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), total_prompt, total_completion)
-    except Exception as e:
+    except GoogleAPIError as e:
         await vertex_ai_breaker.record_failure()
         logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
         raise

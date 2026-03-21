@@ -123,7 +123,7 @@ async def _get_owned_profile(
 async def list_profiles(
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[dict]:
     result = await db.execute(
         select(StyleProfile)
         .where(StyleProfile.user_id == user.uid, StyleProfile.is_active == True)
@@ -147,7 +147,7 @@ async def create_profile(
     profile: ProfileCreate,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict:
     new_profile = StyleProfile(user_id=user.uid, name=profile.name)
     db.add(new_profile)
     await db.commit()
@@ -164,7 +164,7 @@ async def upload_document(
     file: UploadFile = File(...),
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict:
     if doc_type not in ("style", "content"):
         raise HTTPException(400, "doc_type deve ser 'style' ou 'content'")
 
@@ -215,7 +215,7 @@ async def list_documents(
     profile_id: str | None = None,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[dict]:
     query = (
         select(KnowledgeDocument)
         .where(KnowledgeDocument.user_id == user.uid)
@@ -252,7 +252,7 @@ async def delete_document(
     doc_id: str,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict:
     result = await db.execute(
         select(KnowledgeDocument).where(
             KnowledgeDocument.id == doc_id,
@@ -279,7 +279,7 @@ async def extract_style(
     profile_id: str,
     user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict:
     profile = await _get_owned_profile(profile_id, user.uid, db)
 
     chunks_result = await db.execute(

@@ -20,14 +20,7 @@ class TestPlatformAuth:
             _require_platform_admin(user)
         assert exc_info.value.status_code == 403
 
-    def test_require_platform_admin_blocks_non_ness_email(self):
-        """Superadmin without @ness.com.br is blocked."""
-        from app.core.auth import CurrentUser
-        from app.modules.platform.router import _require_platform_admin
-        user = CurrentUser(uid="u1", email="admin@other.com", role="superadmin", status="approved")
-        with pytest.raises(HTTPException) as exc_info:
-            _require_platform_admin(user)
-        assert exc_info.value.status_code == 403
+
 
     def test_require_platform_admin_allows_ness_superadmin(self):
         """Superadmin with @ness.com.br is allowed."""

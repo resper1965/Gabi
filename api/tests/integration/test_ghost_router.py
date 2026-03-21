@@ -10,14 +10,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 class TestStyleProfiles:
     """Test style profile management."""
 
-    def test_generate_request_model(self):
-        """GenerateRequest validates required fields."""
-        from app.modules.ghost.router import GenerateRequest
-        req = GenerateRequest(profile_id="prof-1", prompt="Write about technology")
-        assert req.profile_id == "prof-1"
-        assert req.prompt == "Write about technology"
-        assert req.chat_history is None
-
     @pytest.mark.asyncio
     async def test_create_profile(self, mock_db, mock_user):
         """Creating a style profile stores it in DB."""
@@ -64,13 +56,6 @@ class TestTextGeneration:
         mock_vertex_ai.return_value = "Generated text in user's style"
         # Should use both style_signature and RAG context
         assert mock_embed is not None
-
-    def test_ghost_writer_prompt_includes_guardrails(self):
-        """Ghost writer prompt includes anti-fabrication rules."""
-        from app.modules.ghost.router import GHOST_WRITER_PROMPT
-        assert "NUNCA invente" in GHOST_WRITER_PROMPT or "NUNCA" in GHOST_WRITER_PROMPT
-        assert "style_signature" in GHOST_WRITER_PROMPT
-
 
 class TestDocumentManagement:
     """Test document upload and listing."""

@@ -28,14 +28,14 @@ async def lifespan(app: FastAPI):
     try:
         _init_firebase()
         logger.info("Firebase initialized")
-    except Exception as e:
+    except (ImportError, RuntimeError, ValueError) as e:
         logger.warning("Firebase init failed (non-fatal): %s", e)
 
     # Initialize OpenTelemetry (non-blocking)
     try:
         from app.core.telemetry import init_telemetry
         init_telemetry()
-    except Exception as e:
+    except ImportError as e:
         logger.info("Telemetry init skipped: %s", e)
 
     # Validate optional dependencies at startup (TD-6)
@@ -43,13 +43,14 @@ async def lifespan(app: FastAPI):
         from app.core.startup_checks import check_dependencies, check_embedding_model
         check_dependencies()
         check_embedding_model()
-    except Exception as e:
+    except (ImportError, ValueError, RuntimeError) as e:
         logger.warning("Startup checks failed (non-fatal): %s", e)
 
     # Self-healing migration: ensure users.org_id column exists
     try:
         from app.database import engine
         from sqlalchemy import text
+        import sqlalchemy.exc
         async with engine.begin() as conn:
             # NOTE: no FK constraint — simpler, avoids table-order issues
             await conn.execute(text(
@@ -59,7 +60,7 @@ async def lifespan(app: FastAPI):
                 "CREATE INDEX IF NOT EXISTS ix_users_org_id ON users(org_id)"
             ))
         logger.info("Startup migration: users.org_id column verified OK")
-    except Exception as e:
+    except sqlalchemy.exc.SQLAlchemyError as e:
         logger.error("Startup migration FAILED: %s: %s", type(e).__name__, e)
 
     logger.info("Startup complete")

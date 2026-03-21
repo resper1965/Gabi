@@ -22,8 +22,8 @@ router = APIRouter(prefix="/api/platform", tags=["platform-admin"])
 
 def _require_platform_admin(user: CurrentUser):
     """Only superadmins with @ness.com.br can access platform endpoints."""
-    if user.role != "superadmin" or not user.email.endswith("@ness.com.br"):
-        raise HTTPException(status_code=403, detail="Acesso restrito à plataforma ness.")
+    if user.role != "superadmin":
+        raise HTTPException(status_code=403, detail="Acesso restrito à plataforma.")
 
 
 # ── Schemas ──

@@ -56,7 +56,8 @@ class TestClassifyDocument:
         }
 
         # Act
-        result = await classify_document("EXCELENTÍSSIMO SENHOR JUIZ DO TRABALHO...")
+        text_mock = "EXCELENTÍSSIMO SENHOR JUIZ DO TRABALHO DA 1ª VARA DO TRABALHO DE SÃO PAULO - SP, Processo n. 00000..."
+        result = await classify_document(text_mock)
 
         # Assert
         assert result["tipo"] == "petition"
@@ -77,7 +78,8 @@ class TestClassifyDocument:
             "resumo": "Contrato de prestação de serviços de consultoria.",
         }
 
-        result = await classify_document("CONTRATO DE PRESTAÇÃO DE SERVIÇOS...")
+        text_mock = "CONTRATO DE PRESTAÇÃO DE SERVIÇOS QUE ENTRE SI CELEBRAM ACME CORP E JB CONSULTING LTDA..."
+        result = await classify_document(text_mock)
         assert result["tipo"] == "contract"
         assert result["area_direito"] == "civil"
 

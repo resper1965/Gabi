@@ -26,6 +26,8 @@ import uuid as _uuid_mod
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import SQLAlchemyError
+from google.api_core.exceptions import GoogleAPIError
 
 from app.core.ai import generate, safe_parse_json
 from app.core.cache import cached_rag_result, cache_rag_result
@@ -89,7 +91,7 @@ async def should_retrieve(
             "scope": scope,
             "reason": result.get("reason", ""),
         }
-    except Exception:
+    except GoogleAPIError:
         # Default to always searching if intent detection fails
         return {"needs_rag": True, "refined_query": question, "scope": "all", "reason": "fallback"}
 
@@ -161,7 +163,7 @@ async def _search_legal_provisions(
             {"emb": str(query_embedding), "lim": limit},
         )
         return [dict(r._mapping) for r in results]
-    except Exception as e:
+    except SQLAlchemyError as e:
         # Table may not exist in all environments
         logger.debug("BKJ legal_provisions search skipped: %s", e)
         return []
@@ -206,7 +208,7 @@ async def _get_insights_for_versions(
                 "risco_justificativa": analysis.risco_justificativa,
             })
         return insights
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error("Error fetching regulatory insights: %s", e, exc_info=True)
         return []
 
@@ -465,7 +467,7 @@ async def retrieve_if_needed(
                 "output_count": len(chunks),
                 "ms": _ms(t0),
             }
-        except Exception as e:
+        except GoogleAPIError as e:
             logger.warning("LLM re-ranker failed [%s]: %s", trace_id, e)
             chunks = fused_chunks[:limit]
             trace["rerank"] = {"error": str(e), "fallback": True, "ms": _ms(t0)}

@@ -12,6 +12,7 @@ This client combines multiple sources to achieve comprehensive coverage.
 import asyncio
 import hashlib
 import logging
+import httpx
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -122,7 +123,7 @@ class CVMClient:
                 try:
                     docs = await self.lexml.search(query, max_records=max_per_type)
                     all_docs.extend(docs)
-                except Exception as e:
+                except (httpx.HTTPError, ValueError) as e:
                     logger.warning("LexML search failed for CVM %s: %s", doc_type, e)
 
         # Deduplicate by URN
@@ -196,7 +197,7 @@ class CVMClient:
             logger.info("CVM DOU fallback: %d recent acts found", len(normativos))
             return normativos
 
-        except Exception as e:
+        except (httpx.HTTPError, ValueError, ImportError) as e:
             logger.warning("CVM DOU fallback failed: %s", e)
             return []
 

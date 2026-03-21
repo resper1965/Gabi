@@ -4,45 +4,30 @@ User management, role assignment, module access, system stats.
 Requires admin or superadmin role.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
-from sqlalchemy import select, func, text
+import os
+from fastapi import APIRouter, Depends, HTTPException, Request, Header
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.config import get_settings
 from app.core.auth import CurrentUser, require_role
 from app.models.user import User
-from app.models.ghost import KnowledgeDocument
-from app.models.law import LegalDocument
-from app.core.dynamic_rag import should_retrieve, retrieve_if_needed
+
+from .schemas import (
+    RoleUpdate, UserStatusUpdate, UserApproval, ModulesUpdate,
+    SeedRequest, RAGSimulationRequest, ALL_MODULES
+)
+from .services import (
+    get_system_stats, get_usage_analytics, simulate_rag_retrieval,
+    list_regulatory_bases, run_regulatory_ingestion
+)
 
 settings = get_settings()
 
 router = APIRouter()
 
-ALL_MODULES = ["ghost", "law", "ntalk"]
-
-
-# ── Models ──
-
-class RoleUpdate(BaseModel):
-    role: str  # user, admin, superadmin
-
-
-class UserStatusUpdate(BaseModel):
-    is_active: bool
-
-
-class UserApproval(BaseModel):
-    allowed_modules: list[str] = ALL_MODULES
-
-
-class ModulesUpdate(BaseModel):
-    allowed_modules: list[str]
-
-
-# ── Routes ──
+# ── User Management ──
 
 @router.get("/users")
 async def list_users(
@@ -52,21 +37,12 @@ async def list_users(
     """List all registered users."""
     result = await db.execute(select(User).order_by(User.created_at.desc()))
     users = result.scalars().all()
-    return [
-        {
-            "id": str(u.id),
-            "firebase_uid": u.firebase_uid,
-            "email": u.email,
-            "name": u.name,
-            "picture": u.picture,
-            "role": u.role,
-            "status": u.status,
-            "allowed_modules": u.allowed_modules or [],
-            "is_active": u.is_active,
-            "created_at": u.created_at.isoformat() if u.created_at else None,
-        }
-        for u in users
-    ]
+    return [{
+        "id": str(u.id), "firebase_uid": u.firebase_uid, "email": u.email,
+        "name": u.name, "picture": u.picture, "role": u.role, "status": u.status,
+        "allowed_modules": u.allowed_modules or [], "is_active": u.is_active,
+        "created_at": u.created_at.isoformat() if u.created_at else None,
+    } for u in users]
 
 
 @router.patch("/users/{user_id}/role")
@@ -99,7 +75,6 @@ async def approve_user(
     db: AsyncSession = Depends(get_db),
 ):
     """Approve a pending user and assign allowed modules."""
-    # Validate modules
     invalid = [m for m in body.allowed_modules if m not in ALL_MODULES]
     if invalid:
         raise HTTPException(400, f"Módulos inválidos: {invalid}. Válidos: {ALL_MODULES}")
@@ -112,12 +87,7 @@ async def approve_user(
     target.status = "approved"
     target.allowed_modules = body.allowed_modules
     await db.commit()
-    return {
-        "id": str(target.id),
-        "email": target.email,
-        "status": target.status,
-        "allowed_modules": target.allowed_modules,
-    }
+    return {"id": str(target.id), "email": target.email, "status": target.status, "allowed_modules": target.allowed_modules}
 
 
 @router.patch("/users/{user_id}/block")
@@ -132,7 +102,7 @@ async def block_user(
     if not target:
         raise HTTPException(404, "Usuário não encontrado")
 
-    if target.email.lower() in [e.lower() for e in settings.admin_emails]:
+    if target.role == "superadmin":
         raise HTTPException(403, "Não é permitido bloquear o superadmin")
 
     target.status = "blocked"
@@ -159,11 +129,7 @@ async def update_modules(
 
     target.allowed_modules = body.allowed_modules
     await db.commit()
-    return {
-        "id": str(target.id),
-        "email": target.email,
-        "allowed_modules": target.allowed_modules,
-    }
+    return {"id": str(target.id), "email": target.email, "allowed_modules": target.allowed_modules}
 
 
 @router.patch("/users/{user_id}/status")
@@ -184,103 +150,27 @@ async def update_status(
     return {"id": str(target.id), "email": target.email, "is_active": target.is_active}
 
 
+# ── Dashboard Analytics ──
+
 @router.get("/stats")
-async def system_stats(
+async def stats(
     user: CurrentUser = Depends(require_role("admin", "superadmin")),
     db: AsyncSession = Depends(get_db),
 ):
     """System-wide statistics for the admin dashboard."""
-    user_count = (await db.execute(select(func.count(User.id)))).scalar() or 0
-    ghost_docs = (await db.execute(select(func.count(KnowledgeDocument.id)))).scalar() or 0
-    law_docs = (await db.execute(select(func.count(LegalDocument.id)))).scalar() or 0
-
-    # Pending users
-    pending = (await db.execute(
-        select(func.count(User.id)).where(User.status == "pending")
-    )).scalar() or 0
-
-    # DB size
-    try:
-        size_result = await db.execute(text("SELECT pg_database_size(current_database())"))
-        db_size_bytes = size_result.scalar() or 0
-        db_size_mb = round(db_size_bytes / (1024 * 1024), 1)
-    except Exception:
-        db_size_mb = 0
-
-    return {
-        "users": user_count,
-        "pending_users": pending,
-        "documents": {
-            "ghost": ghost_docs,
-            "law": law_docs,
-            "total": ghost_docs + law_docs,
-        },
-        "database_size_mb": db_size_mb,
-    }
+    return await get_system_stats(db)
 
 
 @router.get("/analytics")
-async def usage_analytics(
+async def analytics(
     user: CurrentUser = Depends(require_role("admin", "superadmin")),
     db: AsyncSession = Depends(get_db),
 ):
     """Usage analytics: queries/day, module breakdown, top users."""
-    # Queries per day (last 7 days)
-    daily = await db.execute(text("""
-        SELECT date_trunc('day', created_at)::date AS day,
-               module, COUNT(*) AS cnt
-        FROM analytics_events
-        WHERE created_at > now() - interval '7 days'
-        GROUP BY day, module
-        ORDER BY day
-    """))
-    queries_by_day = [
-        {"day": str(row[0]), "module": row[1], "count": row[2]}
-        for row in daily
-    ]
-
-    # Top users (last 7 days)
-    top_users = await db.execute(text("""
-        SELECT user_id, COUNT(*) AS cnt
-        FROM analytics_events
-        WHERE created_at > now() - interval '7 days'
-        GROUP BY user_id
-        ORDER BY cnt DESC
-        LIMIT 10
-    """))
-    top = [{"user_id": row[0], "count": row[1]} for row in top_users]
-
-    # Module totals
-    module_totals = await db.execute(text("""
-        SELECT module, COUNT(*) AS cnt
-        FROM analytics_events
-        WHERE created_at > now() - interval '7 days'
-        GROUP BY module
-    """))
-    modules = {row[0]: row[1] for row in module_totals}
-
-    # Total events
-    total = await db.execute(text("""
-        SELECT COUNT(*) FROM analytics_events
-        WHERE created_at > now() - interval '7 days'
-    """))
-    total_count = total.scalar() or 0
-
-    return {
-        "period": "7d",
-        "total_events": total_count,
-        "queries_by_day": queries_by_day,
-        "top_users": top,
-        "module_totals": modules,
-    }
+    return await get_usage_analytics(db)
 
 
 # ── Regulatory Seed Packs ──
-
-class SeedRequest(BaseModel):
-    packs: list[str]  # e.g. ["ans", "cvm", "lgpd"]
-    force: bool = False
-
 
 @router.get("/regulatory/packs")
 async def list_regulatory_packs(
@@ -340,37 +230,14 @@ async def remove_seed_pack(
 
 # ── RAG Knowledge Manager ──
 
-class RAGSimulationRequest(BaseModel):
-    query: str
-    module: str = "law"
-
 @router.get("/regulatory/bases")
-async def list_regulatory_bases(
+async def get_regulatory_bases(
     user: CurrentUser = Depends(require_role("admin", "superadmin")),
     db: AsyncSession = Depends(get_db),
 ):
     """Catalog of all active global knowledge base documents (RAG)."""
-    from app.models.law import LegalDocument
-    from app.models.regulatory import RegulatoryDocument, RegulatoryAnalysis, RegulatoryVersion
-    
-    # 1. Global Law Documents
-    law_res = await db.execute(
-        select(LegalDocument.id, LegalDocument.title, LegalDocument.doc_type, LegalDocument.created_at)
-        .where(LegalDocument.is_shared == True, LegalDocument.is_active == True)
-    )
-    law_docs = [dict(row._mapping) for row in law_res]
+    return await list_regulatory_bases(db)
 
-    # 2. Regulatory Insights (e.g. BCB)
-    reg_res = await db.execute(
-        select(RegulatoryDocument.authority, RegulatoryDocument.tipo_ato, RegulatoryDocument.numero, 
-               RegulatoryAnalysis.risco_nivel, RegulatoryAnalysis.resumo_executivo)
-        .join(RegulatoryVersion, RegulatoryDocument.id == RegulatoryVersion.document_id)
-        .join(RegulatoryAnalysis, RegulatoryVersion.id == RegulatoryAnalysis.version_id)
-        .where(RegulatoryDocument.status == "active")
-    )
-    reg_docs = [dict(row._mapping) for row in reg_res]
-
-    return {"law_documents": law_docs, "regulatory_insights": reg_docs}
 
 @router.post("/regulatory/simulate-rag")
 async def simulate_rag(
@@ -379,27 +246,8 @@ async def simulate_rag(
     db: AsyncSession = Depends(get_db),
 ):
     """Simulate RAG retrieval to audit what the AI would read for a given query."""
-    intent = await should_retrieve(body.query, chat_history=[])
-    
-    chunks = []
-    did_retrieve = False
-    
-    if intent.get("needs_rag"):
-        chunks, did_retrieve = await retrieve_if_needed(
-            question=body.query,
-            chat_history=[],
-            db=db,
-            module=body.module,
-            user_id=None,
-            limit=5
-        )
-        
-    return {
-        "intent": intent,
-        "did_retrieve": did_retrieve,
-        "chunks_returned": len(chunks),
-        "chunks": chunks
-    }
+    return await simulate_rag_retrieval(body.query, body.module, db)
+
 
 # ── Automated Regulatory Ingestion ──
 
@@ -408,85 +256,10 @@ async def ingest_regulatory(
     user: CurrentUser = Depends(require_role("superadmin")),
 ):
     """
-    Trigger the integrated regulatory ingestion pipeline.
-    Scrapes BCB, CMN, SUSEP, ANS, ANPD, ANEEL and Planalto laws.
-    Can be called manually or via Cloud Scheduler.
+    Trigger the integrated regulatory ingestion pipeline manually.
     """
-    import asyncio
-    import sys
-    import os
-    from datetime import datetime, timezone
+    return await run_regulatory_ingestion(trigger="manual")
 
-    # Add scripts directory to path for imports
-    scripts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "scripts")
-    if scripts_dir not in sys.path:
-        sys.path.insert(0, scripts_dir)
-
-    results = {"started_at": datetime.now(timezone.utc).isoformat(), "steps": []}
-
-    # BCB Normativos
-    try:
-        from scripts.ingest_bcb_normativos import run_ingestion as run_bcb
-        await run_bcb()
-        results["steps"].append({"source": "BCB", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "BCB", "status": "error", "detail": str(e)})
-
-    # CMN Normativos
-    try:
-        from scripts.ingest_cmn_normativos import run_ingestion as run_cmn
-        await run_cmn()
-        results["steps"].append({"source": "CMN", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "CMN", "status": "error", "detail": str(e)})
-
-    # CVM
-    try:
-        from scripts.ingest_cvm import run_cvm_ingestion
-        await run_cvm_ingestion()
-        results["steps"].append({"source": "CVM", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "CVM", "status": "error", "detail": str(e)})
-
-    # SUSEP
-    try:
-        from scripts.ingest_susep import run_susep_ingestion
-        await run_susep_ingestion()
-        results["steps"].append({"source": "SUSEP", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "SUSEP", "status": "error", "detail": str(e)})
-
-    # ANS
-    try:
-        from scripts.ingest_ans import run_ans_ingestion
-        await run_ans_ingestion()
-        results["steps"].append({"source": "ANS", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "ANS", "status": "error", "detail": str(e)})
-
-    # ANPD
-    try:
-        from scripts.ingest_anpd import run_anpd_ingestion
-        await run_anpd_ingestion()
-        results["steps"].append({"source": "ANPD", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "ANPD", "status": "error", "detail": str(e)})
-
-    # ANEEL
-    try:
-        from scripts.ingest_aneel import run_aneel_ingestion
-        await run_aneel_ingestion()
-        results["steps"].append({"source": "ANEEL", "status": "ok"})
-    except Exception as e:
-        results["steps"].append({"source": "ANEEL", "status": "error", "detail": str(e)})
-
-    results["finished_at"] = datetime.now(timezone.utc).isoformat()
-    return results
-
-
-# ── Cron Endpoint (API Key auth for Cloud Scheduler) ──
-
-from fastapi import Request, Header
 
 @router.post("/cron/ingest")
 async def cron_ingest(
@@ -494,40 +267,10 @@ async def cron_ingest(
     x_cron_key: str | None = Header(None, alias="X-Cron-Key"),
 ):
     """
-    Cron-compatible ingestion trigger.
-    Authenticates via X-Cron-Key header (set in env GABI_CRON_KEY).
-    Used by Cloud Scheduler for daily recurrence.
+    Cron-compatible ingestion trigger. Authenticates via X-Cron-Key.
     """
-    import os
     cron_key = os.environ.get("GABI_CRON_KEY", "")
     if not cron_key or x_cron_key != cron_key:
         raise HTTPException(403, "Invalid cron key")
 
-    # Reuse the same pipeline logic
-    import asyncio
-    from datetime import datetime, timezone
-
-    results = {"started_at": datetime.now(timezone.utc).isoformat(), "trigger": "cron", "steps": []}
-
-    scrapers = [
-        ("BCB", "scripts.ingest_bcb_normativos", "run_ingestion"),
-        ("CMN", "scripts.ingest_cmn_normativos", "run_ingestion"),
-        ("CVM", "scripts.ingest_cvm", "run_cvm_ingestion"),
-        ("SUSEP", "scripts.ingest_susep", "run_susep_ingestion"),
-        ("ANS", "scripts.ingest_ans", "run_ans_ingestion"),
-        ("ANPD", "scripts.ingest_anpd", "run_anpd_ingestion"),
-        ("ANEEL", "scripts.ingest_aneel", "run_aneel_ingestion"),
-    ]
-
-    for source, module_path, func_name in scrapers:
-        try:
-            import importlib
-            mod = importlib.import_module(module_path)
-            fn = getattr(mod, func_name)
-            await fn()
-            results["steps"].append({"source": source, "status": "ok"})
-        except Exception as e:
-            results["steps"].append({"source": source, "status": "error", "detail": str(e)})
-
-    results["finished_at"] = datetime.now(timezone.utc).isoformat()
-    return results
+    return await run_regulatory_ingestion(trigger="cron")

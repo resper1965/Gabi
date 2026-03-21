@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, select, text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -90,7 +91,7 @@ async def export_user_data(
             export["documents"][module_key] = [
                 dict(row._mapping) for row in docs
             ]
-        except Exception:
+        except SQLAlchemyError:
             pass  # Table might not exist yet
 
     logger.info("LGPD data export for user=%s by admin=%s", user_id, user.email)
@@ -142,7 +143,7 @@ async def purge_user_data(
                 f"DELETE FROM {doc_table} WHERE user_id = :uid"
             ), {"uid": user_id})
             deleted["tables"][doc_table] = result.rowcount
-        except Exception:
+        except SQLAlchemyError:
             pass
 
     # Delete analytics events
@@ -151,7 +152,7 @@ async def purge_user_data(
             "DELETE FROM analytics_events WHERE user_id = :uid"
         ), {"uid": user_id})
         deleted["tables"]["analytics_events"] = result.rowcount
-    except Exception:
+    except SQLAlchemyError:
         pass
 
     # Finally, delete user record
@@ -193,6 +194,6 @@ async def get_audit_log(
 
         events = [dict(row._mapping) for row in result]
         return {"audit_log": events, "count": len(events)}
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.warning("Audit log query failed: %s", e)
         return {"audit_log": [], "count": 0, "error": "Tabela de audit ainda não configurada."}

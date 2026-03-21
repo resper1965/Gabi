@@ -16,6 +16,8 @@ from dataclasses import dataclass, field
 from typing import List, Optional
 from xml.etree import ElementTree as ET
 
+import httpx
+
 from app.services.bcb_client import BCBClient
 from app.services.normalizer import html_to_text, extract_pdf_text
 
@@ -84,8 +86,8 @@ class LexMLClient:
         try:
             xml_text = await self.http.fetch_async(url)
             return self._parse_sru_response(xml_text)
-        except Exception as e:
-            logger.error("LexML search failed for query '%s': %s", query[:80], e)
+        except httpx.HTTPError as e:
+            logger.error("LexML HTTP search failed for query '%s': %s", query[:80], e)
             return []
 
     async def search_by_authority(
@@ -127,7 +129,7 @@ class LexMLClient:
 
             doc.full_text = text
             return text
-        except Exception as e:
+        except (httpx.HTTPError, ValueError) as e:
             logger.warning(
                 "Failed to fetch full text for %s (%s): %s",
                 doc.urn, doc.source_url, e,
@@ -154,7 +156,7 @@ class LexMLClient:
                 doc = self._parse_record(record)
                 if doc:
                     docs.append(doc)
-            except Exception as e:
+            except (ValueError, AttributeError, TypeError) as e:
                 logger.warning("Failed to parse LexML record: %s", e)
 
         logger.info("LexML: parsed %d documents from SRU response", len(docs))

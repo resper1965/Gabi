@@ -33,8 +33,6 @@ class Settings(BaseSettings):
     query_timeout_seconds: int = 30
 
     # Authorization
-    # TODO: migrate admin_emails → Firebase Custom Claims (used by auth.py + admin/router.py)
-    admin_emails: list[str] = ["resper@ness.com.br", "resper@bekaa.eu", "rsarlerno@ness.com.br", "myoshida@ness.com.br", "dajzen@ness.com.br"]
     auto_approve_domains: list[str] = ["ness.com.br", "bekaa.eu"]
 
     # Redis (rate limiting)

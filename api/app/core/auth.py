@@ -29,26 +29,16 @@ def _is_superadmin(email: str, decoded_token: dict | None = None) -> bool:
 
     Priority:
     1. Firebase Custom Claim 'role' == 'superadmin' (set via Firebase Admin SDK)
-    2. Config-based check (env var GABI_ADMIN_EMAILS, fallback)
     """
     # Primary: Firebase Custom Claims (survives deploys, DB resets, everything)
     if decoded_token:
         token_role = decoded_token.get("role", "")
         if token_role == "superadmin":
             return True
-
-    # Fallback: Config-based check (env var GABI_ADMIN_EMAILS)
-    email_lower = email.lower().strip()
-    try:
-        if email_lower in [e.lower().strip() for e in settings.admin_emails]:
-            return True
-    except Exception:
-        pass
     return False
 
-# Startup: log admin config for debugging
-logger.info("Auth config: admin_emails=%s (type=%s), auto_approve_domains=%s",
-            settings.admin_emails, type(settings.admin_emails).__name__, settings.auto_approve_domains)
+# Startup: log auth config for debugging
+logger.info("Auth config: auto_approve_domains=%s", settings.auto_approve_domains)
 
 _firebase_app = None
 

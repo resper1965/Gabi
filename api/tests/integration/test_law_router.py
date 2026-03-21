@@ -26,8 +26,8 @@ class TestLawAgent:
         """Invoking auditor agent returns multi-agent debate synthesis."""
         with patch("app.modules.law.router.get_current_user", return_value=mock_user), \
              patch("app.modules.law.router.get_db", return_value=mock_db), \
-             patch("app.modules.law.router.retrieve_if_needed") as mock_rag, \
-             patch("app.modules.law.router.debate") as mock_debate:
+             patch("app.modules.law.services.retrieve_if_needed") as mock_rag, \
+             patch("app.modules.law.services.debate") as mock_debate:
 
             mock_rag.return_value = (
                 [{"content": "Art. 5º...", "title": "CF", "doc_type": "law"}],
@@ -40,7 +40,7 @@ class TestLawAgent:
                 "mode": "multi-agent-debate",
             }
 
-            from app.modules.law.router import invoke_agent, AgentRequest
+            from app.modules.law.schemas import AgentRequest
             req = AgentRequest(agent="auditor", query="Quais são os riscos?")
             # The function would need proper DI — this tests the logic flow
             assert mock_debate is not None
@@ -48,7 +48,7 @@ class TestLawAgent:
     @pytest.mark.asyncio
     async def test_invoke_researcher_uses_rag(self, mock_db, mock_user):
         """Researcher agent uses dynamic RAG for document retrieval."""
-        with patch("app.modules.law.router.retrieve_if_needed") as mock_rag:
+        with patch("app.modules.law.services.retrieve_if_needed") as mock_rag:
             mock_rag.return_value = ([], False)
             # Verify RAG is called
             assert mock_rag is not None
@@ -60,7 +60,7 @@ class TestLawAgent:
 
     def test_agent_request_model(self):
         """AgentRequest validates required fields."""
-        from app.modules.law.router import AgentRequest
+        from app.modules.law.schemas import AgentRequest
         req = AgentRequest(agent="auditor", query="Test query")
         assert req.agent == "auditor"
         assert req.query == "Test query"

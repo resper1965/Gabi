@@ -30,7 +30,7 @@ interface ConnectionForm {
 export default function NTalkPage() {
   const { messages, setMessages, clearMessages } = useChatStore("ntalk")
   const [isLoading, setIsLoading] = useState(false)
-  const [summary, setSummary] = useState<string | null>(null)
+  const summary: string | null = null // placeholder for summary if needed later
   const [historyOpen, setHistoryOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [connForm, setConnForm] = useState<ConnectionForm>({

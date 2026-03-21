@@ -191,6 +191,31 @@ Exemplos de consultas:
 
 > Desenvolvido por **ness.** — ness.com.br
 `,
+
+    insightcare: `# gabi.care — Insights em Saúde
+    
+Especialista em contratos de saúde, apólices, normas regulatórias (ANS/SUSEP) e análise de sinistralidade.
+
+---
+
+## Como usar
+
+### 1. Envie documentos de planos e apólices
+- Faça o upload de contratos, aditivos, manuais do beneficiário ou resoluções normativas.
+
+### 2. Análise Atuarial e Regulatória
+- Solicite cruzamento de dados de utilização com as regras vigentes do Rol de Procedimentos.
+- Consulte métricas comuns como Loss Ratio e PMPM (Per Member Per Month).
+
+### 3. Exemplos de prompts:
+- \`"Resuma as exclusões de cobertura desta apólice."\`
+- \`"Esta terapia consta como obrigatória na última atualização da ANS?"\`
+- \`"Compare as regras de coparticipação destes dois contratos."\`
+
+---
+
+> Desenvolvido por **ness.** — ness.com.br
+`,
   },
 
   shortcuts: `# Atalhos de Teclado
@@ -275,6 +300,7 @@ export const docsSections = [
   { id: "ghost", label: "gabi.writer", icon: "PenTool" },
   { id: "law", label: "gabi.legal", icon: "Scale" },
   { id: "ntalk", label: "gabi.data", icon: "Database" },
+  { id: "insightcare", label: "gabi.care", icon: "ShieldCheck" },
   { id: "shortcuts", label: "Atalhos", icon: "Keyboard" },
   { id: "faq", label: "FAQ", icon: "HelpCircle" },
 ] as const
