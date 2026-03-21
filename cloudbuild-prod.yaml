@@ -7,8 +7,8 @@ steps:
       - "-c"
       - |
         cd api
-        pip install -e '.[dev]' pytest pytest-asyncio --quiet || true
-        pytest --tb=short -q --no-header || true
+        pip install -e '.[dev]' pytest pytest-asyncio pytest-cov --quiet || true
+        pytest --tb=short -q --no-header --cov=app --cov-report=term-missing || true
     waitFor: ["-"]
 
   # ── SSDLC: SAST ──
@@ -68,6 +68,17 @@ steps:
         "WARNING",
         "api/app/",
       ]
+    waitFor: ["-"]
+
+  # ── SSDLC: Code Quality — Ruff ──
+  - id: "lint-ruff"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install ruff --quiet
+        ruff check api/app/ --statistics || true
     waitFor: ["-"]
 
   # ── Build API (production tag) ──

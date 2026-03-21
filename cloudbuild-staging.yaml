@@ -8,7 +8,7 @@ steps:
       - |
         cd api
         pip install -e ".[dev]" --quiet || true
-        pytest --tb=short -q --no-header || true
+        pytest --tb=short -q --no-header --cov=app --cov-report=term-missing --cov-report=json:/workspace/coverage-report.json || true
     waitFor: ["-"]
 
   # ── SSDLC: SAST (Static Application Security Testing) ──
@@ -85,6 +85,19 @@ steps:
         "WARNING",
         "api/app/",
       ]
+    waitFor: ["-"]
+
+  # ── SSDLC: Code Quality — Ruff (Linter + Formatter) ──
+  - id: "lint-ruff"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install ruff --quiet
+        echo "━━━ Code Quality: Ruff Lint ━━━"
+        ruff check api/app/ --output-format=json > /workspace/ruff-report.json || true
+        ruff check api/app/ --statistics || true
     waitFor: ["-"]
 
   # ── Build API ──
