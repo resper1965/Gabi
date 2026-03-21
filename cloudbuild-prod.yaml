@@ -8,7 +8,7 @@ steps:
       - |
         cd api
         pip install -e '.[dev]' pytest pytest-asyncio pytest-cov --quiet || true
-        pytest --tb=short -q --no-header --cov=app --cov-report=term-missing || true
+        pytest --tb=short -q --no-header --cov=app --cov-fail-under=70 --cov-report=term-missing || true
     waitFor: ["-"]
 
   # ── SSDLC: SAST ──

@@ -8,7 +8,7 @@ steps:
       - |
         cd api
         pip install -e ".[dev]" --quiet || true
-        pytest --tb=short -q --no-header --cov=app --cov-report=term-missing --cov-report=json:/workspace/coverage-report.json || true
+        pytest --tb=short -q --no-header --cov=app --cov-fail-under=70 --cov-report=term-missing --cov-report=json:/workspace/coverage-report.json || true
     waitFor: ["-"]
 
   # ── SSDLC: SAST (Static Application Security Testing) ──
@@ -98,6 +98,20 @@ steps:
         echo "━━━ Code Quality: Ruff Lint ━━━"
         ruff check api/app/ --output-format=json > /workspace/ruff-report.json || true
         ruff check api/app/ --statistics || true
+    waitFor: ["-"]
+
+  # ── SSDLC: SBOM (Software Bill of Materials — ISO 27001 A.8.9) ──
+  - id: "sbom-generate"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install cyclonedx-bom --quiet
+        cd api
+        pip install -e ".[dev]" --quiet 2>/dev/null || true
+        cyclonedx-py environment -o /workspace/sbom.json --output-format json || true
+        echo "━━━ SBOM generated ━━━"
     waitFor: ["-"]
 
   # ── Build API ──

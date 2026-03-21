@@ -42,6 +42,31 @@ def init_telemetry(service_name: str = "gabi-api") -> None:
 
         trace.set_tracer_provider(provider)
         _tracer = trace.get_tracer("gabi")
+
+        # Auto-instrument FastAPI (every route gets a span)
+        try:
+            from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+            FastAPIInstrumentor.instrument()
+            logger.info("Telemetry: FastAPI auto-instrumentation enabled")
+        except ImportError:
+            logger.info("Telemetry: FastAPI instrumentor not available")
+
+        # Auto-instrument SQLAlchemy (DB queries get spans)
+        try:
+            from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+            SQLAlchemyInstrumentor().instrument()
+            logger.info("Telemetry: SQLAlchemy auto-instrumentation enabled")
+        except ImportError:
+            pass
+
+        # Auto-instrument httpx (external API calls get spans)
+        try:
+            from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+            HTTPXClientInstrumentor().instrument()
+            logger.info("Telemetry: HTTPX auto-instrumentation enabled")
+        except ImportError:
+            pass
+
         _initialized = True
         logger.info("OpenTelemetry initialized for service: %s", service_name)
 
