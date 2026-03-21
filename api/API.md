@@ -1,6 +1,6 @@
 # Gabi Hub — API Reference
 
-**Base URL:** `https://api-gabi.ness.com.br` (prod) · `https://gabi-api-3yxil5gluq-rj.a.run.app` (staging)
+**Base URL:** `https://api-gabi.ness.com.br` (prod) · `https://gabi-api-fbbwlzhdlq-rj.a.run.app` (staging)
 
 **Auth:** All endpoints (except `/health`) require `Authorization: Bearer <firebase_id_token>`.
 

@@ -2,7 +2,7 @@
  * Gabi Hub — k6 Load Test
  * Tests API performance under load.
  * 
- * Run: k6 run tests/load/load_test.js --env API_URL=https://gabi-api-3yxil5gluq-rj.a.run.app
+ * Run: k6 run tests/load/load_test.js --env API_URL=https://gabi-api-fbbwlzhdlq-rj.a.run.app
  * 
  * Scenarios:
  *   1. Health check (smoke)

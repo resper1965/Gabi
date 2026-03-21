@@ -236,8 +236,8 @@ Se encontrar referências ao Supabase no código, remova-as.
 | Recurso | URL |
 |---------|-----|
 | Prod API | https://api-gabi.ness.com.br |
-| Staging API | https://gabi-api-3yxil5gluq-rj.a.run.app |
-| Swagger (staging) | https://gabi-api-3yxil5gluq-rj.a.run.app/docs |
+| Staging API | https://gabi-api-fbbwlzhdlq-rj.a.run.app |
+| Swagger (staging) | https://gabi-api-fbbwlzhdlq-rj.a.run.app/docs |
 | Firebase Console | https://console.firebase.google.com/project/nghost-gabi |
 | Cloud Build | https://console.cloud.google.com/cloud-build/builds?project=nghost-gabi |
 | Cloud Run | https://console.cloud.google.com/run?project=nghost-gabi |

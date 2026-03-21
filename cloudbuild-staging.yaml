@@ -126,7 +126,7 @@ steps:
           --port=8080 \
           --add-cloudsql-instances=${PROJECT_ID}:${_REGION}:nghost-db \
           --allow-unauthenticated \
-          --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi.ness.com.br\",\"https://gabi-staging.ness.com.br\",\"https://gabi-web-3yxil5gluq-rj.a.run.app\",\"http://localhost:3000\"]##GABI_ADMIN_EMAILS=[\"resper@ness.com.br\",\"resper@bekaa.eu\"]##GABI_AUTO_APPROVE_DOMAINS=[\"ness.com.br\",\"bekaa.eu\"]##GABI_LOG_LEVEL=DEBUG##GABI_ENABLE_DOCS=true##PYTHONPATH=/app" \
+          --set-env-vars="^##^GABI_GCP_PROJECT_ID=${PROJECT_ID}##GABI_VERTEX_AI_LOCATION=${_REGION}##GABI_FIREBASE_PROJECT_ID=${_FIREBASE_PROJECT_ID}##GABI_CORS_ORIGINS=[\"https://gabi.ness.com.br\",\"https://gabi-staging.ness.com.br\",\"https://gabi-web-fbbwlzhdlq-rj.a.run.app\",\"http://localhost:3000\"]##GABI_ADMIN_EMAILS=[\"resper@ness.com.br\",\"resper@bekaa.eu\"]##GABI_AUTO_APPROVE_DOMAINS=[\"ness.com.br\",\"bekaa.eu\"]##GABI_LOG_LEVEL=DEBUG##GABI_ENABLE_DOCS=true##PYTHONPATH=/app" \
           --set-secrets="GABI_DATABASE_URL=database-url:latest,GABI_FIREBASE_ADMIN_SERVICE_ACCOUNT=firebase-admin-private-key:latest"
     waitFor: ["push-api"]
 
@@ -151,7 +151,7 @@ substitutions:
   _REGION: southamerica-east1
   _REPO: gabi
   _TAG: latest # override with --substitutions=_TAG=$SHORT_SHA on trigger
-  _STAGING_API_URL: https://gabi-api-3yxil5gluq-rj.a.run.app
+  _STAGING_API_URL: https://gabi-api-fbbwlzhdlq-rj.a.run.app
   _FIREBASE_AUTH_DOMAIN: "nghost-gabi.firebaseapp.com"
   _FIREBASE_PROJECT_ID: "nghost-gabi"
 

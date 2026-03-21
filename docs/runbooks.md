@@ -150,20 +150,20 @@ gcloud run services update gabi-web \
 ```bash
 # Via API (requer token de admin/superadmin)
 curl -H "Authorization: Bearer $TOKEN" \
-  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/export
+  https://gabi-api-fbbwlzhdlq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/export
 ```
 
 ### Purge completo de dados (irreversível)
 ```bash
 # Apenas superadmin pode executar
 curl -X DELETE -H "Authorization: Bearer $TOKEN" \
-  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/purge
+  https://gabi-api-fbbwlzhdlq-rj.a.run.app/api/admin/lgpd/users/$USER_ID/purge
 ```
 
 ### Consultar audit log
 ```bash
 curl -H "Authorization: Bearer $TOKEN" \
-  https://gabi-api-3yxil5gluq-rj.a.run.app/api/admin/lgpd/audit-log?limit=50
+  https://gabi-api-fbbwlzhdlq-rj.a.run.app/api/admin/lgpd/audit-log?limit=50
 ```
 
 > ⚠️ O purge é **irreversível**. Sempre exporte os dados antes de purgar.

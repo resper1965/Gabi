@@ -293,8 +293,8 @@ git push → Cloud Build → Docker build → Artifact Registry → Cloud Run de
 ### Serviços Cloud Run
 | Serviço | URL | Port |
 |---------|-----|------|
-| `gabi-api` | `gabi-api-3yxil5gluq-rj.a.run.app` | 8080 |
-| `gabi-web` | `gabi-web-3yxil5gluq-rj.a.run.app` | 3000 |
+| `gabi-api` | `gabi-api-fbbwlzhdlq-rj.a.run.app` | 8080 |
+| `gabi-web` | `gabi-web-fbbwlzhdlq-rj.a.run.app` | 3000 |
 
 ---
 
