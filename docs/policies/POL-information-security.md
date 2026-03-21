@@ -1,7 +1,8 @@
 # Política de Segurança da Informação
 
-> Ness · Gabi Platform · v1.0 · 2026-03-21
-> Classificação: INTERNO · Revisão: Anual · Aprovador: CTO / DPO
+> Ness Processos e Tecnologia Ltda. · CNPJ 72.027.097/0001-37
+> Gabi Platform · v1.0 · 2026-03-21
+> Classificação: INTERNO · Revisão: Anual · Aprovador: CTO / DPO (Ricardo Esper)
 
 ---
 
@@ -84,7 +85,7 @@ Toda informação deve ser classificada conforme `docs/data-classification.md`:
 - Registro de tratamento: `docs/ROPA.md`
 - Export de dados: `/api/admin/lgpd/export`
 - Exclusão de dados: `/api/admin/lgpd/purge`
-- DPO: `dpo@ness.com.br`
+- DPO: Ricardo Esper · `dpo@ness.com.br`
 - Consent tracking: `middleware/consent.py`
 
 ---
@@ -94,7 +95,7 @@ Toda informação deve ser classificada conforme `docs/data-classification.md`:
 | Papel | Responsabilidade |
 | --- | --- |
 | CTO | Aprovação da política, alocação de recursos |
-| DPO | Compliance LGPD, contato com ANPD |
+| DPO (Ricardo Esper) | Compliance LGPD, contato com ANPD |
 | Desenvolvedores | Seguir SSDLC, pre-commit hooks, code review |
 | DevOps | Manter pipeline de segurança, monitoramento |
 

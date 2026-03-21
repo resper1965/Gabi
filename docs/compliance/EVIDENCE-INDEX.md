@@ -92,7 +92,7 @@ Este índice lista todos os artefatos de evidência disponíveis para auditoria 
 | 8.3 | Termos de Serviço | `web/src/app/terms/page.tsx` → `/terms` | 7.3.2 |
 | 8.4 | LGPD Export Endpoint | `GET /api/admin/lgpd/export/{uid}` | 7.3.6 |
 | 8.5 | LGPD Purge Endpoint | `DELETE /api/admin/lgpd/purge/{uid}` | 7.3.9 |
-| 8.6 | DPO Contact | `dpo@ness.com.br` (Trust Center) | 7.5.1 |
+| 8.6 | DPO Contact | Ricardo Esper · `dpo@ness.com.br` (Trust Center) | 7.5.1 |
 | 8.7 | Security Contact | `security@ness.com.br` (Trust Center) | A.5.24 |
 | 8.8 | Vertex AI Zero-Training | Google Cloud agreement — dados efêmeros | 7.4.9 |
 

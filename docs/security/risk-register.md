@@ -32,7 +32,7 @@
 | R-101 | Violação LGPD (vazamento PII) | 1 | 4 | 4 | ✅ Aceito | Consent middleware, data retention, export/purge |
 | R-102 | Audit trail incompleto | 2 | 3 | 6 | ⚠️ Monitor | Analytics logging + audit events |
 | R-103 | Dados de saúde expostos (InsightCare) | 1 | 4 | 4 | ✅ Aceito | Tenant isolation, LGPD endpoints |
-| R-104 | DPO não designado | 3 | 2 | 6 | ⚠️ Monitor | ❌ GAP — designar DPO |
+| R-104 | DPO não designado | 3 | 2 | 6 | ✅ Mitigado | Ricardo Esper designado como DPO |
 | R-105 | Normas regulatórias desatualizadas | 3 | 2 | 6 | ⚠️ Monitor | Ingestion pipeline (BCB/CMN/Planalto) |
 
 ## Riscos Técnicos

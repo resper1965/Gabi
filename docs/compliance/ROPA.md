@@ -18,7 +18,7 @@
 | **Natureza Jurídica** | Sociedade Empresária Limitada |
 | **Fundação** | 20/09/1993 |
 | **Situação** | Ativa |
-| **DPO / Encarregado** | `dpo@ness.com.br` |
+| **DPO / Encarregado** | Ricardo Esper · `dpo@ness.com.br` |
 | **Contato Segurança** | `security@ness.com.br` |
 
 ---

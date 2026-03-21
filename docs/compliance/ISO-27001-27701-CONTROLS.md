@@ -83,7 +83,7 @@ Este documento mapeia os controles do Anexo A da ISO 27001:2022 e extensões da 
 | 7.2.8 | Registros de tratamento | Audit log + `core/data_retention.py` | ✅ |
 | 7.3.1 | Obrigações com titulares | Portal Trust Center `/trust` | ✅ |
 | 7.3.2 | Determinação de informações ao titular | `/privacy` — Política de privacidade pública | ✅ |
-| 7.3.4 | Mecanismo de objeção | DPO contact form `security@ness.com.br` | ✅ |
+| 7.3.4 | Mecanismo de objeção | DPO (Ricardo Esper) · `dpo@ness.com.br` | ✅ |
 | 7.3.6 | Acesso pelo titular | `/api/admin/lgpd/export` — Data export | ✅ |
 | 7.3.9 | Apagamento | `/api/admin/lgpd/purge` — Data purge | ✅ |
 | 7.4.1 | Limitar coleta | Pydantic models — coleta mínima necessária | ✅ |
@@ -91,7 +91,7 @@ Este documento mapeia os controles do Anexo A da ISO 27001:2022 e extensões da 
 | 7.4.5 | Minimização de PII | Anti-hallucination guardrail em AI responses | ✅ |
 | 7.4.7 | Retenção | `core/data_retention.py` — Automação programada | ✅ |
 | 7.4.9 | Transferência de PII | Vertex AI zero-training agreement — dados efêmeros | ✅ |
-| 7.5.1 | Encarregado/DPO | `dpo@ness.com.br` — referenciado no Trust Center | ✅ |
+| 7.5.1 | Encarregado/DPO | Ricardo Esper · `dpo@ness.com.br` — Trust Center | ✅ |
 
 ---
 
