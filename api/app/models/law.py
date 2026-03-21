@@ -40,6 +40,7 @@ class LegalChunk(Base):
     chunk_index = Column(Integer, nullable=False)
     hierarchy = Column(String(255), nullable=True)  # Art. 5, §2, III
     embedding = Column(Vector(768), nullable=True)
+    embedding_model = Column(String(100), nullable=True)
     created_at = Column(DateTime, server_default=func.now())
 
 

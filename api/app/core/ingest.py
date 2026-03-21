@@ -11,7 +11,8 @@ from typing import Any
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.embeddings import embed_batch
+from app.core.embeddings import embed_batch, get_embedding_model_name
+from app.core.telemetry import trace_span
 
 logger = logging.getLogger("gabi.ingest")
 
@@ -50,17 +51,23 @@ def extract_text_from_docx(data: bytes) -> str:
 
 def extract_text(data: bytes, filename: str) -> str:
     """Auto-detect file type and extract text."""
-    lower = filename.lower()
+    with trace_span("document.extract_text", {"filename": filename, "size": len(data)}) as span:
+        lower = filename.lower()
 
-    if lower.endswith(".pdf"):
-        return extract_text_from_pdf(data)
-    elif lower.endswith(".docx"):
-        return extract_text_from_docx(data)
-    elif lower.endswith((".txt", ".md", ".csv")):
-        return data.decode("utf-8", errors="replace")
-    else:
-        # Fallback: try as text
-        return data.decode("utf-8", errors="replace")
+        if lower.endswith(".pdf"):
+            text = extract_text_from_pdf(data)
+        elif lower.endswith(".docx"):
+            text = extract_text_from_docx(data)
+        elif lower.endswith((".txt", ".md", ".csv")):
+            text = data.decode("utf-8", errors="replace")
+        else:
+            # Fallback: try as text
+            text = data.decode("utf-8", errors="replace")
+            
+        if span:
+            span.set_attribute("char_count", len(text))
+            
+        return text
 
 
 # ── Chunking ──
@@ -170,6 +177,7 @@ async def process_document(
             "content": content,
             "chunk_index": i,
             embedding_field: emb,
+            "embedding_model": get_embedding_model_name(),
         }
         db.add(chunk_model(**chunk_kwargs))
 

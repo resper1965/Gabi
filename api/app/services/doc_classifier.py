@@ -13,6 +13,7 @@ import json
 import logging
 
 from app.core.ai import generate, safe_parse_json
+from app.core.telemetry import trace_span
 
 logger = logging.getLogger("gabi.doc_classifier")
 
@@ -54,38 +55,47 @@ async def classify_document(text: str, fallback_type: str = "law") -> dict:
     Returns:
         dict with keys: tipo, area_direito, tema, partes, resumo
     """
-    # Use first 4000 chars for classification (enough for most docs)
-    snippet = text[:4000] if text else ""
-    if len(snippet.strip()) < 50:
-        logger.warning("Document too short for classification (%d chars)", len(snippet))
-        return _fallback(fallback_type)
+    with trace_span("document.classify", {"fallback_type": fallback_type}) as span:
+        # Use first 4000 chars for classification (enough for most docs)
+        snippet = text[:4000] if text else ""
+        if span: span.set_attribute("snippet_length", len(snippet))
 
-    prompt = CLASSIFY_PROMPT.format(text=snippet)
+        if len(snippet.strip()) < 50:
+            logger.warning("Document too short for classification (%d chars)", len(snippet))
+            if span: span.set_attribute("reason", "too_short")
+            return _fallback(fallback_type)
 
-    try:
-        raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
-        result = safe_parse_json(raw)
+        prompt = CLASSIFY_PROMPT.format(text=snippet)
 
-        # Validate tipo
-        tipo = result.get("tipo", fallback_type)
-        if tipo not in VALID_TYPES:
-            tipo = fallback_type
+        try:
+            raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
+            result = safe_parse_json(raw)
 
-        # Validate partes
-        partes = result.get("partes", [])
-        if not isinstance(partes, list):
-            partes = []
+            # Validate tipo
+            tipo = result.get("tipo", fallback_type)
+            if tipo not in VALID_TYPES:
+                tipo = fallback_type
 
-        return {
-            "tipo": tipo,
-            "area_direito": result.get("area_direito", "outro"),
-            "tema": (result.get("tema") or "")[:255],
-            "partes": json.dumps(partes, ensure_ascii=False),
-            "resumo": result.get("resumo", ""),
-        }
-    except Exception as e:
-        logger.warning("Document classification failed: %s", e)
-        return _fallback(fallback_type)
+            # Validate partes
+            partes = result.get("partes", [])
+            if not isinstance(partes, list):
+                partes = []
+
+            if span:
+                span.set_attribute("classification_tipo", tipo)
+                span.set_attribute("classification_area", result.get("area_direito", "outro"))
+
+            return {
+                "tipo": tipo,
+                "area_direito": result.get("area_direito", "outro"),
+                "tema": (result.get("tema") or "")[:255],
+                "partes": json.dumps(partes, ensure_ascii=False),
+                "resumo": result.get("resumo", ""),
+            }
+        except Exception as e:
+            logger.warning("Document classification failed: %s", e)
+            if span: span.set_attribute("error", str(e))
+            return _fallback(fallback_type)
 
 
 def _fallback(tipo: str) -> dict:

@@ -32,6 +32,7 @@ from google.api_core.exceptions import GoogleAPIError
 from app.core.ai import generate, safe_parse_json
 from app.core.cache import cached_rag_result, cache_rag_result
 from app.core.embeddings import embed
+from app.core.telemetry import trace_span
 
 logger = logging.getLogger("gabi.dynamic_rag")
 
@@ -70,30 +71,39 @@ async def should_retrieve(
     chat_history: list[dict] | None = None,
 ) -> dict:
     """Ask Gemini Flash whether RAG retrieval is needed and determine scope."""
-    history_text = ""
-    if chat_history:
-        history_text = "\n".join(
-            f"{'User' if m['role'] == 'user' else 'Gabi'}: {m['content'][:200]}"
-            for m in (chat_history or [])[-4:]
-        )
+    with trace_span("rag.intent_detection", {"question_length": len(question)}) as span:
+        history_text = ""
+        if chat_history:
+            history_text = "\n".join(
+                f"{'User' if m['role'] == 'user' else 'Gabi'}: {m['content'][:200]}"
+                for m in (chat_history or [])[-4:]
+            )
 
-    prompt = INTENT_PROMPT.format(history=history_text or "(nenhum)", question=question)
+        prompt = INTENT_PROMPT.format(history=history_text or "(nenhum)", question=question)
 
-    try:
-        raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
-        result = safe_parse_json(raw)
-        scope = result.get("scope", "all")
-        if scope not in VALID_SCOPES:
-            scope = "all"
-        return {
-            "needs_rag": bool(result.get("needs_rag", True)),
-            "refined_query": result.get("refined_query", question),
-            "scope": scope,
-            "reason": result.get("reason", ""),
-        }
-    except GoogleAPIError:
-        # Default to always searching if intent detection fails
-        return {"needs_rag": True, "refined_query": question, "scope": "all", "reason": "fallback"}
+        try:
+            raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
+            result = safe_parse_json(raw)
+            scope = result.get("scope", "all")
+            if scope not in VALID_SCOPES:
+                scope = "all"
+            
+            needs_rag = bool(result.get("needs_rag", True))
+            if span:
+                span.set_attribute("needs_rag", needs_rag)
+                span.set_attribute("scope", scope)
+
+            return {
+                "needs_rag": needs_rag,
+                "refined_query": result.get("refined_query", question),
+                "scope": scope,
+                "reason": result.get("reason", ""),
+            }
+        except GoogleAPIError as e:
+            if span:
+                span.set_attribute("error", str(e))
+            # Default to always searching if intent detection fails
+            return {"needs_rag": True, "refined_query": question, "scope": "all", "reason": "fallback"}
 
 
 async def _search_provisions(
@@ -230,19 +240,21 @@ async def retrieve_if_needed(
     Returns (chunks, did_retrieve).
     Each request is tagged with a short trace_id for log correlation.
     """
-    trace_id = _uuid_mod.uuid4().hex[:12]
-    t_start = time.perf_counter()
+    with trace_span("rag.retrieval", {"module": module, "user_id": user_id or "unknown"}) as ret_span:
+        trace_id = _uuid_mod.uuid4().hex[:12]
+        t_start = time.perf_counter()
 
-    def _ms(t0: float) -> float:
-        return round((time.perf_counter() - t0) * 1000, 1)
+        def _ms(t0: float) -> float:
+            return round((time.perf_counter() - t0) * 1000, 1)
 
-    trace: dict = {"trace_id": trace_id, "module": module, "user_id": user_id}
+        trace: dict = {"trace_id": trace_id, "module": module, "user_id": user_id}
 
-    # Validate table names against allowlist (prevent SQL injection)
-    if module not in ALLOWED_TABLE_PAIRS:
-        logger.warning("RAG blocked: unknown module '%s' [%s]", module, trace_id)
-        return [], False
-    chunks_table, docs_table, doc_type_col = ALLOWED_TABLE_PAIRS[module]
+        # Validate table names against allowlist (prevent SQL injection)
+        if module not in ALLOWED_TABLE_PAIRS:
+            logger.warning("RAG blocked: unknown module '%s' [%s]", module, trace_id)
+            if ret_span: ret_span.set_attribute("error", "blocked_module")
+            return [], False
+        chunks_table, docs_table, doc_type_col = ALLOWED_TABLE_PAIRS[module]
 
     # ── Phase 1: Intent classification ──────────────────────────────────────
     t0 = time.perf_counter()

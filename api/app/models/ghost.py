@@ -51,4 +51,5 @@ class DocumentChunk(Base):
     content = Column(Text, nullable=False)
     chunk_index = Column(Integer, nullable=False)
     embedding = Column(Vector(768), nullable=True)
+    embedding_model = Column(String(100), nullable=True)
     created_at = Column(DateTime, server_default=func.now())

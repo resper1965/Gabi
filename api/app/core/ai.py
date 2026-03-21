@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.config import get_settings
 from app.core.circuit_breaker import vertex_ai_breaker
+from app.core.telemetry import trace_span
 
 logger = logging.getLogger("gabi.ai")
 
@@ -138,27 +139,33 @@ async def generate(
         return "⚠️ O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes."
 
     start = time.perf_counter()
-    try:
-        model = get_model(module, system_instruction)
-        contents = _build_contents(prompt, chat_history)
-        response = model.generate_content(contents)
-        await vertex_ai_breaker.record_success()
-        duration_ms = round((time.perf_counter() - start) * 1000, 1)
-        logger.info("AI generate: module=%s, duration=%sms", module, duration_ms)
-
-        # FinOps: capture token usage
+    with trace_span("llm.generate", {"module": module, "model": MODEL_MAP.get(module, "unknown")}) as span:
         try:
-            um = response.usage_metadata
-            if um:
-                _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), um.prompt_token_count or 0, um.candidates_token_count or 0)
-        except Exception:
-            pass
+            model = get_model(module, system_instruction)
+            contents = _build_contents(prompt, chat_history)
+            response = model.generate_content(contents)
+            await vertex_ai_breaker.record_success()
+            duration_ms = round((time.perf_counter() - start) * 1000, 1)
+            logger.info("AI generate: module=%s, duration=%sms", module, duration_ms)
 
-        return response.text
-    except GoogleAPIError as e:
-        await vertex_ai_breaker.record_failure()
-        logger.error("AI generate failed: module=%s, error=%s", module, str(e), exc_info=True)
-        raise
+            # FinOps: capture token usage
+            try:
+                um = response.usage_metadata
+                if um:
+                    _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), um.prompt_token_count or 0, um.candidates_token_count or 0)
+                    if span:
+                        span.set_attribute("prompt_tokens", um.prompt_token_count or 0)
+                        span.set_attribute("completion_tokens", um.candidates_token_count or 0)
+            except Exception:
+                pass
+
+            return response.text
+        except GoogleAPIError as e:
+            await vertex_ai_breaker.record_failure()
+            logger.error("AI generate failed: module=%s, error=%s", module, str(e), exc_info=True)
+            if span:
+                span.set_attribute("error", str(e))
+            raise
 
 
 async def generate_stream(
@@ -173,31 +180,38 @@ async def generate_stream(
         yield "⚠️ O serviço de IA está temporariamente indisponível. Tente novamente em alguns instantes."
         return
 
-    try:
-        model = get_model(module, system_instruction)
-        contents = _build_contents(prompt, chat_history)
-        response = model.generate_content(contents, stream=True)
-        total_prompt = 0
-        total_completion = 0
-        for chunk in response:
-            if chunk.text:
-                yield chunk.text
-            try:
-                um = chunk.usage_metadata
-                if um:
-                    total_prompt = um.prompt_token_count or total_prompt
-                    total_completion = um.candidates_token_count or total_completion
-            except Exception:
-                pass
-        await vertex_ai_breaker.record_success()
+    with trace_span("llm.generate_stream", {"module": module, "model": MODEL_MAP.get(module, "unknown")}) as span:
+        try:
+            model = get_model(module, system_instruction)
+            contents = _build_contents(prompt, chat_history)
+            response = model.generate_content(contents, stream=True)
+            total_prompt = 0
+            total_completion = 0
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+                try:
+                    um = chunk.usage_metadata
+                    if um:
+                        total_prompt = um.prompt_token_count or total_prompt
+                        total_completion = um.candidates_token_count or total_completion
+                except Exception:
+                    pass
+            await vertex_ai_breaker.record_success()
 
-        # FinOps: capture token usage from stream
-        if total_prompt or total_completion:
-            _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), total_prompt, total_completion)
-    except GoogleAPIError as e:
-        await vertex_ai_breaker.record_failure()
-        logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
-        raise
+            if span and (total_prompt or total_completion):
+                span.set_attribute("prompt_tokens", total_prompt)
+                span.set_attribute("completion_tokens", total_completion)
+
+            # FinOps: capture token usage from stream
+            if total_prompt or total_completion:
+                _queue_token_usage(module, MODEL_MAP.get(module, "unknown"), total_prompt, total_completion)
+        except GoogleAPIError as e:
+            await vertex_ai_breaker.record_failure()
+            logger.error("AI stream failed: module=%s, error=%s", module, str(e), exc_info=True)
+            if span:
+                span.set_attribute("error", str(e))
+            raise
 
 
 def safe_parse_json(text: str) -> dict:
