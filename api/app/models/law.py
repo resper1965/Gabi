@@ -1,12 +1,23 @@
-"""Law & Comply models — Legal documents, regulatory alerts, gap analysis, style profiles."""
+"""Law & Comply models — User documents, regulatory corpus, style profiles."""
 
+import enum
 import uuid
+from datetime import datetime
+from typing import Optional, List
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import JSON, UUID
+from sqlalchemy import Boolean, Column, DateTime, Enum, Integer, String, Text, func, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import JSON as PGJSON, UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+
+
+# ═══════════════════════════════════════════════════════════════════
+# User Documents (ex-ghost module)
+# Tables: law_documents, law_chunks, law_alerts, law_gap_analyses,
+#          ghost_style_profiles, ghost_knowledge_docs, ghost_doc_chunks
+# ═══════════════════════════════════════════════════════════════════
 
 
 class LegalDocument(Base):
@@ -81,7 +92,7 @@ class StyleProfile(Base):
     user_id = Column(String(128), nullable=False, index=True)
     name = Column(String(255), nullable=False)
     style_signature = Column(Text, nullable=True)
-    style_exemplars = Column(JSON, nullable=True)
+    style_exemplars = Column(PGJSON, nullable=True)
     system_prompt = Column(Text, nullable=True)
     sample_count = Column(Integer, default=0)
     needs_refresh = Column(Boolean, default=False)
@@ -117,3 +128,82 @@ class StyleDocChunk(Base):
     embedding = Column(Vector(768), nullable=True)
     embedding_model = Column(String(100), nullable=True)
     created_at = Column(DateTime, server_default=func.now())
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Regulatory Corpus (Planalto, CVM, BACEN — formerly legal.py)
+# Tables: legal_documents, legal_versions, legal_provisions
+# ═══════════════════════════════════════════════════════════════════
+
+
+class RegulatoryDomain(str, enum.Enum):
+    CIVIL = "CIVIL"
+    PENAL = "PENAL"
+    CONSUMIDOR = "CONSUMIDOR"
+    ADMINISTRATIVO = "ADMINISTRATIVO"
+    SANCIONADOR = "SANCIONADOR"
+    PROCESSUAL = "PROCESSUAL"
+
+
+class EmbeddingStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    SKIPPED = "SKIPPED"
+    READY = "READY"
+
+
+class RegulatoryDocument(Base):
+    __tablename__ = "legal_documents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    doc_id: Mapped[str] = mapped_column(String(36), index=True, unique=True, nullable=False)
+    authority: Mapped[str] = mapped_column(String(100), index=True, nullable=False, default="PLANALTO")
+    act_type: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    law_number: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
+    publication_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    canonical_url: Mapped[str] = mapped_column(String(1024), index=True, unique=True, nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    current_version_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("legal_versions.id"), nullable=True)
+    status: Mapped[str] = mapped_column(String(100), nullable=False, default="vigente")
+
+    versions: Mapped[List["RegulatoryVersion"]] = relationship("app.models.law.RegulatoryVersion", back_populates="document", foreign_keys="RegulatoryVersion.doc_id")
+
+
+class RegulatoryVersion(Base):
+    __tablename__ = "legal_versions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    doc_id: Mapped[int] = mapped_column(Integer, ForeignKey("legal_documents.id"), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    raw_storage_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    normalized_storage_path: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    mime_type: Mapped[str] = mapped_column(String(100), nullable=False, default="text/html")
+    is_current: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    parse_metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+
+    document: Mapped["RegulatoryDocument"] = relationship("app.models.law.RegulatoryDocument", back_populates="versions", foreign_keys=[doc_id])
+    provisions: Mapped[List["RegulatoryProvision"]] = relationship("app.models.law.RegulatoryProvision", back_populates="version")
+
+
+class RegulatoryProvision(Base):
+    __tablename__ = "legal_provisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    doc_id: Mapped[int] = mapped_column(Integer, ForeignKey("legal_documents.id"), nullable=False)
+    version_id: Mapped[int] = mapped_column(Integer, ForeignKey("legal_versions.id"), nullable=False)
+    structure_path: Mapped[str] = mapped_column(String(1024), index=True, nullable=False)
+
+    article_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    paragraph: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    inciso: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    alinea: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    item: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    topics: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    legal_domain: Mapped[Optional[RegulatoryDomain]] = mapped_column(Enum(RegulatoryDomain), nullable=True)
+
+    embedding_status: Mapped[EmbeddingStatus] = mapped_column(Enum(EmbeddingStatus), nullable=False, default=EmbeddingStatus.PENDING)
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768), nullable=True)
+
+    version: Mapped["RegulatoryVersion"] = relationship("app.models.law.RegulatoryVersion", back_populates="provisions")
