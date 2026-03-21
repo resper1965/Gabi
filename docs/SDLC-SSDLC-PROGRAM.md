@@ -2,7 +2,7 @@
 
 ## Context
 
-A Gabi é uma plataforma AI enterprise com 3 módulos verticais (Legal, GhostWriter, Data), servindo setores regulados (jurídico, financeiro, seguros). O repositório já tem CI/CD (Cloud Build), 117 testes, monitoramento, e compliance LGPD. A proposta é formalizar um **programa completo de SDLC (Software Development Life Cycle) + SSDLC (Secure SDLC)** como se já estivesse implantado, passando por todas as fases.
+A Gabi é uma plataforma AI enterprise com 2 módulos verticais (Legal + Style), servindo setores regulados (jurídico, financeiro, seguros). O repositório já tem CI/CD (Cloud Build), 199 testes, monitoramento, e compliance LGPD. O programa SDLC/SSDLC está **ativo** com 10 scanners de segurança automatizados.
 
 ---
 
@@ -120,27 +120,31 @@ repos:
 | Security | ❌ | OWASP ZAP + bandit | ZAP, bandit, safety |
 
 #### 4.2 Security Testing
-| Tipo | Ferramenta | Frequência |
-|------|-----------|------------|
-| SAST | `bandit` (Python), `semgrep` | Cada push (CI) |
-| SCA | `safety`, `pip-audit` | Diário (scheduled) |
-| DAST | OWASP ZAP | Semanal contra staging |
-| Secrets Scan | `gitleaks` | Pre-commit + CI |
-| Container Scan | `trivy` | Build time |
-| Fuzzing | `hypothesis` (Python) | Para parsers (legal, regulatory) |
+| Tipo | Ferramenta | Status | Frequência |
+|------|-----------|--------|------------|
+| SAST | `bandit` (Python) | ✅ CI | Cada push |
+| SAST | `semgrep` (multi-lang) | ✅ CI | Cada push |
+| SCA | `pip-audit` | ✅ CI | Cada push |
+| DAST | OWASP ZAP baseline | ✅ CI (staging) | Cada deploy staging |
+| Secrets Scan | `gitleaks` | ✅ CI + pre-commit | Cada push |
+| Container Scan | `trivy` (API + Web) | ✅ CI | Cada build |
+| IaC Scan | `checkov` (Dockerfiles) | ✅ CI | Cada push |
+| Code Quality | `ruff` | ✅ CI | Cada push |
+| Coverage | `pytest --cov` | ✅ CI | Cada push |
 
-#### 4.3 CI Test Gate
+#### 4.3 CI Security Pipeline (Implementado)
 ```yaml
-# cloudbuild.yaml — JÁ IMPLEMENTADO
-- name: 'python:3.12'
-  entrypoint: 'bash'
-  args: ['-c', 'pip install -r requirements.txt && pytest tests/ -q']
-
-# A ADICIONAR:
-- name: 'python:3.12'
-  args: ['-c', 'pip install bandit && bandit -r app/ -ll']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'aquasec/trivy', 'image', '$_IMAGE']
+# cloudbuild-staging.yaml — 10 security steps
+- test-api:     pytest --cov (199 testes + coverage)
+- sast-bandit:  Bandit Python SAST
+- sca-audit:    pip-audit dependency scan
+- secrets-scan: Gitleaks credential detection
+- iac-checkov:  Checkov Dockerfile audit
+- sast-semgrep: Semgrep multi-language SAST
+- lint-ruff:    Ruff code quality (700+ rules)
+- trivy-api:    Trivy container scan (API image)
+- trivy-web:    Trivy container scan (Web image)
+- dast-zap:     OWASP ZAP baseline (post-deploy)
 ```
 
 ---
@@ -276,6 +280,6 @@ tag v*    → gabi-prod-deploy    → cloudbuild-prod.yaml    → gabi-api (prod
 
 **Abordagem incremental por camada**: Foundation → Testing → Observability → Governance
 
-Justificativa: A plataforma já tem uma base sólida (117 testes, CI/CD, monitoramento, LGPD). O maior gap é na **security testing** (SAST/DAST/SCA) e **governance** (threat models, risk register, ADRs). Implementar pre-commit hooks + bandit + trivy no Sprint 1 dá retorno imediato com esforço mínimo.
+Justificativa: A plataforma tem uma base sólida (199 testes, CI/CD com 10 scanners, monitoramento, LGPD). O pipeline SSDLC está **100% operacional** com SAST+DAST+SCA+Container+IaC+Secrets+Quality+Coverage. Próximos gaps: governance (threat models, risk register) e observability (traces, dashboards).
 
 Qual direção quer explorar primeiro?
