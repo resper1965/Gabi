@@ -136,7 +136,7 @@ class StyleDocChunk(Base):
 # ═══════════════════════════════════════════════════════════════════
 
 
-class RegulatoryDomain(str, enum.Enum):
+class LegislativeDomain(str, enum.Enum):
     CIVIL = "CIVIL"
     PENAL = "PENAL"
     CONSUMIDOR = "CONSUMIDOR"
@@ -145,13 +145,13 @@ class RegulatoryDomain(str, enum.Enum):
     PROCESSUAL = "PROCESSUAL"
 
 
-class EmbeddingStatus(str, enum.Enum):
+class LegislativeEmbeddingStatus(str, enum.Enum):
     PENDING = "PENDING"
     SKIPPED = "SKIPPED"
     READY = "READY"
 
 
-class RegulatoryDocument(Base):
+class LegislativeDocument(Base):
     __tablename__ = "legal_documents"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -165,10 +165,10 @@ class RegulatoryDocument(Base):
     current_version_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("legal_versions.id"), nullable=True)
     status: Mapped[str] = mapped_column(String(100), nullable=False, default="vigente")
 
-    versions: Mapped[List["RegulatoryVersion"]] = relationship("app.models.law.RegulatoryVersion", back_populates="document", foreign_keys="RegulatoryVersion.doc_id")
+    versions: Mapped[List["LegislativeVersion"]] = relationship("app.models.law.LegislativeVersion", back_populates="document", foreign_keys="LegislativeVersion.doc_id")
 
 
-class RegulatoryVersion(Base):
+class LegislativeVersion(Base):
     __tablename__ = "legal_versions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -181,11 +181,11 @@ class RegulatoryVersion(Base):
     is_current: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     parse_metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
-    document: Mapped["RegulatoryDocument"] = relationship("app.models.law.RegulatoryDocument", back_populates="versions", foreign_keys=[doc_id])
-    provisions: Mapped[List["RegulatoryProvision"]] = relationship("app.models.law.RegulatoryProvision", back_populates="version")
+    document: Mapped["LegislativeDocument"] = relationship("app.models.law.LegislativeDocument", back_populates="versions", foreign_keys=[doc_id])
+    provisions: Mapped[List["LegislativeProvision"]] = relationship("app.models.law.LegislativeProvision", back_populates="version")
 
 
-class RegulatoryProvision(Base):
+class LegislativeProvision(Base):
     __tablename__ = "legal_provisions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -201,9 +201,9 @@ class RegulatoryProvision(Base):
 
     text: Mapped[str] = mapped_column(Text, nullable=False)
     topics: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    legal_domain: Mapped[Optional[RegulatoryDomain]] = mapped_column(Enum(RegulatoryDomain), nullable=True)
+    legal_domain: Mapped[Optional[LegislativeDomain]] = mapped_column(Enum(LegislativeDomain), nullable=True)
 
-    embedding_status: Mapped[EmbeddingStatus] = mapped_column(Enum(EmbeddingStatus), nullable=False, default=EmbeddingStatus.PENDING)
+    embedding_status: Mapped[LegislativeEmbeddingStatus] = mapped_column(Enum(LegislativeEmbeddingStatus), nullable=False, default=LegislativeEmbeddingStatus.PENDING)
     embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768), nullable=True)
 
-    version: Mapped["RegulatoryVersion"] = relationship("app.models.law.RegulatoryVersion", back_populates="provisions")
+    version: Mapped["LegislativeVersion"] = relationship("app.models.law.LegislativeVersion", back_populates="provisions")

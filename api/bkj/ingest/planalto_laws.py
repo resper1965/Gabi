@@ -11,7 +11,7 @@ from bkj.parsers.planalto_html_parser import parse_planalto_html
 from bkj.parsers.legal_structure_parser import parse_legal_structure
 from bkj.repositories.legal_repository import LegalRepository
 
-from app.models.law import RegulatoryDocument, RegulatoryVersion, RegulatoryProvision, RegulatoryDomain
+from app.models.law import LegislativeDocument, LegislativeVersion, LegislativeProvision, LegislativeDomain
 from app.models.audit import IngestRun, IngestRunItem, IngestStatus, IngestSource
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -49,7 +49,7 @@ class PlanaltoIngester:
                 # 4. Check Idempotency
                 doc = await self.repo.get_document_by_url(url)
                 if not doc:
-                    doc = RegulatoryDocument(
+                    doc = LegislativeDocument(
                         doc_id=str(uuid.uuid4()),
                         authority="PLANALTO",
                         act_type=law['act_type'],
@@ -69,7 +69,7 @@ class PlanaltoIngester:
 
                 # 5. Versioning
                 await self.repo.mark_versions_not_current(doc.id)
-                new_version = RegulatoryVersion(
+                new_version = LegislativeVersion(
                     doc_id=doc.id,
                     content_hash=content_hash,
                     retrieved_at=datetime.now(timezone.utc),
@@ -86,7 +86,7 @@ class PlanaltoIngester:
                 schema_provisions = parse_legal_structure(clean_text, law_name=law['name'])
                 db_provisions = []
                 for p in schema_provisions:
-                    db_provisions.append(RegulatoryProvision(
+                    db_provisions.append(LegislativeProvision(
                         doc_id=doc.id,
                         version_id=new_version.id,
                         structure_path=p.structure_path,

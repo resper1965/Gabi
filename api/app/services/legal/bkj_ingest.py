@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.law import RegulatoryDocument, RegulatoryVersion, RegulatoryProvision, RegulatoryDomain
+from app.models.law import LegislativeDocument, LegislativeVersion, LegislativeProvision, LegislativeDomain
 from app.services.legal_structure_parser import parse_legal_structure, LegalProvisionSchema
 
 class LegalIngester:
@@ -23,18 +23,18 @@ class LegalIngester:
                    act_type: str, 
                    law_number: str, 
                    clean_text: str,
-                   domain: Optional[RegulatoryDomain] = None) -> RegulatoryDocument:
+                   domain: Optional[LegislativeDomain] = None) -> LegislativeDocument:
         """
         Ingests a law idempotently. If the hash hasn't changed, skips provisions.
         """
         content_hash = self._generate_hash(clean_text)
         
         # 1. Find or Create Document
-        stmt = select(RegulatoryDocument).filter_by(canonical_url=canonical_url)
+        stmt = select(LegislativeDocument).filter_by(canonical_url=canonical_url)
         doc = self.db.execute(stmt).scalar_one_or_none()
         
         if not doc:
-            doc = RegulatoryDocument(
+            doc = LegislativeDocument(
                 doc_id=str(uuid.uuid4()),
                 authority="PLANALTO",
                 act_type=act_type,
@@ -48,7 +48,7 @@ class LegalIngester:
         # 2. Check current version hash
         current_version = None
         if doc.current_version_id:
-            stmt_v = select(RegulatoryVersion).filter_by(id=doc.current_version_id)
+            stmt_v = select(LegislativeVersion).filter_by(id=doc.current_version_id)
             current_version = self.db.execute(stmt_v).scalar_one_or_none()
 
         if current_version and current_version.content_hash == content_hash:
@@ -59,12 +59,12 @@ class LegalIngester:
         self.logger.info("[%s] NEW VERSION: Compiling new version from Planalto...", law_number)
         
         # Mark old versions as not current
-        stmt_old = select(RegulatoryVersion).filter_by(doc_id=doc.id, is_current=True)
+        stmt_old = select(LegislativeVersion).filter_by(doc_id=doc.id, is_current=True)
         old_versions = self.db.execute(stmt_old).scalars().all()
         for ov in old_versions:
             ov.is_current = False
 
-        new_version = RegulatoryVersion(
+        new_version = LegislativeVersion(
             doc_id=doc.id,
             content_hash=content_hash,
             retrieved_at=datetime.now(timezone.utc),
@@ -82,7 +82,7 @@ class LegalIngester:
         
         provisions_to_insert = []
         for p in schema_provisions:
-            provisions_to_insert.append(RegulatoryProvision(
+            provisions_to_insert.append(LegislativeProvision(
                 doc_id=doc.id,
                 version_id=new_version.id,
                 structure_path=p.structure_path,

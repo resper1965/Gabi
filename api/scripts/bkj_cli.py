@@ -11,7 +11,7 @@ from bkj.ingest.planalto_laws import PlanaltoIngester
 from bkj.libs.storage import Storage
 from app.database import async_session
 from app.models.audit import IngestRun, IngestSource
-from app.models.law import RegulatoryDomain
+from app.models.law import LegislativeDomain
 
 # --- SEEDS ---
 
@@ -21,35 +21,35 @@ CORE_LAWS = [
         "url": "https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm",
         "act_type": "Lei",
         "number": "10406",
-        "domain": RegulatoryDomain.CIVIL
+        "domain": LegislativeDomain.CIVIL
     },
     {
         "name": "Código Penal",
         "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm",
         "act_type": "Decreto-Lei",
         "number": "2848",
-        "domain": RegulatoryDomain.PENAL
+        "domain": LegislativeDomain.PENAL
     },
     {
         "name": "Código de Processo Civil",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm",
         "act_type": "Lei",
         "number": "13105",
-        "domain": RegulatoryDomain.PROCESSUAL
+        "domain": LegislativeDomain.PROCESSUAL
     },
     {
         "name": "Código de Defesa do Consumidor",
         "url": "https://www.planalto.gov.br/ccivil_03/Leis/L8078compilado.htm",
         "act_type": "Lei",
         "number": "8078",
-        "domain": RegulatoryDomain.CONSUMIDOR
+        "domain": LegislativeDomain.CONSUMIDOR
     },
     {
         "name": "LGPD",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/L13709compilado.htm",
         "act_type": "Lei",
         "number": "13709",
-        "domain": RegulatoryDomain.ADMINISTRATIVO
+        "domain": LegislativeDomain.ADMINISTRATIVO
     }
 ]
 
@@ -59,28 +59,28 @@ FINANCIAL_LAWS = [
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/lei/l12846compilado.htm",
         "act_type": "Lei",
         "number": "12846",
-        "domain": RegulatoryDomain.ADMINISTRATIVO
+        "domain": LegislativeDomain.ADMINISTRATIVO
     },
     {
         "name": "Lei de Lavagem de Dinheiro",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l9613compilado.htm",
         "act_type": "Lei",
         "number": "9613",
-        "domain": RegulatoryDomain.ADMINISTRATIVO
+        "domain": LegislativeDomain.ADMINISTRATIVO
     },
     {
         "name": "Lei do Processo Sancionador",
         "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2017/lei/l13506.htm",
         "act_type": "Lei",
         "number": "13506",
-        "domain": RegulatoryDomain.SANCIONADOR
+        "domain": LegislativeDomain.SANCIONADOR
     },
     {
         "name": "Lei de Crimes contra o SFN",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l7492.htm",
         "act_type": "Lei",
         "number": "7492",
-        "domain": RegulatoryDomain.PENAL
+        "domain": LegislativeDomain.PENAL
     }
 ]
 
