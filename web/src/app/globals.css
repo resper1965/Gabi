@@ -15,11 +15,8 @@
   --color-gabi-dim: rgba(16, 185, 129, 0.5);
   --color-gabi-glow: rgba(16, 185, 129, 0.25);
 
-  /* ── Module Accents ── */
-  --color-mod-ghost: #10b981; /* emerald */
+  /* ── Module Accent ── */
   --color-mod-law: #f59e0b; /* amber */
-  --color-mod-ntalk: #06b6d4; /* cyan */
-  --color-mod-insightcare: #f43f5e; /* rose */
 
   /* ── Surfaces (Swiss Solid Dark) ── */
   --color-surface-base: #0F172A; /* slate-900 */

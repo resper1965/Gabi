@@ -176,10 +176,10 @@ export default function UnifiedChatPage() {
             {/* Style Profile toggle */}
             <button
               onClick={() => setStyleOpen(!styleOpen)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-mod-ghost)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-mod-ghost)] relative z-10"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-gabi-primary)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-gabi-primary)] relative z-10"
               style={{
-                background: `color-mix(in srgb, var(--color-mod-ghost) 12%, transparent)`,
-                color: "var(--color-mod-ghost)",
+                background: `color-mix(in srgb, var(--color-gabi-primary) 12%, transparent)`,
+                color: "var(--color-gabi-primary)",
               }}
               title="Configurar perfil de estilo para redação"
             >
@@ -258,7 +258,7 @@ export default function UnifiedChatPage() {
           <KnowledgePanel
             isOpen={true}
             onToggle={() => setStyleOpen(false)}
-            moduleAccent="var(--color-mod-ghost)"
+            moduleAccent="var(--color-gabi-primary)"
             onProfileChange={setProfileId}
             activeProfileId={profileId}
           />

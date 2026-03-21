@@ -109,7 +109,7 @@ export default function OrgDashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
           { label: "Membros", value: `${org.members.length}/${org.limits?.max_seats || "∞"}`, icon: Users, color: "var(--color-gabi-primary)" },
-          { label: "Módulos", value: org.modules.filter(m => m.enabled).length, icon: Package, color: "var(--color-mod-ghost)" },
+          { label: "Módulos", value: org.modules.filter(m => m.enabled).length, icon: Package, color: "var(--color-gabi-primary)" },
           { label: "Ops/mês", value: `${org.usage?.ops_count || 0}/${org.limits?.max_ops_month || "∞"}`, icon: BarChart3, color: "var(--color-mod-law)" },
           { label: "Plano", value: org.plan.charAt(0).toUpperCase() + org.plan.slice(1), icon: Crown, color: "#fbbf24" },
         ].map((card) => (

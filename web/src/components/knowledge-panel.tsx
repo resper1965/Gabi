@@ -44,7 +44,7 @@ interface KnowledgePanelProps {
 export function KnowledgePanel({
   isOpen,
   onToggle,
-  moduleAccent = "var(--color-mod-ghost)",
+  moduleAccent = "var(--color-gabi-primary)",
   onProfileChange,
   activeProfileId,
 }: KnowledgePanelProps) {

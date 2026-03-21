@@ -37,7 +37,7 @@ export function MassUploadZone({
   docType,
   docTypeOptions,
   onDocTypeChange,
-  moduleAccent = "var(--color-mod-ghost)",
+  moduleAccent = "var(--color-gabi-primary)",
   onComplete,
   accept = ".pdf,.docx,.txt,.md",
   acceptLabel = "PDF, DOCX, TXT, MD — múltiplos arquivos",

@@ -8,8 +8,8 @@ Retrieval strategy (law module):
   2. Cache check            — SHA256(module:user:refined_query)
   3. Embed refined_query    — Vertex AI text-multilingual-embedding-002
   4. Three parallel searches:
-       A. Semantic (pgvector IVFFlat)      → law_chunks / ghost_doc_chunks
-       B. Lexical  (TSVECTOR Portuguese)   → law_chunks / ghost_doc_chunks
+       A. Semantic (pgvector IVFFlat)      → law_chunks / ghost_doc_chunks (style)
+       B. Lexical  (TSVECTOR Portuguese)   → law_chunks / ghost_doc_chunks (style)
        C. Provision vector search          → regulatory_provisions (law only)
   5. Reciprocal Rank Fusion (K=60)         → merge A+B+C into single ranked list
   6. LLM re-ranking (Gemini Flash)         → top-40 → best 8
@@ -39,7 +39,7 @@ logger = logging.getLogger("gabi.dynamic_rag")
 # Allowlist of valid table pairs to prevent SQL injection
 ALLOWED_TABLE_PAIRS = {
     "law": ("law_chunks", "law_documents", "doc_type"),
-    "ghost": ("ghost_doc_chunks", "ghost_knowledge_docs", "doc_type"),
+    "style": ("ghost_doc_chunks", "ghost_knowledge_docs", "doc_type"),
 }
 
 

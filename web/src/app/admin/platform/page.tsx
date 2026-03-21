@@ -88,7 +88,7 @@ export default function PlatformAdminPage() {
           {[
             { label: "Organizações", value: stats.total_orgs, icon: Building2, color: "var(--color-gabi-primary)" },
             { label: "Usuários ativos", value: stats.total_users, icon: Users, color: "var(--color-mod-law)" },
-            { label: "Ops este mês", value: stats.ops_this_month.toLocaleString("pt-BR"), icon: BarChart3, color: "var(--color-mod-ghost)" },
+            { label: "Ops este mês", value: stats.ops_this_month.toLocaleString("pt-BR"), icon: BarChart3, color: "var(--color-gabi-primary)" },
             { label: "Sessões ativas", value: stats.active_sessions, icon: Wifi, color: "#38bdf8" },
           ].map((card) => (
             <div key={card.label} className="rounded-2xl bg-[#1E293B] border border-[#334155] p-4">
