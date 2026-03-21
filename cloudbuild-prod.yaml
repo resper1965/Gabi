@@ -41,6 +41,35 @@ steps:
     args: ["detect", "--source", ".", "--no-banner"]
     waitFor: ["-"]
 
+  # ── SSDLC: IaC Security (Checkov) ──
+  - id: "iac-checkov"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install checkov --quiet
+        checkov -d . --framework dockerfile --compact --quiet || true
+    waitFor: ["-"]
+
+  # ── SSDLC: SAST — Semgrep (Multi-language) ──
+  - id: "sast-semgrep"
+    name: "returntocorp/semgrep:latest"
+    entrypoint: semgrep
+    args:
+      [
+        "scan",
+        "--config",
+        "auto",
+        "--json",
+        "--output",
+        "/workspace/semgrep-report.json",
+        "--severity",
+        "WARNING",
+        "api/app/",
+      ]
+    waitFor: ["-"]
+
   # ── Build API (production tag) ──
   - id: "build-api"
     name: "gcr.io/cloud-builders/docker"
@@ -79,6 +108,33 @@ steps:
       - "NEXT_PUBLIC_FIREBASE_APP_ID=1:563447386199:web:58002f335c8d7cec021312"
       - "."
     waitFor: ["-"] # parallel with API build
+
+  # ── SSDLC: Container Vulnerability Scan (Trivy) ──
+  - id: "trivy-api"
+    name: "aquasec/trivy:latest"
+    args:
+      [
+        "image",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--exit-code",
+        "0",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${TAG_NAME}",
+      ]
+    waitFor: ["build-api"]
+
+  - id: "trivy-web"
+    name: "aquasec/trivy:latest"
+    args:
+      [
+        "image",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--exit-code",
+        "0",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${TAG_NAME}",
+      ]
+    waitFor: ["build-web"]
 
   # ── Push Images ──
   - id: "push-api"

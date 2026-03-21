@@ -56,6 +56,37 @@ steps:
       ]
     waitFor: ["-"]
 
+  # ── SSDLC: IaC Security (Checkov) ──
+  - id: "iac-checkov"
+    name: "python:3.12-slim"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        pip install checkov --quiet
+        echo "━━━ IaC: Checkov Security Scan ━━━"
+        checkov -d . --framework dockerfile --compact --quiet -o json > /workspace/checkov-report.json || true
+        checkov -d . --framework dockerfile --compact --quiet || true
+    waitFor: ["-"]
+
+  # ── SSDLC: SAST — Semgrep (Multi-language) ──
+  - id: "sast-semgrep"
+    name: "returntocorp/semgrep:latest"
+    entrypoint: semgrep
+    args:
+      [
+        "scan",
+        "--config",
+        "auto",
+        "--json",
+        "--output",
+        "/workspace/semgrep-report.json",
+        "--severity",
+        "WARNING",
+        "api/app/",
+      ]
+    waitFor: ["-"]
+
   # ── Build API ──
   - id: "build-api"
     name: "gcr.io/cloud-builders/docker"
@@ -88,6 +119,41 @@ steps:
           --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=1:563447386199:web:58002f335c8d7cec021312 \
           .
     waitFor: ["test-api"]
+
+  # ── SSDLC: Container Vulnerability Scan (Trivy) ──
+  - id: "trivy-api"
+    name: "aquasec/trivy:latest"
+    args:
+      [
+        "image",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--format",
+        "json",
+        "--output",
+        "/workspace/trivy-api-report.json",
+        "--exit-code",
+        "0",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-api:${_TAG}",
+      ]
+    waitFor: ["build-api"]
+
+  - id: "trivy-web"
+    name: "aquasec/trivy:latest"
+    args:
+      [
+        "image",
+        "--severity",
+        "HIGH,CRITICAL",
+        "--format",
+        "json",
+        "--output",
+        "/workspace/trivy-web-report.json",
+        "--exit-code",
+        "0",
+        "${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-web:${_TAG}",
+      ]
+    waitFor: ["build-web"]
 
   # ── Push Images ──
   - id: "push-api"
@@ -146,6 +212,23 @@ steps:
       - "--max-instances=2"
       - "--port=3000"
     waitFor: ["push-web"]
+
+  # ── SSDLC: DAST — OWASP ZAP Baseline (Staging only) ──
+  - id: "dast-zap"
+    name: "ghcr.io/zaproxy/zaproxy:stable"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        echo "━━━ DAST: OWASP ZAP Baseline Scan ━━━"
+        echo "Waiting 30s for staging deploy to stabilize..."
+        sleep 30
+        zap-baseline.py \
+          -t ${_STAGING_API_URL}/health \
+          -J /workspace/zap-report.json \
+          -I || true
+        echo "━━━ ZAP scan complete ━━━"
+    waitFor: ["deploy-api-staging"]
 
 substitutions:
   _REGION: southamerica-east1
