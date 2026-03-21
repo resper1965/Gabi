@@ -20,6 +20,7 @@ from .schemas import AgentRequest, LegalDocType, PresentationRequest
 from .services import process_law_agent_invocation, process_law_agent_stream
 from app.modules.law.insights import router as insights_router
 from app.modules.law.insurance import router as insurance_router
+from app.modules.law.style_service import router as style_router
 
 # Module-level auth: every route requires the "law" module to be enabled
 ModuleUser = Depends(require_module("law"))
@@ -29,6 +30,7 @@ router = APIRouter()
 # Include sub-routers (same prefix, endpoints merge seamlessly)
 router.include_router(insights_router)
 router.include_router(insurance_router)
+router.include_router(style_router, prefix="/style")
 
 
 # ── Text extraction (ephemeral — for inline chat analysis) ──

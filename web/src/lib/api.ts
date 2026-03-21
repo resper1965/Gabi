@@ -157,18 +157,18 @@ async function streamRequest(
   return res.body.getReader()
 }
 
-// ── gabi.writer (style profiles & knowledge docs) ──
+// ── Style Profiles (integrated into law module) ──
 
-export const gabiWriter = {
-  profiles: () => request("/api/ghost/profiles"),
-  createProfile: (data: { name: string }) => request("/api/ghost/profiles", { method: "POST", body: JSON.stringify(data) }),
-  extractStyle: (profileId: string) => request(`/api/ghost/profiles/${profileId}/extract-style`, { method: "POST" }),
+export const gabiStyle = {
+  profiles: () => request("/api/law/style/profiles"),
+  createProfile: (data: { name: string }) => request("/api/law/style/profiles", { method: "POST", body: JSON.stringify(data) }),
+  extractStyle: (profileId: string) => request(`/api/law/style/profiles/${profileId}/extract-style`, { method: "POST" }),
   upload: (profileId: string, docType: string, file: File) =>
-    uploadFile("/api/ghost/upload", file, { profile_id: profileId, doc_type: docType }),
+    uploadFile("/api/law/style/upload", file, { profile_id: profileId, doc_type: docType }),
   documents: (profileId?: string) =>
-    request(`/api/ghost/documents${profileId ? `?profile_id=${profileId}` : ""}`),
+    request(`/api/law/style/documents${profileId ? `?profile_id=${profileId}` : ""}`),
   deleteDocument: (docId: string) =>
-    request(`/api/ghost/documents/${docId}`, { method: "DELETE" }),
+    request(`/api/law/style/documents/${docId}`, { method: "DELETE" }),
 }
 
 // ── gabi.legal ──
@@ -210,24 +210,6 @@ export const gabiLegal = {
       timeline: Array<{ label: string; week_start: string; week_end: string; alto: number; medio: number; baixo: number; total: number }>
     }>("/api/law/insights/stats"),
 }
-
-// ── gabi.data ──
-
-export const gabiData = {
-  ask: (data: { tenant_id: string; question: string; chat_history?: Array<{ role: string; content: string }>; summary?: string }) =>
-    request("/api/ntalk/ask", { method: "POST", body: JSON.stringify(data) }),
-  askStream: (data: { tenant_id: string; question: string; chat_history?: Array<{ role: string; content: string }>; summary?: string }, signal?: AbortSignal) =>
-    streamRequest("/api/ntalk/ask-stream", data, signal),
-  addTerm: (tenantId: string, term: string, definition: string) =>
-    request("/api/ntalk/dictionary", { method: "POST", body: JSON.stringify({ tenant_id: tenantId, term, definition }) }),
-  registerConnection: (data: { tenant_id: string; name: string; host: string; port?: number; db_name: string; username: string; secret_manager_ref: string }) =>
-    request("/api/ntalk/connections", { method: "POST", body: JSON.stringify(data) }),
-  syncSchema: (tenantId: string) =>
-    request(`/api/ntalk/connections/${tenantId}/schema-sync`, { method: "POST" }),
-}
-
-// ── gabi.care → consolidated into gabi.legal ──
-// Insurance methods now route through /api/law/* endpoints
 
 // ── Admin ──
 
@@ -378,24 +360,18 @@ export const gabiPlatform = {
     request("/api/platform/finops/by-org"),
 }
 
-// Unified export — 3 modules: writer, legal, data
+// Unified export — law module (7 agents) + shared services
 export const gabi = {
-  // Branded names
-  writer: gabiWriter,
+  // Core
   legal: gabiLegal,
-  data: gabiData,
-  // Module names (aliases)
-  ghost: gabiWriter,
+  style: gabiStyle,
+  // Aliases
   law: gabiLegal,
-  ntalk: gabiData,
-  // Backward compat: care/insightcare → legal
-  care: gabiLegal,
-  insightcare: gabiLegal,
+  writer: gabiStyle,
   // Shared
   admin: gabiAdmin,
   auth: gabiAuth,
   chat: gabiChat,
-  // Onboarding
   org: gabiOrg,
   platform: gabiPlatform,
 }

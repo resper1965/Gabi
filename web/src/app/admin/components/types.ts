@@ -29,10 +29,10 @@ export interface FinOpsOrg {
   org_id: string; org_name: string; cost_usd: number; tokens: number; requests: number
 }
 
-export const ALL_MODULES = ["ghost", "law", "ntalk"]
-export const MODULE_LABELS: Record<string, string> = { ghost: "Writer", law: "Legal", ntalk: "Data" }
+export const ALL_MODULES = ["law"]
+export const MODULE_LABELS: Record<string, string> = { law: "Legal" }
 export const MODULE_COLORS: Record<string, string> = {
-  ghost: "var(--color-mod-ghost)", law: "var(--color-mod-law)", ntalk: "var(--color-mod-ntalk)",
+  law: "var(--color-mod-law)",
 }
 export const PLAN_COLORS: Record<string, string> = {
   trial: "#fbbf24", starter: "#38bdf8", pro: "#818cf8", enterprise: "#f472b6",

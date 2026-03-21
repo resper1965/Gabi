@@ -100,11 +100,9 @@ from app.core.health import router as health_router
 app.include_router(health_router, tags=["Health"])
 
 # ── Module Routers ──
-from app.modules.ghost.router import router as ghost_router
 from app.modules.law.router import router as law_router
 from app.modules.ntalk.router import router as ntalk_router
 
-app.include_router(ghost_router, prefix="/api/ghost", tags=["nGhost"])
 app.include_router(law_router, prefix="/api/law", tags=["Law & Comply"])
 app.include_router(ntalk_router, prefix="/api/ntalk", tags=["nTalkSQL"])
 

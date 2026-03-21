@@ -9,9 +9,9 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-const MODULE_LABELS: Record<string, string> = { ghost: "Writer", law: "Legal", ntalk: "Data" }
+const MODULE_LABELS: Record<string, string> = { law: "Legal" }
 const MODULE_COLORS: Record<string, string> = {
-  ghost: "var(--color-mod-ghost)", law: "var(--color-mod-law)", ntalk: "var(--color-mod-ntalk)",
+  law: "var(--color-mod-law)",
 }
 
 export default function OrgDashboardPage() {

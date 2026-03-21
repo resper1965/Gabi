@@ -6,9 +6,7 @@ import { Building2, Package, ArrowRight, ArrowLeft, Loader2, CheckCircle2 } from
 import { toast } from "sonner"
 
 const MODULES = [
-  { key: "ghost", label: "gabi.writer", desc: "Clone de estilo + geração de texto", color: "var(--color-mod-ghost)" },
-  { key: "law", label: "gabi.legal", desc: "RAG jurídico + compliance regulatório", color: "var(--color-mod-law)" },
-  { key: "ntalk", label: "gabi.data", desc: "SQL por linguagem natural", color: "var(--color-mod-ntalk)" },
+  { key: "law", label: "gabi.legal", desc: "Agentes de IA especializados", color: "var(--color-mod-law)" },
 ]
 
 const SECTORS = [
@@ -26,7 +24,7 @@ export default function CreateOrgPage() {
   const [name, setName] = useState("")
   const [sector, setSector] = useState("")
   const [cnpj, setCnpj] = useState("")
-  const [selectedModules, setSelectedModules] = useState<string[]>(["ghost", "law", "ntalk"])
+  const [selectedModules, setSelectedModules] = useState<string[]>(["law"])
   const [loading, setLoading] = useState(false)
 
   const toggleModule = (key: string) => {

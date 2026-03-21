@@ -11,7 +11,7 @@ from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
-from app.models.ghost import KnowledgeDocument
+from app.models.law import KnowledgeDocument
 from app.models.law import LegalDocument
 from app.models.regulatory import RegulatoryDocument, RegulatoryAnalysis, RegulatoryVersion
 from app.core.dynamic_rag import should_retrieve, retrieve_if_needed

@@ -1,12 +1,13 @@
 """
-nGhost Module — Style Profile Management & Knowledge Documents
+Style Profile Service — Manages writing style profiles and knowledge documents.
+Formerly the ghost module, now integrated into the law module.
 
-Provides endpoints for:
- - Style profile CRUD (create, list)
- - Style extraction / refinement (forensic analysis of author voice)
- - Document upload & management (style + content docs with differentiated chunking)
+Endpoints:
+  - Style profile CRUD
+  - Style extraction / refinement (forensic analysis of author voice)
+  - Document upload & management (style + content docs with differentiated chunking)
 
-Text generation now runs through the unified Gabi orchestrator (law/router.py)
+Text generation runs through the unified Gabi orchestrator (law/services.py)
 using the 'writer' agent with style_profile_id.
 """
 
@@ -22,12 +23,12 @@ from app.database import get_db
 from app.core.auth import CurrentUser, get_current_user, require_module
 from app.core.rate_limit import check_rate_limit
 from app.core.ai import generate
-from app.models.ghost import StyleProfile, KnowledgeDocument, DocumentChunk
+from app.models.law import StyleProfile, KnowledgeDocument, StyleDocChunk
 
-logger = logging.getLogger("gabi.ghost")
+logger = logging.getLogger("gabi.style")
 
-# Module-level auth: every route requires the "ghost" module to be enabled
-ModuleUser = Depends(require_module("ghost"))
+# Module-level auth: style features require "law" module
+ModuleUser = Depends(require_module("law"))
 
 router = APIRouter()
 
@@ -183,7 +184,7 @@ async def upload_document(
         file=file,
         db=db,
         doc_model=KnowledgeDocument,
-        chunk_model=DocumentChunk,
+        chunk_model=StyleDocChunk,
         doc_fields={
             "user_id": user.uid,
             "profile_id": profile_id,
