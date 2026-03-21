@@ -12,13 +12,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import get_db
-from app.core.auth import CurrentUser, get_current_user
+from app.core.auth import CurrentUser, get_current_user, require_module
+from app.core.rate_limit import check_rate_limit
 from app.models.law import LegalDocument, LegalChunk, RegulatoryAlert
 
 from .schemas import AgentRequest, LegalDocType, PresentationRequest
 from .services import process_law_agent_invocation, process_law_agent_stream
 from app.modules.law.insights import router as insights_router
 from app.modules.law.insurance import router as insurance_router
+
+# Module-level auth: every route requires the "law" module to be enabled
+ModuleUser = Depends(require_module("law"))
 
 router = APIRouter()
 
@@ -32,7 +36,7 @@ router.include_router(insurance_router)
 @router.post("/extract-text")
 async def extract_text_endpoint(
     file: UploadFile = File(...),
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
 ):
     """Extract text from a file without storing it. Used by inline chat upload."""
     from app.core.ingest import extract_text
@@ -53,9 +57,12 @@ async def upload_document(
     doc_type: LegalDocType | None = None,
     title: str | None = None,
     file: UploadFile = File(...),
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
+    _internal: bool = False,
 ):
+    if not _internal:
+        check_rate_limit(user.uid)
     """Upload a legal document with AI auto-classification."""
     from app.core.ingest import process_document
     from app.services.doc_classifier import classify_document
@@ -112,29 +119,45 @@ async def upload_document(
 @router.post("/upload-batch")
 async def upload_batch(
     files: list[UploadFile] = File(...),
-    user: CurrentUser = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
+    user: CurrentUser = ModuleUser,
 ):
+    check_rate_limit(user.uid)
     """Upload multiple legal documents at once. Each is auto-classified by AI."""
-    results = []
-    for file in files:
-        try:
-            result = await upload_document(
-                doc_type=None,
-                title=file.filename,
-                file=file,
-                user=user,
-                db=db,
-            )
-            results.append({"filename": file.filename, "status": "ok", **result})
-        except HTTPException as e:
-            results.append({"filename": file.filename, "status": "error", "error": e.detail})
+    import asyncio
+    from app.database import get_db as _get_db
+
+    sem = asyncio.Semaphore(5)  # Limit concurrent processing
+
+    async def _process_one(file: UploadFile) -> dict:
+        async with sem:
+            # Each file gets its own db session — AsyncSession is NOT safe for concurrent use
+            db_gen = _get_db()
+            db = await db_gen.__anext__()
+            try:
+                result = await upload_document(
+                    doc_type=None,
+                    title=file.filename,
+                    file=file,
+                    user=user,
+                    db=db,
+                    _internal=True,
+                )
+                return {"filename": file.filename, "status": "ok", **result}
+            except HTTPException as e:
+                return {"filename": file.filename, "status": "error", "error": e.detail}
+            finally:
+                try:
+                    await db_gen.aclose()
+                except Exception:
+                    pass
+
+    results = await asyncio.gather(*[_process_one(f) for f in files])
 
     return {
         "total": len(files),
         "success": sum(1 for r in results if r["status"] == "ok"),
         "errors": sum(1 for r in results if r["status"] == "error"),
-        "results": results,
+        "results": list(results),
     }
 
 
@@ -143,10 +166,9 @@ async def upload_batch(
 @router.post("/agent")
 async def invoke_agent(
     req: AgentRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
-    from app.core.rate_limit import check_rate_limit
     check_rate_limit(user.uid)
     return await process_law_agent_invocation(req, user, db)
 
@@ -154,10 +176,9 @@ async def invoke_agent(
 @router.post("/agent-stream")
 async def invoke_agent_stream(
     req: AgentRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
-    from app.core.rate_limit import check_rate_limit
     check_rate_limit(user.uid)
     return await process_law_agent_stream(req, user, db)
 
@@ -166,7 +187,7 @@ async def invoke_agent_stream(
 
 @router.get("/documents")
 async def list_documents(
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """List legal documents in the knowledge base."""
@@ -185,7 +206,7 @@ async def list_documents(
 
 @router.get("/alerts")
 async def list_alerts(
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """List regulatory alerts."""
@@ -205,7 +226,7 @@ async def list_alerts(
 @router.post("/presentation")
 async def generate_doc_presentation(
     req: PresentationRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """Generate a PowerPoint presentation from selected documents."""

@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.core.analytics import log_event
-from app.core.auth import CurrentUser, get_current_user
+from app.core.auth import CurrentUser, get_current_user, require_module
 from app.core.ai import generate, generate_json
 from app.core.embeddings import embed
 from app.core.memory import summarize, should_summarize
@@ -23,6 +23,34 @@ from app.models.ntalk import BusinessDictionary, GoldenQuery, TenantConnection, 
 from app.config import get_settings
 
 settings = get_settings()
+
+# Module-level auth: every route requires the "ntalk" module to be enabled
+ModuleUser = Depends(require_module("ntalk"))
+
+
+def validate_tenant_access(tenant_id: str, user: CurrentUser) -> None:
+    """Ensure the user is authorized to access this tenant's data.
+
+    Rules:
+    - Superadmins can access any tenant.
+    - Users with org_id can only access their org's tenant (tenant_id == org_id).
+    - Users without org_id can only access their personal tenant (tenant_id == uid).
+
+    Raises HTTPException 403 if the tenant_id doesn't belong to the user.
+    """
+    if user.role == "superadmin":
+        return
+
+    allowed_tenants = {user.uid}  # Personal tenant always allowed
+    if user.org_id:
+        allowed_tenants.add(user.org_id)
+
+    if tenant_id not in allowed_tenants:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Acesso negado ao tenant '{tenant_id}'. Você só pode acessar dados do seu próprio tenant.",
+        )
+
 
 router = APIRouter()
 
@@ -99,10 +127,11 @@ class ConnectionRequest(BaseModel):
 @router.post("/connections")
 async def register_connection(
     req: ConnectionRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """Register a new MS SQL connection for a tenant."""
+    validate_tenant_access(req.tenant_id, user)
     # Check if connection already exists
     existing = await db.execute(
         select(TenantConnection).where(TenantConnection.tenant_id == req.tenant_id)
@@ -129,13 +158,14 @@ async def register_connection(
 @router.post("/connections/{tenant_id}/schema-sync")
 async def sync_schema(
     tenant_id: str,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """
     Read INFORMATION_SCHEMA from tenant's MS SQL and auto-populate
     the Business Dictionary with table/column definitions.
     """
+    validate_tenant_access(tenant_id, user)
     conn_res = await db.execute(
         select(TenantConnection).where(
             TenantConnection.tenant_id == tenant_id, TenantConnection.is_active == True
@@ -191,10 +221,12 @@ async def sync_schema(
 @router.post("/ask")
 async def ask_gabi(
     req: ChatRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """Full nTalkSQL flow: RAG → SQL gen → execute → interpret → audit."""
+    validate_tenant_access(req.tenant_id, user)
+    check_rate_limit(user.uid)
 
     # Step 1: RAG — dictionary + golden queries
     emb = await asyncio.to_thread(embed, req.question)
@@ -311,7 +343,7 @@ async def ask_gabi(
 @router.post("/ask-stream")
 async def ask_gabi_stream(
     req: ChatRequest,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ):
     """Streaming variant of /ask. SQL gen + execution sync, CFO interpretation streams via SSE.
@@ -321,6 +353,8 @@ async def ask_gabi_stream(
       data: {"type": "text", "text": "<chunk>"}                                        ← N events
       data: [DONE]
     """
+    validate_tenant_access(req.tenant_id, user)
+    check_rate_limit(user.uid)
     import json
     from app.core.ai import generate_stream
 
@@ -441,8 +475,9 @@ async def ask_gabi_stream(
 @router.post("/dictionary")
 async def add_term(tenant_id: str, term: str, definition: str,
                    sql_logic: str | None = None, category: str | None = None,
-                   user: CurrentUser = Depends(get_current_user),
+                   user: CurrentUser = ModuleUser,
                    db: AsyncSession = Depends(get_db)):
+    validate_tenant_access(tenant_id, user)
     entry = BusinessDictionary(tenant_id=tenant_id, term=term, definition=definition,
                                 sql_logic_snippet=sql_logic, category=category,
                                 embedding=await asyncio.to_thread(embed, f"{term}: {definition}"))
@@ -454,8 +489,9 @@ async def add_term(tenant_id: str, term: str, definition: str,
 @router.post("/golden-queries")
 async def add_golden(tenant_id: str, intent: str, sql: str,
                      approved_by: str | None = None,
-                     user: CurrentUser = Depends(get_current_user),
+                     user: CurrentUser = ModuleUser,
                      db: AsyncSession = Depends(get_db)):
+    validate_tenant_access(tenant_id, user)
     gq = GoldenQuery(tenant_id=tenant_id, user_intent=intent, approved_sql=sql,
                       approved_by=approved_by, embedding=await asyncio.to_thread(embed, intent))
     db.add(gq)

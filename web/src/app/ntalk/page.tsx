@@ -6,6 +6,7 @@ import { ChatHistorySidebar } from "@/components/chat-history-sidebar"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { useChatStore } from "@/contexts/chat-context"
 import { gabi } from "@/lib/api"
+import { useAuth } from "@/components/auth-provider"
 import { Database, Settings, RefreshCw, X } from "lucide-react"
 import { toast } from "sonner"
 
@@ -29,6 +30,8 @@ interface ConnectionForm {
 
 export default function NTalkPage() {
   const { messages, setMessages, clearMessages } = useChatStore("ntalk")
+  const { user, profile } = useAuth()
+  const tenantId = profile?.org_id || user?.uid || "default"
   const [isLoading, setIsLoading] = useState(false)
   const summary: string | null = null // placeholder for summary if needed later
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -59,7 +62,7 @@ export default function NTalkPage() {
 
         const controller = new AbortController()
         const reader = await gabi.ntalk.askStream({
-          tenant_id: "default",
+          tenant_id: tenantId,
           question: text,
           chat_history: history,
           summary: summary || undefined,
@@ -134,13 +137,13 @@ export default function NTalkPage() {
         setIsLoading(false)
       }
     },
-    [messages, summary, setMessages],
+    [messages, summary, setMessages, tenantId],
   )
 
   const handleSyncSchema = async () => {
     setIsLoading(true)
     try {
-      const res = (await gabi.data.syncSchema("default")) as {
+      const res = (await gabi.data.syncSchema(tenantId)) as {
         tables_synced: number
         terms_created: number
       }
@@ -156,7 +159,7 @@ export default function NTalkPage() {
     setSavingConn(true)
     try {
       await gabi.data.registerConnection({
-        tenant_id: "default",
+        tenant_id: tenantId,
         name: connForm.db_name || "Banco Principal",
         host: connForm.host,
         port: Number(connForm.port) || 1433,

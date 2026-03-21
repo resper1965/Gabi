@@ -41,12 +41,12 @@ export const painPoints = [
   },
   {
     before: "Redação morosa de pareceres e relatórios do zero",
-    after: "O Ghost Writer integrado redige a análise replicando o exato estilo do seu escritório",
+    after: "A IA integrada redige a análise replicando o exato estilo do seu escritório",
     audience: "Escritórios de Advocacia",
     impact: "Zero Copy/Paste",
     icon: PenTool,
     accent: "#06b6d4", // Cyan
-    module: "ghost writer corporativo",
+    module: "redação inteligente",
   },
 ]
 

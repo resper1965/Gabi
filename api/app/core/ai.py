@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 import time
+from contextvars import ContextVar
 from typing import AsyncGenerator, Literal
 
 import vertexai
@@ -22,16 +23,21 @@ from app.core.telemetry import trace_span
 
 logger = logging.getLogger("gabi.ai")
 
-# ── Token usage tracking (fire-and-forget) ──
-_usage_queue: list[dict] = []
+# ── Token usage tracking (per-request isolation via contextvars) ──
+_usage_queue: ContextVar[list[dict]] = ContextVar("_usage_queue", default=[])
 
 
 def _queue_token_usage(module: str, model_name: str, prompt_tokens: int, completion_tokens: int) -> None:
-    """Queue token usage for async DB write. Non-blocking."""
+    """Queue token usage for async DB write. Non-blocking, isolated per request."""
     try:
         from app.models.org import calc_cost_usd
         cost = calc_cost_usd(model_name, prompt_tokens, completion_tokens)
-        _usage_queue.append({
+        queue = _usage_queue.get()
+        # Copy-on-write: ensure we don't mutate the default empty list
+        if not queue:
+            queue = []
+            _usage_queue.set(queue)
+        queue.append({
             "module": module,
             "model": model_name,
             "prompt_tokens": prompt_tokens,
@@ -43,17 +49,17 @@ def _queue_token_usage(module: str, model_name: str, prompt_tokens: int, complet
             "Token usage: module=%s model=%s in=%d out=%d cost=$%.6f",
             module, model_name, prompt_tokens, completion_tokens, cost,
         )
-    except Exception:
-        pass  # Never block on FinOps logging
+    except Exception as e:
+        logger.warning("Failed to queue token usage: %s", e)
 
 
 async def flush_token_usage(user_id: str, org_id: str | None = None) -> None:
-    """Flush queued token usage to DB. Called from request handlers."""
-    global _usage_queue
-    if not _usage_queue:
+    """Flush queued token usage to DB. Called from FinOps middleware."""
+    queue = _usage_queue.get()
+    if not queue:
         return
-    batch = _usage_queue.copy()
-    _usage_queue = []
+    batch = queue.copy()
+    _usage_queue.set([])
     try:
         from app.database import async_session
         from app.models.org import TokenUsage

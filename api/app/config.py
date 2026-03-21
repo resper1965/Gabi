@@ -35,6 +35,14 @@ class Settings(BaseSettings):
     # Authorization
     auto_approve_domains: list[str] = ["ness.com.br", "bekaa.eu"]
 
+    # Trusted Hosts — in production, override via GABI_ALLOWED_HOSTS env var
+    # Default includes test hostnames (testclient, test) for pytest/CI;
+    # Cloud Run deploys MUST set GABI_ALLOWED_HOSTS to production hosts only.
+    allowed_hosts: list[str] = [
+        "api-gabi.ness.com.br", "gabi.ness.com.br", "localhost",
+        "testclient", "test",  # pytest TestClient + httpx ASGITransport
+    ]
+
     # Redis (rate limiting)
     redis_url: str = ""
 

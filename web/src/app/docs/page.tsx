@@ -4,10 +4,7 @@ import { useState } from "react"
 import ReactMarkdown from "react-markdown"
 import {
   BookOpen,
-  PenTool,
-  Scale,
-  Database,
-  ShieldCheck,
+  Users,
   Keyboard,
   HelpCircle,
 } from "lucide-react"
@@ -15,10 +12,7 @@ import { docsContent } from "@/lib/docs-content"
 
 const sections = [
   { id: "overview", label: "Visão Geral", icon: BookOpen },
-  { id: "ghost", label: "gabi.writer", icon: PenTool },
-  { id: "law", label: "gabi.legal", icon: Scale },
-  { id: "ntalk", label: "gabi.data", icon: Database },
-  { id: "insightcare", label: "gabi.care", icon: ShieldCheck },
+  { id: "agents", label: "Os 7 Agentes", icon: Users },
   { id: "shortcuts", label: "Atalhos", icon: Keyboard },
   { id: "faq", label: "FAQ", icon: HelpCircle },
 ] as const

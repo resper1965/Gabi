@@ -279,7 +279,7 @@ async def retrieve_if_needed(
     # ── Phase 2: Cache lookup ────────────────────────────────────────────────
     t0 = time.perf_counter()
     cache_key = hashlib.sha256(
-        f"{module}:{user_id}:{intent['refined_query']}".encode()
+        f"{module}:{user_id}:{profile_id or ''}:{effective_scope}:{intent['refined_query']}".encode()
     ).hexdigest()
     cached = await cached_rag_result(cache_key)
     trace["cache"] = {"hit": cached is not None, "ms": _ms(t0)}

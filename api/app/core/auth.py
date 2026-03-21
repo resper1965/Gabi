@@ -243,7 +243,7 @@ async def get_current_user(
         )
         org_modules = [r[0] for r in mod_rows]
 
-    return CurrentUser(
+    current_user = CurrentUser(
         uid=user.firebase_uid,
         email=user.email,
         db_id=str(user.id),
@@ -256,6 +256,11 @@ async def get_current_user(
         org_role=org_role,
         org_modules=org_modules,
     )
+
+    # Expose user to middleware (e.g. FinOps token flush)
+    request.state.user = current_user
+
+    return current_user
 
 
 def require_role(*allowed_roles: str):

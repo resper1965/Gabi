@@ -89,13 +89,21 @@ export function ChatHistorySidebar({
   if (!isOpen) return null
 
   return (
-    <div
-      className="w-72 h-full flex flex-col"
-      style={{
-        background: "var(--color-surface-card)",
-        borderLeft: "1px solid rgba(255,255,255,0.06)",
-      }}
-    >
+    <>
+      {/* Backdrop — mobile/tablet only */}
+      <div
+        className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm lg:hidden"
+        onClick={onClose}
+      />
+
+      {/* Panel — full-screen overlay on mobile, inline on desktop */}
+      <div
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-xs lg:relative lg:inset-auto lg:z-auto lg:w-72 lg:max-w-none h-full flex flex-col"
+        style={{
+          background: "var(--color-surface-card)",
+          borderLeft: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
       {/* Header */}
       <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="flex items-center gap-2">
@@ -165,6 +173,7 @@ export function ChatHistorySidebar({
           ))
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }

@@ -50,7 +50,12 @@ def extract_text_from_docx(data: bytes) -> str:
 
 
 def extract_text(data: bytes, filename: str) -> str:
-    """Auto-detect file type and extract text."""
+    """Auto-detect file type and extract text.
+    
+    Supported: .pdf, .docx, .txt, .md, .csv
+    Unsupported with explicit error: .xlsx (requires structured handling)
+    Unknown types: decoded as text with warning logged.
+    """
     with trace_span("document.extract_text", {"filename": filename, "size": len(data)}) as span:
         lower = filename.lower()
 
@@ -60,8 +65,17 @@ def extract_text(data: bytes, filename: str) -> str:
             text = extract_text_from_docx(data)
         elif lower.endswith((".txt", ".md", ".csv")):
             text = data.decode("utf-8", errors="replace")
+        elif lower.endswith(".xlsx"):
+            raise ValueError(
+                f"Formato XLSX não suportado para ingestão genérica: {filename}. "
+                "Use o endpoint específico de importação de planilhas."
+            )
         else:
-            # Fallback: try as text
+            # Fallback: try as text but warn — likely produces low-quality content
+            logger.warning(
+                "Unsupported file type for '%s', attempting text decode. "
+                "Quality of indexed content may be degraded.", filename
+            )
             text = data.decode("utf-8", errors="replace")
             
         if span:
@@ -145,7 +159,10 @@ async def process_document(
         )
 
     # Extract text
-    text = extract_text(data, filename)
+    try:
+        text = extract_text(data, filename)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     if not text.strip():
         return {"error": "Não foi possível extrair texto do arquivo.", "chunk_count": 0}
 

@@ -48,7 +48,7 @@ export function Sidebar() {
     <aside
       className={`${
         collapsed ? "w-[72px]" : "w-[250px]"
-      } h-screen flex flex-col transition-all duration-300 z-50 relative bg-[#0F172A] border-r border-[#1E293B]`}
+      } h-screen hidden lg:flex flex-col transition-all duration-300 z-50 relative bg-[#0F172A] border-r border-[#1E293B]`}
     >
       {/* ── Brand Header ── */}
       <div

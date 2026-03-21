@@ -46,22 +46,8 @@ async def lifespan(app: FastAPI):
     except (ImportError, ValueError, RuntimeError) as e:
         logger.warning("Startup checks failed (non-fatal): %s", e)
 
-    # Self-healing migration: ensure users.org_id column exists
-    try:
-        from app.database import engine
-        from sqlalchemy import text
-        import sqlalchemy.exc
-        async with engine.begin() as conn:
-            # NOTE: no FK constraint — simpler, avoids table-order issues
-            await conn.execute(text(
-                "ALTER TABLE users ADD COLUMN IF NOT EXISTS org_id UUID"
-            ))
-            await conn.execute(text(
-                "CREATE INDEX IF NOT EXISTS ix_users_org_id ON users(org_id)"
-            ))
-        logger.info("Startup migration: users.org_id column verified OK")
-    except sqlalchemy.exc.SQLAlchemyError as e:
-        logger.error("Startup migration FAILED: %s: %s", type(e).__name__, e)
+    # NOTE: users.org_id column must exist (managed by Alembic migration).
+    # Previously: self-healing ALTER TABLE ran here. Removed in favor of proper migration control.
 
     logger.info("Startup complete")
     yield
@@ -83,6 +69,10 @@ app = FastAPI(
 from app.middleware.error_handler import ErrorHandlerMiddleware
 app.add_middleware(ErrorHandlerMiddleware)
 
+# 1.5 FinOps — flush per-request token usage to DB
+from app.middleware.finops import FinOpsMiddleware
+app.add_middleware(FinOpsMiddleware)
+
 # 2. Security headers — HSTS, CSP, X-Frame-Options
 from app.middleware.security_headers import SecurityHeadersMiddleware
 app.add_middleware(SecurityHeadersMiddleware)
@@ -91,7 +81,10 @@ app.add_middleware(SecurityHeadersMiddleware)
 from app.middleware.request_logging import RequestLoggingMiddleware
 app.add_middleware(RequestLoggingMiddleware)
 
-# 4. CORS — tightened: explicit methods and headers
+# 4. Trusted Host — reject requests with invalid Host header
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
+
+# 5. CORS — tightened: explicit methods and headers
 # MUST BE LAST ADDED so it surrounds everything (outermost layer)
 app.add_middleware(
     CORSMiddleware,

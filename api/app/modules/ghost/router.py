@@ -19,11 +19,15 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.core.auth import CurrentUser, get_current_user
+from app.core.auth import CurrentUser, get_current_user, require_module
+from app.core.rate_limit import check_rate_limit
 from app.core.ai import generate
 from app.models.ghost import StyleProfile, KnowledgeDocument, DocumentChunk
 
 logger = logging.getLogger("gabi.ghost")
+
+# Module-level auth: every route requires the "ghost" module to be enabled
+ModuleUser = Depends(require_module("ghost"))
 
 router = APIRouter()
 
@@ -121,7 +125,7 @@ async def _get_owned_profile(
 
 @router.get("/profiles")
 async def list_profiles(
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> list[dict]:
     result = await db.execute(
@@ -145,7 +149,7 @@ async def list_profiles(
 @router.post("/profiles")
 async def create_profile(
     profile: ProfileCreate,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     new_profile = StyleProfile(user_id=user.uid, name=profile.name)
@@ -162,9 +166,10 @@ async def upload_document(
     profile_id: str,
     doc_type: str = "content",
     file: UploadFile = File(...),
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
+    check_rate_limit(user.uid)
     if doc_type not in ("style", "content"):
         raise HTTPException(400, "doc_type deve ser 'style' ou 'content'")
 
@@ -213,7 +218,7 @@ async def upload_document(
 @router.get("/documents")
 async def list_documents(
     profile_id: str | None = None,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> list[dict]:
     query = (
@@ -250,7 +255,7 @@ async def list_documents(
 @router.delete("/documents/{doc_id}")
 async def delete_document(
     doc_id: str,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
     result = await db.execute(
@@ -277,9 +282,10 @@ async def delete_document(
 @router.post("/profiles/{profile_id}/extract-style")
 async def extract_style(
     profile_id: str,
-    user: CurrentUser = Depends(get_current_user),
+    user: CurrentUser = ModuleUser,
     db: AsyncSession = Depends(get_db),
 ) -> dict:
+    check_rate_limit(user.uid)
     profile = await _get_owned_profile(profile_id, user.uid, db)
 
     chunks_result = await db.execute(

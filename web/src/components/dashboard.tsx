@@ -1,6 +1,6 @@
 "use client"
 
-import { PenTool, Scale, Database, ArrowRight, Lock, Clock, FileText, Activity } from "lucide-react"
+import { Sparkles, ArrowRight, Lock, Clock, FileText, Activity } from "lucide-react"
 import Link from "next/link"
 import NextImage from "next/image"
 import { useRouter } from "next/navigation"
@@ -10,31 +10,13 @@ import { gabi } from "@/lib/api"
 
 const allModules = [
   {
-    key: "ghost",
-    name: "gabi.writer",
-    tagline: "Sua IA Escritora",
-    description: "Absorve estilo e escreve com fidelidade — Style Signature + RAG",
-    icon: PenTool,
-    href: "/ghost",
-    accent: "var(--color-mod-ghost)",
-  },
-  {
     key: "law",
-    name: "gabi.legal",
-    tagline: "Sua Auditora Jurídica",
-    description: "4 agentes IA: Auditora, Pesquisadora, Redatora, Sentinela",
-    icon: Scale,
-    href: "/law",
-    accent: "var(--color-mod-law)",
-  },
-  {
-    key: "ntalk",
-    name: "gabi.data",
-    tagline: "Sua CFO de Dados",
-    description: "Converse com seus dados financeiros — SQL em linguagem natural",
-    icon: Database,
-    href: "/ntalk",
-    accent: "var(--color-mod-ntalk)",
+    name: "Gabi",
+    tagline: "7 Agentes de IA Especializados",
+    description: "Auditoria de contratos, pesquisa regulatória, redação baseada em estilos, monitoramento 24/7 e análise de seguros",
+    icon: Sparkles,
+    href: "/chat",
+    accent: "var(--color-gabi-primary)",
   },
 ]
 

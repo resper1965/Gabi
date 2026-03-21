@@ -26,7 +26,7 @@ export function HeroSection() {
         </h1>
 
         <p className="mt-6 text-lg tracking-wide md:text-xl text-slate-300 max-w-xl leading-relaxed font-light">
-          Uma única conversa aciona a inteligência de <strong className="text-white">7 agentes de IA</strong> especializados. Monitoramento 24/7, auditoria de contratos, pesquisa regulatória e redação com Ghost Writer integrado — para escritórios, gestoras e compliance.
+          Uma única conversa aciona a inteligência de <strong className="text-white">7 agentes de IA</strong> especializados. Monitoramento 24/7, auditoria de contratos, pesquisa regulatória e redação baseada no estilo do escritório — para escritórios, gestoras e compliance.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
