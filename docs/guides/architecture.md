@@ -1,6 +1,6 @@
 # Gabi Hub — Architecture Guide
 
-> Enterprise-grade AI platform for legal, compliance, and business intelligence.
+> Enterprise AI platform for legal, compliance, insurance, and professional writing.
 
 ---
 
@@ -57,15 +57,17 @@ graph TB
 
 ```mermaid
 graph LR
-    subgraph "Modules"
-        LAW["Law & Comply<br/>Legal AI + Writer"]
-        FLASH["Flash<br/>Natural Language → SQL"]
-        CHAT["Chat<br/>Session Management"]
+    subgraph "Law Module — 7 AI Agents"
+        LEGAL["Legal Agents<br/>auditor · researcher · drafter · watcher"]
+        INS["Insurance Agents<br/>policy_analyst · claims_analyst · regulatory_consultant"]
+        STYLE["Writer<br/>Style Profiles + Generation"]
+        INSIGHTS["InsightCare<br/>Regulatory Intel Pipeline"]
     end
 
     subgraph "Core Services"
         AUTH["Auth & RBAC"]
         ORG["Organizations"]
+        CHAT["Chat Sessions"]
         PLATFORM["Platform Admin"]
         ADMIN["Admin Dashboard"]
         LGPD["LGPD Compliance"]
@@ -73,17 +75,39 @@ graph LR
 
     subgraph "Shared Infrastructure"
         RAG["RAG Pipeline<br/>Upload → Chunk → Embed → Store"]
-        AI["AI Service<br/>Vertex AI Abstraction"]
+        AI["AI Service<br/>Gemini Pro + Flash"]
+        MULTI["Multi-Agent Debate<br/>Anti-hallucination"]
         LIMITS["FinOps<br/>Rate Limiting"]
     end
 
-    LAW --> RAG
-    LAW --> AI
-    FLASH --> AI
-    LAW --> LIMITS
-    FLASH --> LIMITS
+    LEGAL --> RAG
+    LEGAL --> AI
+    LEGAL --> MULTI
+    INS --> AI
+    STYLE --> RAG
+    INSIGHTS --> RAG
+    LEGAL --> LIMITS
+    INS --> LIMITS
     ORG --> LIMITS
 ```
+
+---
+
+## AI Agents
+
+The `law` module orchestrates 7 specialized agents via an auto-router that classifies queries and dispatches to the best agent(s). Multi-agent debate is used when multiple agents are selected.
+
+| Agent | Domain | Model | Role |
+|-------|--------|-------|------|
+| `auditor` | Legal | Gemini Pro | Contract compliance auditing |
+| `researcher` | Legal | Gemini Pro | Legal research and jurisprudence |
+| `drafter` | Legal | Gemini Pro | Legal document drafting |
+| `watcher` | Legal | Gemini Pro | Regulatory monitoring and alerts |
+| `policy_analyst` | Insurance | Gemini Flash | Insurance policy analysis |
+| `claims_analyst` | Insurance | Gemini Flash | Claims processing and analysis |
+| `regulatory_consultant` | Insurance | Gemini Pro | Insurance regulatory consulting |
+
+**Auto-router**: When `agent: "auto"` is sent, Gemini Flash classifies the query and selects one or more agents. If multiple agents are selected, their outputs are synthesized via multi-agent debate.
 
 ---
 
