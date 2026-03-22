@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { ChatPanel, type StreamMeta } from "@/components/chat-panel"
 import { ChatHistorySidebar } from "@/components/chat-history-sidebar"
 import { MassUploadZone } from "@/components/mass-upload-zone"
@@ -38,18 +38,7 @@ export default function UnifiedChatPage() {
   const [styleOpen, setStyleOpen] = useState(false)
   const [profileId, setProfileId] = useState("default")
   const [generatingPptx, setGeneratingPptx] = useState(false)
-  const [recentInsights, setRecentInsights] = useState<
-    Array<{ id: number; authority: string; numero: string; tipo_ato: string }>
-  >([])
 
-  useEffect(() => {
-    gabi.legal
-      .insights()
-      .then((data) => {
-        if (Array.isArray(data)) setRecentInsights(data.slice(0, 3) as typeof recentInsights)
-      })
-      .catch(console.error)
-  }, [])
 
   // ── Streaming handler (unified: law orchestrator + style profile) ──────────
   const handleSendStream = useCallback(
@@ -133,7 +122,7 @@ export default function UnifiedChatPage() {
   }, [])
 
   return (
-    <div className="h-full flex flex-col bg-[#020617] relative selection:bg-[color:var(--color-gabi-primary)] selection:text-white">
+    <div className="h-full flex flex-col bg-[#020617] relative pb-[76px] lg:pb-0 selection:bg-[color:var(--color-gabi-primary)] selection:text-white">
       {/* Background Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none z-0"></div>
 
@@ -149,22 +138,12 @@ export default function UnifiedChatPage() {
             </div>
             <div>
               <h1 className="text-lg font-semibold">Gabi</h1>
-              <div className="flex items-center gap-2">
-                <p className="text-xs text-zinc-500">Sua IA Orquestradora — Legal, Redação, Compliance</p>
-                {recentInsights.length > 0 && (
-                  <>
-                    <span className="w-1 h-1 rounded-full bg-zinc-700" />
-                    <span className="flex items-center gap-1 text-[10px] text-amber-500 font-medium">
-                      <Sparkles className="w-2.5 h-2.5" />
-                      {recentInsights.length} análises hoje
-                    </span>
-                  </>
-                )}
-              </div>
+              <p className="text-xs text-zinc-500 hidden sm:block">Sua IA Orquestradora — Legal, Redação, Compliance</p>
+
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
             <button
               onClick={() => setHistoryOpen(true)}
               className="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white hover:shadow-[0_0_15px_rgba(255,255,255,0.05)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-all duration-300 relative z-10"
@@ -202,18 +181,18 @@ export default function UnifiedChatPage() {
               ) : (
                 <Presentation className="w-3 h-3" />
               )}
-              {generatingPptx ? "Gerando..." : "Apresentação"}
+              {generatingPptx ? "..." : "PPTX"}
             </button>
 
             <button
               onClick={() => setShowUpload(!showUpload)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-gabi-primary)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-gabi-primary)] relative z-10"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer hover:shadow-[0_0_15px_color-mix(in_srgb,var(--color-gabi-primary)_20%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-gabi-primary)] relative z-10"
               style={{
                 background: `color-mix(in srgb, var(--color-gabi-primary) 12%, transparent)`,
                 color: ACCENT,
               }}
             >
-              📎 Base Jurídica
+              📎 <span className="hidden sm:inline">Base Jurídica</span>
               {showUpload ? (
                 <ChevronUp className="w-3 h-3" />
               ) : (
