@@ -21,11 +21,6 @@ RETENTION_RULES = {
         "date_column": "created_at",
         "description": "Analytics events older than 1 year",
     },
-    "ntalk_audit_logs": {
-        "max_age_days": 365,
-        "date_column": "executed_at",
-        "description": "nTalk SQL audit logs older than 1 year",
-    },
     "chat_messages": {
         "max_age_days": 180,
         "date_column": "created_at",

@@ -6,8 +6,20 @@ import { ChatProvider } from "@/contexts/chat-context"
 import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
-  title: "Gabi",
-  description: "Inteligencia Artificial powered by ness.",
+  title: {
+    default: "Gabi — Inteligência Artificial para Compliance",
+    template: "%s | Gabi",
+  },
+  description:
+    "Plataforma de IA para compliance regulatório, análise jurídica e gestão documental. Powered by ness.",
+  robots: { index: false, follow: false },
+  openGraph: {
+    title: "Gabi — IA para Compliance",
+    description: "Análise jurídica, monitoramento regulatório e gestão documental com IA.",
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Gabi",
+  },
   icons: {
     icon: "/favicon.png",
   },
