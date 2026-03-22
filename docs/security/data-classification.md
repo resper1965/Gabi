@@ -1,82 +1,116 @@
 # Data Classification Matrix
 
-> Gabi Platform · LGPD / Security · 2026-02-27
+> Gabi Hub · classificacao alinhada ao runtime atual · 2026-03-22
 
-## Classification Levels
+## Niveis
 
-| Nível | Definição | Controle de Acesso | Exemplos |
-|-------|-----------|-------------------|----------|
-| 🟢 **PUBLIC** | Informação pública | Sem restrição | API docs, landing page |
-| 🔵 **INTERNAL** | Uso interno | Login obrigatório | Dashboard, analytics agregados |
-| 🟡 **CONFIDENTIAL** | Dados sensíveis | Role-based + tenant | Documentos jurídicos, apólices |
-| 🔴 **RESTRICTED** | Dados altamente sensíveis | Acesso mínimo + audit log | PII, dados de saúde, credenciais |
-
----
-
-## Classification por Tabela
-
-### Dados de Usuário
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `users` | email, name, uid | 🔴 RESTRICTED | Consentimento |
-| `analytics_events` | user_id, module, event_type | 🟡 CONFIDENTIAL | Legítimo interesse |
-| `chat_messages` | content, user_id | 🔴 RESTRICTED | Consentimento |
-
-### gabi.legal
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `law_documents` | title, content, user_id | 🔴 RESTRICTED | Exercício de direitos |
-| `law_chunks` | content, embedding | 🟡 CONFIDENTIAL | Exercício de direitos |
-| `legal_documents` | canonical_url, act_type | 🔵 INTERNAL | Legítimo interesse |
-| `legal_provisions` | text, embedding | 🔵 INTERNAL | Legítimo interesse |
-
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `insurance_clients` | name, cnpj, segment | 🔴 RESTRICTED | Consentimento |
-| `policies` | policy_number, premium, lives | 🔴 RESTRICTED | Contrato |
-| `claims_data` | claims_value, category | 🔴 RESTRICTED | Contrato |
-| `ic_documents` | content (apólices, laudos) | 🔴 RESTRICTED | Contrato |
-
-### gabi.writer (Writer — integrado ao Law)
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `ghost_documents` | content, style profile | 🟡 CONFIDENTIAL | Consentimento |
-| `style_profiles` | style_data | 🟡 CONFIDENTIAL | Consentimento |
-
-### Regulatório
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `regulatory_documents` | content | 🔵 INTERNAL | Legítimo interesse |
-| `regulatory_analyses` | AI analysis content | 🔵 INTERNAL | Legítimo interesse |
+| Nivel | Definicao | Exemplo de controle |
+|-------|-----------|---------------------|
+| `PUBLIC` | Conteudo publico ou institucional | acesso sem autenticacao |
+| `INTERNAL` | Dado operacional interno | acesso autenticado e restrito por funcao |
+| `CONFIDENTIAL` | Dado de negocio ou conteudo de cliente | isolamento por usuario/org e trilha de auditoria |
+| `RESTRICTED` | PII, credenciais, textos sensiveis e conteudo sigiloso | minimo privilegio, logs, retencao e resposta a incidente |
 
 ---
 
-## Credenciais e Secrets
-| Secret | Nível | Armazenamento |
-|--------|-------|---------------|
-| DATABASE_URL | 🔴 RESTRICTED | Secret Manager |
-| FIREBASE_SA_JSON | 🔴 RESTRICTED | Secret Manager |
-| VERTEX_AI_CREDENTIALS | 🔴 RESTRICTED | Service Account (IAM) |
-| SESSION_SECRET | 🔴 RESTRICTED | Secret Manager |
+## Escopo Atual da Aplicacao
+
+A superficie ativa do produto esta centrada em:
+
+- `law`
+- writer/style integrado ao `law`
+- admin/org/platform
+- chat persistido
+- LGPD e auth
+
+Nao ha modulo publico `ntalk`.
 
 ---
 
-## Retenção de Dados (LGPD)
-| Categoria | Período | Automação |
-|-----------|---------|-----------|
-| Analytics events | 1 ano | `data_retention.py` ✅ |
-| Audit logs | 1 ano | `data_retention.py` ✅ |
-| Chat messages inativos | 6 meses | `data_retention.py` ✅ |
-| Documentos do usuário | Até exclusão pelo usuário | LGPD purge endpoint ✅ |
-| Credenciais de conexão | Até revogação | Manual |
+## Classificacao por Dominio
+
+### Identidade, acesso e organizacao
+
+| Tabela / Dominio | Dados principais | Nivel |
+|------------------|------------------|-------|
+| `users` | email, nome, firebase uid, papel, status | `RESTRICTED` |
+| `organizations` | identificadores organizacionais, plano, dominio | `CONFIDENTIAL` |
+| `org_members` | vinculo usuario-organizacao | `CONFIDENTIAL` |
+| `org_modules` | habilitacao de modulo | `INTERNAL` |
+| `org_usage`, `org_sessions` | consumo, atividade e sessao | `CONFIDENTIAL` |
+| `token_usage` | custo, modelo, consumo por usuario/org | `CONFIDENTIAL` |
+
+### Chat e historico
+
+| Tabela / Dominio | Dados principais | Nivel |
+|------------------|------------------|-------|
+| `chat_sessions` | titulo, modulo, metadados de conversa | `CONFIDENTIAL` |
+| `chat_messages` | texto das mensagens, contexto e metadados | `RESTRICTED` |
+
+### Base juridica do usuario
+
+| Tabela / Dominio | Dados principais | Nivel |
+|------------------|------------------|-------|
+| `law_documents` | contratos, pecas, politicas, opinioes, texto e metadados | `RESTRICTED` |
+| `law_chunks` | fragmentos de documento e embeddings | `CONFIDENTIAL` |
+| `law_alerts` | alertas regulatorios vinculados ao usuario | `CONFIDENTIAL` |
+| `law_gap_analyses` | achados e sugestoes de compliance | `CONFIDENTIAL` |
+
+### Corpus regulatorio compartilhado
+
+| Tabela / Dominio | Dados principais | Nivel |
+|------------------|------------------|-------|
+| `legal_documents` | referencias normativas, URL canonica, tipo de ato | `INTERNAL` |
+| `legal_versions` | versoes capturadas e metadados de parsing | `INTERNAL` |
+| `legal_provisions` | dispositivos estruturados e embeddings | `INTERNAL` |
+
+### Writer/style integrado ao `law`
+
+| Tabela / Dominio | Dados principais | Nivel |
+|------------------|------------------|-------|
+| `ghost_style_profiles` | assinatura de estilo, exemplares, system prompt | `RESTRICTED` |
+| `ghost_knowledge_docs` | documentos associados ao perfil de estilo | `CONFIDENTIAL` |
+| `ghost_doc_chunks` | chunks e embeddings de writer/style | `CONFIDENTIAL` |
+
+Nota: os nomes `ghost_*` sao legados de banco e nao representam um modulo publico ativo.
+
+### Admin e compliance
+
+| Dominio | Dados principais | Nivel |
+|---------|------------------|-------|
+| LGPD export/purge | pacote de exportacao de dados do titular | `RESTRICTED` |
+| observabilidade operacional | erros, consumo, saude, correlacao | `CONFIDENTIAL` |
+| analytics agregados | contagens, uso consolidado, tendencias | `INTERNAL` |
 
 ---
 
-## Direitos LGPD (DSAR)
-| Direito | Endpoint | Status |
-|---------|----------|--------|
-| Acesso (Art. 18, II) | `GET /api/admin/lgpd/export/{uid}` | ✅ |
-| Eliminação (Art. 18, VI) | `DELETE /api/admin/lgpd/purge/{uid}` | ✅ |
-| Consentimento (Art. 8) | Consent middleware (451) | ✅ |
-| Portabilidade (Art. 18, V) | Via export (JSON) | ✅ |
-| Audit trail | `analytics_events` table | ✅ |
+## Credenciais e Segredos
+
+| Segredo | Nivel | Armazenamento esperado |
+|---------|-------|------------------------|
+| `DATABASE_URL` | `RESTRICTED` | Secret Manager / runtime secret |
+| `FIREBASE_*` service account | `RESTRICTED` | Secret Manager |
+| credenciais Vertex AI / IAM | `RESTRICTED` | IAM / workload identity / secret controlado |
+| segredos de sessao e chaves internas | `RESTRICTED` | Secret Manager |
+
+---
+
+## Regras de Tratamento
+
+- dados `RESTRICTED` nao devem aparecer em logs de aplicacao
+- embeddings de conteudo do cliente devem ser tratados como derivados sensiveis
+- exportacao LGPD deve cobrir os dados persistidos do usuario e de chat
+- exclusao/purge deve considerar tambem dados derivados e historicos associados
+- uploads inline efemeros de chat nao devem ser persistidos fora do fluxo explicitamente solicitado pelo usuario
+
+---
+
+## Legado Estrutural Relevante
+
+Os pontos que ainda exigem atencao na classificacao:
+
+- nomes de tabelas `ghost_*` ainda nao foram migrados para nomenclatura `law/style`
+- docs antigas ainda tratam writer como modulo separado
+- alguns artefatos historicos ainda usam taxonomia anterior de produto
+
+Enquanto esse legado existir, a classificacao deve seguir o dado real persistido, nao o nome historico da feature.

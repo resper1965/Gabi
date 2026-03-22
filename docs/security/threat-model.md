@@ -1,118 +1,143 @@
-# Threat Model — STRIDE Analysis
+# Threat Model — STRIDE
 
-> Gabi Platform · Atualizado 2026-02-27
+> Gabi Hub · modelo de ameacas alinhado ao runtime atual · 2026-03-22
 
-## Overview
+## Escopo
 
-Este modelo de ameaças cobre a superfície de ataque da plataforma Gabi, uma aplicação AI enterprise para setores regulados (legal, financeiro, seguros). Segue a metodologia **STRIDE** aplicada por módulo e componente.
+Este documento cobre a superficie ativa da aplicacao:
+
+- frontend Next.js
+- backend FastAPI
+- auth Firebase
+- modulo publico `law`
+- chat persistido
+- admin/org/platform
+- ingestao de arquivos
+- IA via Vertex AI
+- PostgreSQL + pgvector
+
+Nao considera `ntalk` como modulo publico porque ele foi expurgado da superficie ativa.
 
 ---
 
-## Trust Boundaries
+## Limites de Confianca
 
+```text
+Internet / Browser
+    ->
+Frontend Next.js
+    ->
+API FastAPI
+    ->
+Core interno: auth, RAG, AI, ingest, FinOps
+    ->
+Servicos gerenciados: Firebase, Vertex AI, Cloud SQL, Secret Manager
 ```
-┌───────────────────────────────────────────────────┐
-│  INTERNET (untrusted)                             │
-│  ├── Browser/Mobile App                           │
-│  └── Third-party integrations                     │
-├───────────────────────────────────────────────────┤
-│  CLOUD RUN (semi-trusted)                         │
-│  ├── gabi-api (FastAPI)                           │
-│  ├── gabi-web (Next.js SSR)                       │
-│  └── Middleware: Auth, Rate Limit, Consent, CORS  │
-├───────────────────────────────────────────────────┤
-│  GCP SERVICES (trusted)                           │
-│  ├── Cloud SQL (PostgreSQL + pgvector)            │
-│  ├── Vertex AI (Gemini Pro/Flash)                 │
-│  ├── Secret Manager                               │
-│  └── Cloud Storage (backups)                      │
-└───────────────────────────────────────────────────┘
-```
+
+Principais fronteiras:
+
+- cliente nao confiavel -> frontend/backend
+- documentos do usuario -> pipeline de ingestao e RAG
+- respostas de modelo -> aplicacao e usuario final
+- credenciais/cloud services -> runtime do backend
+
+---
+
+## Ativos Criticos
+
+- tokens Firebase
+- documentos juridicos e textos de cliente
+- style profiles e prompts derivados
+- historico de conversas
+- dados organizacionais e de billing/uso
+- corpus regulatorio processado
+- segredos de infraestrutura
 
 ---
 
 ## STRIDE por Componente
 
-### 1. Autenticação (Firebase Auth)
+### 1. Auth e autorizacao
 
-| Ameaça | Tipo | Risco | Mitigação |
-|--------|------|-------|-----------|
-| Token replay | **S**poofing | Médio | Token expiry (1h), verify `aud` claim |
-| Stolen JWT | **S**poofing | Alto | HTTPS only, secure cookie flags |
-| Role escalation | **E**levation | Alto | Server-side role check via `CurrentUser.role` |
-| Missing refresh rotation | **S**poofing | Médio | ❌ **GAP** — implementar refresh token rotation |
-| Brute force | **D**oS | Médio | Rate limiting (per-user) ✅ |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| uso de token roubado | Spoofing | Alto | mitigado por verificacao server-side do Firebase e HTTPS |
+| escalacao de privilegio por papel | Elevation | Alto | mitigado por `CurrentUser` + checks server-side |
+| acesso a modulo nao habilitado | Elevation | Medio | mitigado por `require_module("law")` |
+| uso indevido de contas pendentes/bloqueadas | Elevation | Medio | mitigado por status no backend |
 
-### 2. AI / Vertex AI (Gemini)
+### 2. Chat e anexos inline
 
-| Ameaça | Tipo | Risco | Mitigação |
-|--------|------|-------|-----------|
-| Prompt injection | **T**ampering | Alto | Anti-hallucination guardrail ✅ + system prompt isolation |
-| Data exfiltration via prompt | **I**nfo Disclosure | Alto | Response filtering ⚠️ — melhorar output sanitization |
-| Model denial of service | **D**oS | Médio | Rate limiting ✅ + quota Vertex AI |
-| Hallucinated legal advice | **T**ampering | Crítico | Zero Alucinação guardrail ✅ + RAG citations obrigatórias |
-| Indirect prompt injection (via documents) | **T**ampering | Alto | ❌ **GAP** — document content sanitization |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| upload de arquivo malicioso | Tampering | Alto | parcialmente mitigado por validacoes de extensao/tamanho |
+| extracao de texto de arquivo hostil | Tampering | Alto | risco residual; parsing continua superficie sensivel |
+| vazamento de conteudo anexado | Information Disclosure | Alto | anexos inline sao efemeros, mas exigem atencao em logs e erros |
+| abuso por arquivos grandes | DoS | Medio | limite de tamanho aplicado no endpoint de extracao |
 
-### 3. Database (Cloud SQL + pgvector)
+### 3. RAG e documentos
 
-| Ameaça | Tipo | Risco | Mitigação |
-|--------|------|-------|-----------|
-| SQL injection | **T**ampering | Crítico | ALLOWED_TABLE_PAIRS allowlist ✅ + parameterized queries |
-| Data exfiltration | **I**nfo Disclosure | Alto | Private IP ✅, authorized networks cleaned ✅ |
-| Privilege escalation | **E**levation | Médio | Minimal DB user privileges |
-| Backup exposure | **I**nfo Disclosure | Médio | Encryption at rest (GCP default) ✅ |
-| BOLA (Broken Object Level Auth) | **E**levation | Alto | ⚠️ **GAP** — verificar tenant isolation em todas as queries |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| broken object access em documentos do usuario | Elevation | Alto | mitigado por filtros de ownership; exige regressao continua |
+| vazamento entre contexto juridico e writer/style | Information Disclosure | Medio | mitigado por filtros de usuario e `profile_id` |
+| SQL injection em consultas de busca | Tampering | Alto | mitigado por allowlists e queries parametrizadas |
+| retorno de contexto errado por cache | Tampering | Medio | mitigado no desenho atual, mas continua area critica de regressao |
 
-### 4. File Upload (Ingest Pipeline)
+### 4. IA generativa
 
-| Ameaça | Tipo | Risco | Mitigação |
-|--------|------|-------|-----------|
-| Arbitrary file upload | **T**ampering | Alto | ⚠️ Extension validation — melhorar MIME type check |
-| Path traversal | **T**ampering | Médio | Filename sanitization |
-| Malicious PDF/DOCX | **T**ampering | Alto | ❌ **GAP** — sandboxed parsing (ex: tika) |
-| DoS via large files | **D**oS | Médio | Upload size limit ⚠️ |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| prompt injection direta do usuario | Tampering | Alto | mitigado parcialmente por guardrails e prompts de sistema |
+| prompt injection indireta via documento | Tampering | Alto | risco residual; conteudo ingerido continua hostil por definicao |
+| fabricacao de fatos juridicos | Tampering | Critico | mitigado por guardrail global e uso de RAG/citacoes |
+| vazamento de dados sensiveis na resposta | Information Disclosure | Alto | depende de filtros de contexto, ownership e revisao continua |
 
-### 5. Infrastructure (Cloud Run / GCP)
+### 5. Admin, org e dados operacionais
 
-| Ameaça | Tipo | Risco | Mitigação |
-|--------|------|-------|-----------|
-| Container escape | **E**levation | Baixo | Cloud Run sandboxing (gVisor) |
-| Secret exposure | **I**nfo Disclosure | Alto | Secret Manager ✅, no vars in code |
-| Log injection | **T**ampering | Médio | Structured JSON logging ✅ |
-| DDoS | **D**oS | Médio | Cloud Run auto-scaling + max instances |
-| Supply chain attack | **T**ampering | Alto | SCA (pip-audit) ✅, SBOM ✅ |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| acesso indevido a dados de organizacao | Elevation | Alto | depende de checks server-side de papel e escopo |
+| exposicao de telemetria/custos | Information Disclosure | Medio | deve permanecer restrita a admin/superadmin |
+| alteracao indevida de provisionamento | Tampering | Alto | depende de auth forte e trilha de auditoria |
 
----
+### 6. Infraestrutura
 
-## Módulos Específicos
-
-### gabi.legal
-| Ameaça | Risco | Status |
-|--------|-------|--------|
-| Vazamento de documentos jurídicos sigilosos | Crítico | Tenant isolation ✅, mas verificar queries |
-| Citação de legislação incorreta (hallucination) | Alto | Anti-hallucination ✅ + RAG citations |
-| Acesso não autorizado a processos | Alto | Role-based access ✅ |
-
-| Ameaça | Risco | Status |
-|--------|-------|--------|
-| Dados de saúde expostos (PHI-like) | Crítico | Tenant isolation ✅, LGPD consent ✅ |
-| Sinistralidade de clientes vazada entre tenants | Crítico | `tenant_id` filter em queries ✅ |
-| Normas regulatórias desatualizadas | Alto | Ingestion pipeline atualizado |
-
-### gabi.writer (Writer — integrado ao Law)
-| Ameaça | Risco | Status |
-|--------|-------|--------|
-| Style profile theft | Médio | User-scoped profiles |
-| Propriedade intelectual exposta | Médio | Per-user document isolation |
+| Ameaca | Tipo | Risco | Estado atual |
+|--------|------|-------|--------------|
+| exposicao de segredos | Information Disclosure | Alto | mitigado por Secret Manager/IAM e ausencia de secrets em codigo |
+| host header abuse | Spoofing | Medio | mitigado por `TrustedHostMiddleware` |
+| abuso cross-origin | Spoofing | Medio | mitigado por CORS explicito |
+| indisponibilidade de provedor de IA | DoS | Medio | mitigado por circuit breaker e degradacao controlada |
 
 ---
 
-## Gaps e Ações Prioritárias
+## Principais Riscos Residuais
 
-| # | Gap | Criticidade | Ação |
-|---|-----|-------------|------|
-| 1 | Indirect prompt injection via documents | Alta | Sanitize document content before RAG |
-| 2 | BOLA verification across all endpoints | Alta | Audit all queries for tenant/user filter |
-| 3 | File upload MIME validation | Alta | Add magic byte + MIME type check |
-| 4 | Refresh token rotation | Média | Implement Firebase refresh token rotation |
-| 5 | Output sanitization (AI responses) | Média | Strip PII patterns from AI output |
+- parsing de arquivos ainda e uma superficie de alto risco
+- prompt injection indireta via documentos nao desaparece; precisa tratamento continuo
+- legado nominal (`ghost`, `flash`) aumenta risco de entendimento errado em manutencao
+- tabelas `ghost_*` podem induzir classificacao ou auditoria equivocada se o time nao conhecer o contexto
+- docs desatualizados aumentam risco operacional e de resposta a incidente
+
+---
+
+## Controles Prioritarios
+
+1. manter auditoria recorrente de ownership e escopo em queries de documento, chat e admin
+2. endurecer validacao de upload com MIME real e sanitizacao mais forte
+3. revisar logs para garantir ausencia de dados `RESTRICTED`
+4. alinhar nomenclatura interna e documentacao para reduzir risco humano
+5. manter testes de regressao para auth por modulo, style isolation e RAG ownership
+
+---
+
+## Acoes Para Estado Final
+
+| Item | Objetivo |
+|------|----------|
+| nomenclatura final | remover ambiguidade entre `law`, `writer`, `ghost` e `Gabi` |
+| legado de banco | decidir entre migrar ou congelar formalmente as tabelas `ghost_*` |
+| seguranca de ingestao | fortalecer parsing e validacao de arquivos |
+| docs operacionais | manter arquitetura, classificacao e threat model sincronizados com o runtime |
+| testes de seguranca | cobrir auth, ownership, isolamento de perfil e anexos inline |

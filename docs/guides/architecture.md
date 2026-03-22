@@ -1,295 +1,264 @@
 # Gabi Hub — Architecture Guide
 
-> Enterprise AI platform for legal, compliance, insurance, and professional writing.
+> Runtime atual da aplicacao em producao/staging. Este documento descreve a superficie ativa do sistema, nao a historia completa do repositorio.
 
 ---
 
-## High-Level Architecture
+## Resumo Executivo
+
+Gabi e um monorepo full-stack com:
+
+- `web/`: frontend Next.js App Router
+- `api/`: backend FastAPI
+- `packages/core/`: tipos e utilitarios compartilhados do frontend
+
+A superficie publica ativa do produto esta consolidada no modulo `law`, que concentra:
+
+- agentes juridicos
+- fluxos de compliance e regulatorio
+- recursos de seguros
+- writer/style profiles
+- ingestao e consulta de base documental
+
+Nao existe mais modulo publico `ntalk`. O legado nominal `ghost` e `flash` ainda aparece internamente como alias tecnico de roteamento de modelo e nomes de tabelas congelados.
+
+---
+
+## Arquitetura Atual
 
 ```mermaid
 graph TB
-    subgraph "Frontend (Next.js)"
-        WEB["gabi-web<br/>Next.js 14 · Port 3000"]
+    subgraph "Frontend"
+        WEB["gabi-web<br/>Next.js 16 App Router"]
+        CHAT["/chat<br/>experiencia unificada Gabi"]
+        ADMIN_UI["admin / org / dashboard"]
     end
 
-    subgraph "Backend (FastAPI)"
-        API["gabi-api<br/>FastAPI · Port 8080"]
-        AUTH["Auth Middleware<br/>Firebase ID Token"]
-        FINOPS["FinOps Engine<br/>Seats · Ops · Sessions"]
+    subgraph "Backend"
+        API["gabi-api<br/>FastAPI"]
+        LAW["/api/law<br/>superficie principal"]
+        AUTH["/api/auth"]
+        CHAT_API["/api/chat"]
+        ADMIN["/api/admin"]
+        ORG["/api/org + /api/platform"]
     end
 
-    subgraph "AI Layer"
-        VERTEX["Vertex AI<br/>Gemini 1.5 Pro"]
-        EMBED["Embeddings<br/>text-multilingual-004"]
+    subgraph "Core"
+        RBAC["Firebase Auth + module access"]
+        AI["AI service<br/>law / flash / ghost aliases"]
+        RAG["Dynamic RAG"]
+        INGEST["Ingest / chunk / embed"]
+        FINOPS["FinOps + rate limit"]
     end
 
-    subgraph "Data Layer"
-        PG["Cloud SQL<br/>PostgreSQL 15"]
-        VECTOR["pgvector<br/>Cosine Similarity"]
+    subgraph "Data"
+        PG["PostgreSQL + pgvector"]
+        VERTEX["Vertex AI"]
+        FIREBASE["Firebase Auth"]
     end
 
-    subgraph "Infrastructure"
-        CR["Cloud Run<br/>Managed Containers"]
-        CB["Cloud Build<br/>CI/CD Pipeline"]
-        SM["Secret Manager<br/>Credentials"]
-        FB["Firebase<br/>Auth + Storage"]
-    end
-
-    WEB -->|HTTPS| API
-    API --> AUTH
-    AUTH --> FB
+    WEB --> API
+    CHAT --> LAW
+    ADMIN_UI --> ADMIN
+    API --> RBAC
+    API --> AI
+    API --> RAG
+    API --> INGEST
     API --> FINOPS
-    FINOPS --> PG
-    API --> VERTEX
-    API --> EMBED
-    EMBED --> VECTOR
-    VERTEX --> PG
-    API --> PG
-    CR --> API
-    CR --> WEB
-    CB --> CR
-    SM --> API
+    RBAC --> FIREBASE
+    AI --> VERTEX
+    RAG --> PG
+    INGEST --> PG
+    ADMIN --> PG
+    ORG --> PG
 ```
 
 ---
 
-## Module Architecture
+## Superficie HTTP Ativa
 
-```mermaid
-graph LR
-    subgraph "Law Module — 7 AI Agents"
-        LEGAL["Legal Agents<br/>auditor · researcher · drafter · watcher"]
-        INS["Insurance Agents<br/>policy_analyst · claims_analyst · regulatory_consultant"]
-        STYLE["Writer<br/>Style Profiles + Generation"]
-        INSIGHTS["InsightCare<br/>Regulatory Intel Pipeline"]
-    end
+O backend registra atualmente estes routers:
 
-    subgraph "Core Services"
-        AUTH["Auth & RBAC"]
-        ORG["Organizations"]
-        CHAT["Chat Sessions"]
-        PLATFORM["Platform Admin"]
-        ADMIN["Admin Dashboard"]
-        LGPD["LGPD Compliance"]
-    end
+- `/api/law`
+- `/api/auth`
+- `/api/chat`
+- `/api/admin`
+- `/api/admin/lgpd`
+- rotas de organizacao e platform admin
+- `/health`
 
-    subgraph "Shared Infrastructure"
-        RAG["RAG Pipeline<br/>Upload → Chunk → Embed → Store"]
-        AI["AI Service<br/>Gemini Pro + Flash"]
-        MULTI["Multi-Agent Debate<br/>Anti-hallucination"]
-        LIMITS["FinOps<br/>Rate Limiting"]
-    end
-
-    LEGAL --> RAG
-    LEGAL --> AI
-    LEGAL --> MULTI
-    INS --> AI
-    STYLE --> RAG
-    INSIGHTS --> RAG
-    LEGAL --> LIMITS
-    INS --> LIMITS
-    ORG --> LIMITS
-```
+`law` e o unico modulo funcional exposto como produto principal. O acesso ao modulo e controlado por `require_module("law")`.
 
 ---
 
-## AI Agents
+## Frontend Real
 
-The `law` module orchestrates 7 specialized agents via an auto-router that classifies queries and dispatches to the best agent(s). Multi-agent debate is used when multiple agents are selected.
+O frontend usa Next.js `16.1.6` e concentra a experiencia principal em `/chat`.
 
-| Agent | Domain | Model | Role |
-|-------|--------|-------|------|
-| `auditor` | Legal | Gemini Pro | Contract compliance auditing |
-| `researcher` | Legal | Gemini Pro | Legal research and jurisprudence |
-| `drafter` | Legal | Gemini Pro | Legal document drafting |
-| `watcher` | Legal | Gemini Pro | Regulatory monitoring and alerts |
-| `policy_analyst` | Insurance | Gemini Flash | Insurance policy analysis |
-| `claims_analyst` | Insurance | Gemini Flash | Claims processing and analysis |
-| `regulatory_consultant` | Insurance | Gemini Pro | Insurance regulatory consulting |
+Fluxos ativos relevantes:
 
-**Auto-router**: When `agent: "auto"` is sent, Gemini Flash classifies the query and selects one or more agents. If multiple agents are selected, their outputs are synthesized via multi-agent debate.
+- chat unificado com streaming
+- upload inline de PDF/DOCX/TXT para analise efemera
+- upload persistente de documentos para a base juridica
+- gerenciamento de style profiles no painel lateral
+- geracao de apresentacoes PPTX a partir de documentos
+- historico de sessoes via `/api/chat`
 
----
-
-## Data Model (ERD)
-
-```mermaid
-erDiagram
-    USERS {
-        uuid id PK
-        string firebase_uid UK
-        string email UK
-        string name
-        string role "superadmin | admin | user"
-        string status "approved | pending | blocked"
-        string[] allowed_modules
-        uuid org_id FK
-    }
-
-    ORGANIZATIONS {
-        uuid id PK
-        string name
-        string cnpj UK
-        string sector
-        uuid plan_id FK
-        string domain
-        boolean is_active
-        datetime trial_expires_at
-    }
-
-    PLANS {
-        uuid id PK
-        string name UK "trial | starter | pro | enterprise"
-        int max_seats
-        int max_ops_month
-        int max_concurrent
-        float price_brl
-        boolean is_trial
-    }
-
-    ORG_MEMBERS {
-        uuid id PK
-        uuid org_id FK
-        uuid user_id FK
-        string role "owner | admin | member"
-    }
-
-    ORG_MODULES {
-        uuid id PK
-        uuid org_id FK
-        string module "law"
-        boolean enabled
-    }
-
-    ORG_USAGE {
-        uuid id PK
-        uuid org_id FK
-        string month "YYYY-MM"
-        int ops_count
-        datetime last_op_at
-    }
-
-    ORG_SESSIONS {
-        uuid id PK
-        uuid org_id FK
-        uuid user_id FK
-        datetime last_active
-    }
-
-    ORGANIZATIONS ||--o{ ORG_MEMBERS : "has members"
-    ORGANIZATIONS ||--o{ ORG_MODULES : "has modules"
-    ORGANIZATIONS ||--o{ ORG_USAGE : "tracks usage"
-    ORGANIZATIONS ||--o{ ORG_SESSIONS : "tracks sessions"
-    ORGANIZATIONS }o--|| PLANS : "subscribes to"
-    USERS ||--o{ ORG_MEMBERS : "belongs to"
-    USERS ||--o{ ORG_SESSIONS : "has sessions"
-```
+O gating de navegacao principal hoje depende de `law`. O produto visivel para o usuario final e `Gabi`, mesmo quando partes internas ainda usam nomes legados.
 
 ---
 
-## Request Flow
+## Backend Real
 
-```mermaid
-sequenceDiagram
-    participant U as User Browser
-    participant W as gabi-web
-    participant F as Firebase Auth
-    participant A as gabi-api
-    participant M as Middleware
-    participant DB as PostgreSQL
-    participant AI as Vertex AI
+### API principal
 
-    U->>W: Click action
-    W->>F: Get ID Token
-    F-->>W: JWT Token
-    W->>A: API Request + Bearer Token
-    A->>M: Security Headers
-    M->>M: Request Logging
-    M->>M: Error Handler
-    A->>A: Verify Firebase Token
-    A->>DB: Upsert User + Resolve Org
-    A->>A: Check FinOps Limits
-    A->>A: Check Module Access
-    A->>AI: Generate AI Response
-    AI-->>A: Response
-    A->>DB: Store Result + Increment Ops
-    A-->>W: JSON Response
-    W-->>U: Render UI
-```
+`api/app/main.py` publica:
 
----
+- `law`
+- admin
+- LGPD
+- auth
+- chat
+- org
+- platform
 
-## Deployment Pipeline
+Nao ha router publico `ntalk`.
 
-```mermaid
-graph LR
-    subgraph "Development"
-        DEV["git push"]
-    end
+### Middleware ativo
 
-    subgraph "Security Gates (Parallel)"
-        TEST["pytest + coverage"]
-        SAST["Bandit SAST"]
-        SEMGREP["Semgrep SAST"]
-        SCA["pip-audit SCA"]
-        SECRETS["Gitleaks"]
-        IAC["Checkov IaC"]
-        LINT["Ruff Lint"]
-    end
+Middlewares registrados:
 
-    subgraph "Build & Push"
-        BUILD_API["Docker Build API"]
-        BUILD_WEB["Docker Build Web"]
-        TRIVY_API["Trivy Scan API"]
-        TRIVY_WEB["Trivy Scan Web"]
-        SBOM["Syft SBOM"]
-    end
+- `ErrorHandlerMiddleware`
+- `FinOpsMiddleware`
+- `SecurityHeadersMiddleware`
+- `RequestLoggingMiddleware`
+- `TrustedHostMiddleware`
+- `CORSMiddleware`
 
-    subgraph "Deploy"
-        DEPLOY_API["Deploy API → Cloud Run"]
-        DEPLOY_WEB["Deploy Web → Cloud Run"]
-        DAST["OWASP ZAP DAST"]
-    end
+### Autenticacao e autorizacao
 
-    DEV --> TEST & SAST & SEMGREP & SCA & SECRETS & IAC & LINT
-    TEST --> BUILD_API & BUILD_WEB
-    BUILD_API --> TRIVY_API --> DEPLOY_API
-    BUILD_WEB --> TRIVY_WEB --> DEPLOY_WEB
-    BUILD_API --> SBOM
-    DEPLOY_API --> DAST
-```
+- autenticacao via Firebase ID Token
+- sincronizacao/upsert de usuario no banco
+- resolucao de contexto organizacional
+- controle de modulo por `allowed_modules` do usuario e `org_modules`
+- conjunto de modulos validos atual: `["law"]`
 
 ---
 
-## Security Architecture
+## Modulo `law`
 
-| Layer | Control | Implementation |
-|-------|---------|----------------|
-| **Auth** | Firebase ID Token | JWT verification on every request |
-| **RBAC** | Role-based access | superadmin → admin → user |
-| **Module** | Hybrid access | org_modules (org-level) + allowed_modules (user-level) |
-| **FinOps** | Rate limiting | Seats, ops/month, concurrent sessions per plan |
-| **SSDLC** | Security pipeline | 18-step SSDLC: Bandit + Semgrep + Ruff + pip-audit + Gitleaks + Checkov + Trivy + ZAP DAST |
-| **Headers** | Security headers | HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Permissions-Policy |
-| **XML** | Safe parsing | defusedxml (prevents XXE attacks) |
-| **LGPD** | Data protection | Right to access, deletion, portability |
-| **Secrets** | Secret Manager | DB URL, Firebase key stored in GCP Secret Manager |
-| **Error** | Sanitization | Production errors never leak stack traces |
+`law` e um router unificado que agrega:
+
+- agentes juridicos
+- insurance
+- insights regulatorios
+- writer/style service
+- upload e listagem de documentos
+- extracao efemera de texto para anexos de chat
+- geracao de apresentacoes
+
+Sub-routers incluidos no mesmo namespace:
+
+- `insurance`
+- `insights`
+- `style` em `/api/law/style`
 
 ---
 
-## Technology Stack
+## AI e RAG
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Frontend | Next.js | 14.x |
-| Backend | FastAPI | 0.100+ |
-| Language | Python | 3.12 |
-| Database | PostgreSQL | 15 |
-| Vector | pgvector | 0.7+ |
-| AI | Vertex AI (Gemini) | 1.5 Pro |
-| Auth | Firebase Auth | — |
-| Container | Cloud Run | Gen2 |
-| CI/CD | Cloud Build | — |
-| Registry | Artifact Registry | — |
-| Region | southamerica-east1 | São Paulo |
+### Model routing real
+
+O core de IA usa aliases tecnicos internos:
+
+- `law`: modelo de maior precisao para analise juridica
+- `flash`: modelo mais barato/rapido para classificacao, RAG e sumarizacao
+- `ghost`: alias legado usado para writer/criatividade
+
+Esses nomes nao representam modulos de produto. Sao apenas rotas internas de modelo.
+
+### Dynamic RAG
+
+O pipeline atual faz:
+
+- decisao se precisa ou nao de busca
+- busca hibrida em PostgreSQL/pgvector
+- re-ranking
+- isolamento por escopo do usuario
+- suporte a corpus regulatorio e documentos do usuario
+- suporte a style/profile context para writer
+
+### Ingestao
+
+O fluxo de ingestao cobre:
+
+- upload de documentos do usuario
+- chunking
+- embeddings
+- persistencia em tabelas vetoriais
+- extracao efemera para chat inline
+
+---
+
+## Modelo de Dados Atual
+
+### Dados centrais de `law`
+
+- `law_documents`
+- `law_chunks`
+- `law_alerts`
+- `law_gap_analyses`
+
+### Corpus regulatorio
+
+- `legal_documents`
+- `legal_versions`
+- `legal_provisions`
+
+### Writer/style integrado ao `law`
+
+Esses recursos continuam com nomes de tabela legados:
+
+- `ghost_style_profiles`
+- `ghost_knowledge_docs`
+- `ghost_doc_chunks`
+
+Esse legado e intencional no runtime atual: a feature foi absorvida por `law`, mas as tabelas nao foram renomeadas.
+
+---
+
+## Legado Estrutural Ainda Presente
+
+Os principais residuos tecnicos ativos sao:
+
+- alias internos `ghost` e `flash` no roteamento de IA
+- nomes de tabela `ghost_*` para style/writer
+- referencias historicas em docs, testes e migrations
+- nomenclatura mista entre `Gabi`, `law`, `writer` e `ghost` em alguns comentarios e artefatos auxiliares
+
+Nada disso reabre o modulo antigo publicamente, mas esses residuos continuam importantes para manutencao, onboarding e auditoria tecnica.
+
+---
+
+## Estado Arquitetural Atual
+
+O runtime atual e coerente como produto unificado. A arquitetura pratica hoje pode ser resumida assim:
+
+- um frontend unificado
+- um backend com um modulo principal exposto (`law`)
+- auth e multi-tenant no core
+- IA centralizada em um service comum
+- writer/style absorvido pelo dominio juridico
+- legado estrutural concentrado em nomes internos e naming de banco
+
+---
+
+## O Que Ainda Falta Para Estado Final
+
+- eliminar ou neutralizar aliases internos de produto antigo (`ghost`)
+- decidir se as tabelas `ghost_*` serao mantidas como contrato historico ou migradas
+- alinhar todos os docs tecnicos e de seguranca ao runtime atual
+- limpar testes, scripts e comentarios com nomenclatura obsoleta
+- definir uma taxonomia final de dominio para evitar mistura entre `law`, `writer`, `style` e `gabi`
+
+Enquanto isso nao for fechado, a aplicacao esta funcional, mas ainda em consolidacao arquitetural.

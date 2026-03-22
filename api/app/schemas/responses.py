@@ -100,56 +100,6 @@ class RegulatoryAlertItem(BaseModel):
     created_at: datetime | None = None
 
 
-# ── Flash (gabi.data — deprecated) ──
-
-class FlashQueryResponse(BaseModel):
-    """Flash (formerly nTalkSQL) query response."""
-    interpretation: str
-    sql: str
-    explanation: str
-    data: list[dict] | None = None
-    row_count: int = 0
-    execution_time_ms: float | None = None
-
-
-class ConnectionInfo(BaseModel):
-    """Registered SQL Server connection."""
-    id: str
-    tenant_id: str
-    name: str
-    host: str
-    database: str
-    schema_synced: bool = False
-
-
-# ── (Reserved) ──
-
-class InsightCareResponse(BaseModel):
-    """InsightCare agent chat response."""
-    answer: str
-    agent: str
-    rag_used: bool = False
-    chunks_retrieved: int = 0
-
-
-class ClientSummary(BaseModel):
-    """Insurance client summary."""
-    id: str
-    name: str
-    tenant_id: str
-    policy_count: int = 0
-
-
-class PolicySummary(BaseModel):
-    """Insurance policy summary."""
-    id: str
-    client_id: str
-    insurer: str | None = None
-    product: str | None = None
-    start_date: datetime | None = None
-    end_date: datetime | None = None
-
-
 # ── Chat ──
 
 class ChatSessionSummary(BaseModel):
