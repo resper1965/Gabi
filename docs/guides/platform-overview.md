@@ -1,12 +1,12 @@
 # Gabi — Platform Overview
 
-> Plataforma de inteligência artificial especializada para equipes jurídicas, financeiras e de seguros.
+> Plataforma de inteligência artificial especializada para equipes jurídicas, de compliance e seguros.
 
 ---
 
 ## O que é a Gabi
 
-Gabi é uma **copiloto de IA empresarial** que opera em quatro verticais de negócio, cada uma com agentes especializados que entendem o contexto, a linguagem e os riscos do setor. Diferente de chatbots genéricos, a Gabi trabalha com **suas bases de documentos**, **seus dados financeiros** e **suas normas regulatórias** — garantindo respostas fundamentadas e rastreáveis.
+Gabi é uma **copiloto de IA empresarial** que opera em duas verticais de negócio (jurídico/compliance e seguros), com 7 agentes especializados que entendem o contexto, a linguagem e os riscos do setor. Diferente de chatbots genéricos, a Gabi trabalha com **suas bases de documentos** e **suas normas regulatórias** — garantindo respostas fundamentadas e rastreáveis.
 
 A plataforma é desenhada para profissionais que lidam com **informação sensível** e **regulamentação pesada**: advogados, controllers financeiros, corretores de seguros e gestores de compliance.
 
@@ -53,25 +53,7 @@ A plataforma é desenhada para profissionais que lidam com **informação sensí
 
 ---
 
-### 📊 gabi.data — CFO de Dados em Linguagem Natural
-
-**Para quem**: Controllers financeiros, analistas de dados, gestores imobiliários.
-
-**O que faz**:
-
-- **Pergunte em português, receba SQL + resposta** — a Gabi interpreta a pergunta, gera SQL seguro (SELECT-only), executa no banco do cliente e interpreta os resultados
-- **Conexão multitenant** — cada empresa cadastra seus bancos SQL Server com credenciais via Secret Manager
-- **Schema sync automático** — lê INFORMATION_SCHEMA e popula o dicionário de negócio: nome da tabela/coluna → significado de negócio em português
-- **Dicionário de negócio** — vocabulário customizável: *"vacância"* = `(1 - area_locada / area_total)`, *"NOI"* = `receita - despesas_operacionais`
-- **Golden Queries** — consultas validadas e aprovadas por humanos que a IA prioriza quando reconhece a intenção
-- **Audit log** — toda query gerada, executada e interpretada é registrada com tempo, SQL, resultado e contexto
-- **Proteções**: read-only, timeout (30s), limite de linhas (1000), credenciais em Secret Manager
-
-**Fluxo**: Cadastrar conexão → Sync schema → Enriquecer dicionário → Perguntar em linguagem natural → SQL → Execução → Interpretação
-
-**Linguagem de negócio**: Cap Rate, NOI, Yield, VGV, TIR, vacância, inadimplência, sinistralidade
-
----
+### 🏥 gabi.care — InsightCare (Seguros)
 
 **Para quem**: Corretoras de seguros, departamentos de benefícios, gestores de saúde corporativa.
 
@@ -135,7 +117,7 @@ Conformidade com a Lei Geral de Proteção de Dados (Arts. 17-18):
 |-----|--------|-------|
 | Writer | Gemini 2.0 Flash | Criatividade + baixa latência |
 | Análise Jurídica | Gemini 1.5 Pro | Contexto longo (1M tokens) + precisão |
-| Geração SQL | Gemini 2.0 Flash | Velocidade na geração estruturada |
+
 | Embeddings | `text-multilingual-embedding-002` | 768 dimensões, multilíngue, custo otimizado |
 | Intent Detection | Gemini 2.0 Flash | Decisão rápida sobre necessidade de RAG |
 
@@ -158,7 +140,7 @@ Conformidade com a Lei Geral de Proteção de Dados (Arts. 17-18):
 | vs. ChatGPT/Copilot genéricos | Gabi |
 |-------------------------------|------|
 | Responde com base em conhecimento geral | Responde com base nos **seus documentos e dados** |
-| Um modelo só para tudo | **Modelo certo para cada tarefa** (Pro para jurídico, Flash para SQL) |
+| Um modelo só para tudo | **Modelo certo para cada tarefa** (Pro para jurídico, Flash para insurance) |
 | Sem controle de acesso | **Multitenant com permissões por módulo** |
 | Sem rastreabilidade | **Audit log + citação de fontes + LGPD** |
 | Alucina livremente | **Guardrail anti-alucinação em 100% das chamadas** |

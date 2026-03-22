@@ -1,7 +1,7 @@
-# Gabi — Plataforma de IA Empresarial Multimodular
+# Gabi — Plataforma de IA Empresarial
 
-> **Inteligência Artificial especializada para jurídico, finanças e produção textual.**
-> Três módulos verticais integrados em uma única API unificada, com orquestração multi-agente, RAG híbrido (Vector + FTS + RRF + Re-Ranking), conformidade LGPD e sistema de onboarding multi-tenant.
+> **Inteligência Artificial especializada para jurídico, compliance, seguros e produção textual.**
+> Módulo unificado (`law`) com 7 agentes AI especializados, orquestração multi-agente, RAG híbrido (Vector + FTS + RRF + Re-Ranking), conformidade LGPD e sistema de onboarding multi-tenant.
 
 ---
 
@@ -24,14 +24,15 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 
 | Aspecto | Detalhe |
 |---------|---------|
-| **Função** | Análise jurídica com 4 agentes especializados + produção textual com Style Signature |
-| **Modelo IA** | Gemini 1.5 Pro (análise jurídica) + Gemini 2.0 Flash (writer) |
-| **Agentes** | Auditora, Pesquisadora, Redatora, Sentinela |
+| **Função** | Análise jurídica + seguros com 7 agentes especializados + produção textual com Style Signature |
+| **Modelo IA** | Gemini 1.5 Pro (análise/precisão) + Gemini 2.0 Flash (insurance/criatividade) |
+| **Agentes Legais** | Auditora, Pesquisadora, Redatora, Sentinela |
+| **Agentes Insurance** | Analista de Apólices, Analista de Sinistralidade, Consultor Regulatório |
 | **Writer** | Absorve estilo de escrita do usuário e produz textos com fidelidade estilística |
 | **RAG** | Chunks jurídicos + insights regulatórios + documentos do usuário para writer |
 | **Multi-Agent** | Debate paralelo → síntese unificada com citações |
 | **Ingestão** | Leis federais (Planalto), normativos BCB/CMN, CVM — parser estrutural |
-| **Tabelas** | `law_documents`, `law_chunks`, `legal_documents`, `legal_versions`, `legal_provisions`, `regulatory_*`, `ghost_knowledge_docs`, `ghost_doc_chunks`, `ghost_style_profiles` |
+| **Tabelas** | `law_documents`, `law_chunks`, `legal_documents`, `legal_versions`, `legal_provisions`, `regulatory_*`, `ghost_knowledge_docs`, `ghost_doc_chunks`, `ghost_style_profiles` (legacy names, frozen) |
 
 ### 🏢 Onboarding & Platform Admin
 **Multi-Tenancy, FinOps & Provisionamento**
@@ -62,7 +63,7 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 ```
 ┌──────────────────────────────────────────────────────┐
 │                    FRONTEND (Next.js)                 │
-│  Dashboard → 3 módulos + Admin + Chat unificado      │
+│  Dashboard → Law (7 agents) + Admin + Chat unificado │
 │  Firebase Auth • Role-based access • Realtime chat   │
 └──────────────────────┬───────────────────────────────┘
                        │ HTTPS
@@ -297,7 +298,7 @@ Gabi/
 │   ├── app/
 │   │   ├── core/                 # Engine: AI, RAG, embeddings, auth, org_limits
 │   │   ├── models/               # SQLAlchemy models (12 files)
-│   │   ├── modules/              # Routers por módulo (8 modules)
+│   │   ├── modules/              # law, admin, chat, org, platform
 │   │   ├── services/             # Ingestão, parsing, análise
 │   │   └── middleware/           # Security, logging, errors
 │   ├── alembic/                  # Database migrations (9 versions)

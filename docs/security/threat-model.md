@@ -99,13 +99,6 @@ Este modelo de ameaças cobre a superfície de ataque da plataforma Gabi, uma ap
 | Sinistralidade de clientes vazada entre tenants | Crítico | `tenant_id` filter em queries ✅ |
 | Normas regulatórias desatualizadas | Alto | Ingestion pipeline atualizado |
 
-### gabi.data (Flash)
-| Ameaça | Risco | Status |
-|--------|-------|--------|
-| SQL injection via natural language | Crítico | SELECT-only filter ✅, ALLOWED_TABLE_PAIRS ✅ |
-| Credential exposure (DB connections) | Crítico | Secret Manager ✅, encrypted storage |
-| Cross-tenant data access | Alto | Connection per tenant |
-
 ### gabi.writer (Writer — integrado ao Law)
 | Ameaça | Risco | Status |
 |--------|-------|--------|

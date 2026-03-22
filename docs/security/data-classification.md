@@ -37,12 +37,6 @@
 | `claims_data` | claims_value, category | 🔴 RESTRICTED | Contrato |
 | `ic_documents` | content (apólices, laudos) | 🔴 RESTRICTED | Contrato |
 
-### gabi.data (Flash)
-| Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
-|--------|------------------|-------|-----------------|
-| `connections` | connection_string (encrypted) | 🔴 RESTRICTED | Consentimento |
-| `golden_queries` | sql_query | 🟡 CONFIDENTIAL | Legítimo interesse |
-
 ### gabi.writer (Writer — integrado ao Law)
 | Tabela | Campos Sensíveis | Nível | LGPD Base Legal |
 |--------|------------------|-------|-----------------|

@@ -78,7 +78,7 @@ Gabi/
 │   │   └── modules/
 │   │       ├── law/              # Law & Comply + Writer (unified)
 │   │       ├── law/router.py     # Law & Comply
-│   │       ├── flash/router.py   # Flash (NL→SQL)
+
 │   │       ├── chat/router.py    # Chat sessions
 │   │       ├── org/router.py     # Organization management
 │   │       ├── platform/router.py # Platform admin
