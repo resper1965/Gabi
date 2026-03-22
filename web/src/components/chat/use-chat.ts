@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react"
 import { toast } from "sonner"
+import { auth } from "@/lib/firebase"
 import type { StreamMeta } from "@/components/chat-panel"
 
 export function useChatStream({
@@ -41,10 +42,15 @@ export function useChatStream({
       } else if (fileExtractUrl && (ext === "pdf" || ext === "docx")) {
         const formData = new FormData()
         formData.append("file", file)
+        const user = auth.currentUser
+        const headers: Record<string, string> = {}
+        if (user) {
+          headers["Authorization"] = `Bearer ${await user.getIdToken()}`
+        }
         const res = await fetch(fileExtractUrl, {
           method: "POST",
           body: formData,
-          credentials: "include",
+          headers,
         })
         if (!res.ok) throw new Error("Falha ao extrair texto")
         const data = await res.json()

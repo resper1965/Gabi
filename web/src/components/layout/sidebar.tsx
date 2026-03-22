@@ -35,7 +35,7 @@ export function Sidebar() {
   const allowedModules = profile?.allowed_modules || []
   const visibleModules = modules.filter(
     (m) => isSuperadmin || allowedModules.includes(m.key) ||
-      (m.key === "gabi" && (allowedModules.includes("law") || allowedModules.includes("ghost")))
+      (m.key === "gabi" && allowedModules.includes("law"))
   )
 
   const displayName = profile?.name || user?.displayName || user?.email?.split("@")[0] || "Usuário"

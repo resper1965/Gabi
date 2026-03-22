@@ -21,7 +21,7 @@ from app.models.org import OrgMember
 settings = get_settings()
 logger = logging.getLogger("gabi.auth")
 
-ALL_MODULES = ["ghost", "law"]
+ALL_MODULES = ["law"]
 
 
 def _is_superadmin(email: str, decoded_token: dict | None = None) -> bool:
