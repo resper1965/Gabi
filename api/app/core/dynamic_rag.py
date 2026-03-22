@@ -430,7 +430,7 @@ async def retrieve_if_needed(
     _seen_hashes: set[str] = set()
     fused_chunks: list[dict] = []
     for ck in fused_chunks_raw:
-        h = hashlib.md5(ck["content"][:300].encode()).hexdigest()
+        h = hashlib.md5(ck["content"][:300].encode(), usedforsecurity=False).hexdigest()
         if h not in _seen_hashes:
             _seen_hashes.add(h)
             fused_chunks.append(ck)

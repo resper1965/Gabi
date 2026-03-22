@@ -86,7 +86,7 @@ def deduplicate_by_content(chunks: list[dict], prefix_len: int = 300) -> list[di
 
     for i, chunk in enumerate(chunks):
         content = chunk.get("content", "")
-        h = hashlib.md5(content[:prefix_len].encode()).hexdigest()
+        h = hashlib.md5(content[:prefix_len].encode(), usedforsecurity=False).hexdigest()
         if h not in seen:
             seen.add(h)
             unique.append(i)

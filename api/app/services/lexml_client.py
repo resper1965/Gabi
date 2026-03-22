@@ -14,7 +14,11 @@ import logging
 import re
 from dataclasses import dataclass, field
 from typing import List, Optional
-from xml.etree import ElementTree as ET
+try:
+    from defusedxml.ElementTree import fromstring as _xml_fromstring, ParseError as _XMLParseError
+except ImportError:
+    from xml.etree.ElementTree import fromstring as _xml_fromstring  # noqa: S314
+    from xml.etree.ElementTree import ParseError as _XMLParseError
 
 import httpx
 
@@ -141,8 +145,8 @@ class LexMLClient:
         docs: List[LexMLDocument] = []
 
         try:
-            root = ET.fromstring(xml_text)
-        except ET.ParseError as e:
+            root = _xml_fromstring(xml_text)
+        except _XMLParseError as e:
             logger.error("Failed to parse LexML XML response: %s", e)
             return []
 
@@ -162,7 +166,7 @@ class LexMLClient:
         logger.info("LexML: parsed %d documents from SRU response", len(docs))
         return docs
 
-    def _parse_record(self, record: ET.Element) -> Optional[LexMLDocument]:
+    def _parse_record(self, record) -> Optional[LexMLDocument]:
         """Parse a single SRU record into a LexMLDocument."""
         # Try multiple paths to find the data element
         data = record.find(".//srw:recordData", NS)

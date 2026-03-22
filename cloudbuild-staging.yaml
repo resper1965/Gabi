@@ -252,9 +252,13 @@ steps:
         sleep 30
         zap-baseline.py \
           -t ${_STAGING_API_URL}/health \
-          -J /workspace/zap-report.json \
+          -J /zap/wrk/zap-report.json \
           -I || true
+        cp /zap/wrk/zap-report.json /workspace/zap-report.json 2>/dev/null || true
         echo "━━━ ZAP scan complete ━━━"
+    volumes:
+      - name: "zap-wrk"
+        path: "/zap/wrk"
     waitFor: ["deploy-api-staging"]
 
 substitutions:
