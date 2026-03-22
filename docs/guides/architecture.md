@@ -60,7 +60,7 @@ graph LR
     subgraph "Modules"
         GHOST["nGhost<br/>Ghost Writer"]
         LAW["Law & Comply<br/>Legal AI Agent"]
-        NTALK["nTalkSQL<br/>Natural Language → SQL"]
+        FLASH["Flash<br/>Natural Language → SQL"]
         CHAT["Chat<br/>Session Management"]
     end
 
@@ -82,10 +82,10 @@ graph LR
     GHOST --> AI
     LAW --> RAG
     LAW --> AI
-    NTALK --> AI
+    FLASH --> AI
     GHOST --> LIMITS
     LAW --> LIMITS
-    NTALK --> LIMITS
+    FLASH --> LIMITS
     ORG --> LIMITS
 ```
 
@@ -207,28 +207,36 @@ graph LR
         DEV["git push"]
     end
 
-    subgraph "Cloud Build Pipeline"
-        TEST["Step 1: pytest"]
-        SAST["Step 2: Bandit SAST"]
-        SCA["Step 3: pip-audit SCA"]
-        SECRETS["Step 4: Gitleaks"]
-        BUILD_API["Step 5: Docker Build API"]
-        BUILD_WEB["Step 6: Docker Build Web"]
-        PUSH["Step 7: Push to Artifact Registry"]
-        DEPLOY_API["Step 8: Deploy API to Cloud Run"]
-        DEPLOY_WEB["Step 9: Deploy Web to Cloud Run"]
+    subgraph "Security Gates (Parallel)"
+        TEST["pytest + coverage"]
+        SAST["Bandit SAST"]
+        SEMGREP["Semgrep SAST"]
+        SCA["pip-audit SCA"]
+        SECRETS["Gitleaks"]
+        IAC["Checkov IaC"]
+        LINT["Ruff Lint"]
     end
 
-    DEV --> TEST
-    DEV --> SAST
-    DEV --> SCA
-    DEV --> SECRETS
-    TEST --> BUILD_API
-    TEST --> BUILD_WEB
-    BUILD_API --> PUSH
-    BUILD_WEB --> PUSH
-    PUSH --> DEPLOY_API
-    PUSH --> DEPLOY_WEB
+    subgraph "Build & Push"
+        BUILD_API["Docker Build API"]
+        BUILD_WEB["Docker Build Web"]
+        TRIVY_API["Trivy Scan API"]
+        TRIVY_WEB["Trivy Scan Web"]
+        SBOM["Syft SBOM"]
+    end
+
+    subgraph "Deploy"
+        DEPLOY_API["Deploy API → Cloud Run"]
+        DEPLOY_WEB["Deploy Web → Cloud Run"]
+        DAST["OWASP ZAP DAST"]
+    end
+
+    DEV --> TEST & SAST & SEMGREP & SCA & SECRETS & IAC & LINT
+    TEST --> BUILD_API & BUILD_WEB
+    BUILD_API --> TRIVY_API --> DEPLOY_API
+    BUILD_WEB --> TRIVY_WEB --> DEPLOY_WEB
+    BUILD_API --> SBOM
+    DEPLOY_API --> DAST
 ```
 
 ---
@@ -241,8 +249,9 @@ graph LR
 | **RBAC** | Role-based access | superadmin → admin → user |
 | **Module** | Hybrid access | org_modules (org-level) + allowed_modules (user-level) |
 | **FinOps** | Rate limiting | Seats, ops/month, concurrent sessions per plan |
-| **SSDLC** | Security pipeline | Bandit SAST + pip-audit SCA + Gitleaks + pytest |
-| **Headers** | Security headers | HSTS, CSP, X-Frame-Options, X-Content-Type-Options |
+| **SSDLC** | Security pipeline | 18-step SSDLC: Bandit + Semgrep + Ruff + pip-audit + Gitleaks + Checkov + Trivy + ZAP DAST |
+| **Headers** | Security headers | HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Permissions-Policy |
+| **XML** | Safe parsing | defusedxml (prevents XXE attacks) |
 | **LGPD** | Data protection | Right to access, deletion, portability |
 | **Secrets** | Secret Manager | DB URL, Firebase key stored in GCP Secret Manager |
 | **Error** | Sanitization | Production errors never leak stack traces |

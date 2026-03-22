@@ -2,7 +2,7 @@
 
 ## Context
 
-A Gabi é uma plataforma AI enterprise com 2 módulos verticais (Legal + Style), servindo setores regulados (jurídico, financeiro, seguros). O repositório tem CI/CD (Cloud Build), 199 testes (29 arquivos), monitoramento ativo, e compliance LGPD. O programa SDLC/SSDLC está **operacional** com 10 scanners de segurança automatizados no pipeline.
+A Gabi é uma plataforma AI enterprise com 2 módulos verticais (Legal + Flash), servindo setores regulados (jurídico, financeiro, seguros). O repositório tem CI/CD (Cloud Build), 199 testes (29 arquivos), monitoramento ativo, e compliance LGPD. O programa SDLC/SSDLC está **operacional** com 10 scanners de segurança automatizados no pipeline.
 
 ---
 
@@ -23,7 +23,7 @@ A Gabi é uma plataforma AI enterprise com 2 módulos verticais (Legal + Style),
 ```text
 gabi.legal  → Confidencialidade de documentos jurídicos, sigilo profissional
 gabi.style  → Propriedade intelectual de textos, style profiles (ex-GhostWriter)
-gabi.data   → Prevent SQL injection (ALLOWED_TABLE_PAIRS), credential vault
+gabi.flash  → Prevent SQL injection (ALLOWED_TABLE_PAIRS), credential vault
 ```
 
 ### 1.3 Compliance Matrix
@@ -81,7 +81,7 @@ graph LR
 
 | Area | Standard | Enforcement |
 | --- | --- | --- |
-| Python | PEP 8 + type hints | `ruff` linter (CI + pre-commit) |
+| Python | PEP 8 + type hints | `ruff` linter (CI + pre-commit, config: `api/ruff.toml`) |
 | SQL | Parameterized queries only | `ALLOWED_TABLE_PAIRS` allowlist |
 | Secrets | Never in code | `gitleaks` (CI + pre-commit) |
 | Dependencies | Pinned versions | `pyproject.toml` |
@@ -94,7 +94,9 @@ graph LR
 | Input validation (Pydantic) | ✅ | 20+ response models |
 | Error handling (no stack traces) | ✅ | `ErrorHandler` middleware |
 | Anti-hallucination | ✅ | System prompt guardrail em `multi_agent.py` |
-| SQL injection prevention | ✅ | `ALLOWED_TABLE_PAIRS` + parameterized queries |
+| SQL injection prevention | ✅ | `ALLOWED_TABLE_PAIRS` + SQLAlchemy ORM only (raw SQL proibido) |
+| XML safe parsing | ✅ | `defusedxml` (XXE prevention) — `xml.etree.ElementTree` proibido |
+| Hash safety | ✅ | MD5 com `usedforsecurity=False` (apenas deduplicação de conteúdo) |
 | Rate limiting | ✅ | `core/rate_limit.py` per-user |
 | CORS config | ✅ | `config.py` origin allowlist |
 | Consent tracking | ✅ | `middleware/consent.py` |
@@ -143,8 +145,8 @@ repos:
 ```yaml
 # cloudbuild-staging.yaml — 10 security steps (paralelos + sequenciais)
 Paralelos:  test-api, sast-bandit, sca-audit, secrets-scan, iac-checkov, sast-semgrep, lint-ruff
-Pós-build:  trivy-api, trivy-web
-Pós-deploy: dast-zap (staging only)
+Pós-build:  trivy-api, trivy-web, sbom-syft
+Pós-deploy: dast-zap + dast-zap-report (staging only)
 
 # cloudbuild-prod.yaml — 8 security steps (same, sem DAST)
 ```

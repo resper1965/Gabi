@@ -78,12 +78,12 @@ Gabi/
 │   │   └── modules/
 │   │       ├── ghost/router.py   # nGhost Ghost Writer
 │   │       ├── law/router.py     # Law & Comply
-│   │       ├── ntalk/router.py   # nTalkSQL
+│   │       ├── flash/router.py   # Flash (NL→SQL)
 │   │       ├── chat/router.py    # Chat sessions
 │   │       ├── org/router.py     # Organization management
 │   │       ├── platform/router.py # Platform admin
 │   │       └── admin/            # Admin panel + LGPD
-│   ├── tests/                    # 154 tests
+│   ├── tests/                    # 25 test files
 │   ├── migrations/               # Alembic migrations
 │   └── API.md                    # API Reference
 ├── web/                          # Frontend Next.js
@@ -129,9 +129,10 @@ Usamos **Conventional Commits**:
 
 ### Código
 
-- **Python**: PEP 8, type hints, docstrings
+- **Python**: PEP 8, type hints, docstrings — enforced by `ruff` (config: `api/ruff.toml`)
 - **TypeScript**: ESLint + strict mode
-- **SQL**: Preferencialmente via SQLAlchemy ORM (não raw SQL)
+- **SQL**: Exclusivamente via SQLAlchemy ORM (raw SQL proibido)
+- **XML**: Usar `defusedxml` (não `xml.etree.ElementTree`)
 - **Testes**: pytest + pytest-asyncio, mocks com `unittest.mock`
 
 ### Deploy
