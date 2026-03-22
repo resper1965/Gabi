@@ -14,7 +14,7 @@ A plataforma é desenhada para profissionais que lidam com **informação sensí
 
 ## Módulos
 
-### 🖊️ gabi.writer — Ghost Writer Invisível
+### 🖊️ gabi.writer — Writer (integrado ao Law)
 
 **Para quem**: Executivos, advogados, gestores que precisam produzir textos profissionais com constância de estilo.
 
@@ -133,7 +133,7 @@ Conformidade com a Lei Geral de Proteção de Dados (Arts. 17-18):
 
 | Uso | Modelo | Razão |
 |-----|--------|-------|
-| Ghost Writer | Gemini 2.0 Flash | Criatividade + baixa latência |
+| Writer | Gemini 2.0 Flash | Criatividade + baixa latência |
 | Análise Jurídica | Gemini 1.5 Pro | Contexto longo (1M tokens) + precisão |
 | Geração SQL | Gemini 2.0 Flash | Velocidade na geração estruturada |
 | Embeddings | `text-multilingual-embedding-002` | 768 dimensões, multilíngue, custo otimizado |

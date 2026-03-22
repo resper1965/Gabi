@@ -73,7 +73,7 @@
 | **Transferência internacional** | Não (mesma região GCP) |
 | **Medidas de segurança** | ALLOWED_TABLE_PAIRS, parameterized queries, RLS |
 
-### 2.4 Perfis de Estilo (ex-GhostWriter)
+### 2.4 Perfis de Estilo (Writer)
 
 | Campo | Detalhe |
 | --- | --- |

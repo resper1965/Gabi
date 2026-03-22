@@ -12,25 +12,25 @@ Este índice lista todos os artefatos de evidência disponíveis para auditoria 
 
 | # | Documento | Path | Controles |
 | --- | --- | --- | --- |
-| 1.1 | Programa SDLC/SSDLC | `docs/SDLC-SSDLC-PROGRAM.md` | A.5.1, A.5.8, A.8.25 |
-| 1.2 | Risk Register | `docs/risk-register.md` | A.5.7, 7.2.5 |
-| 1.3 | Threat Model (STRIDE) | `docs/threat-model.md` | A.5.7, A.8.27 |
-| 1.4 | Data Classification Matrix | `docs/data-classification.md` | A.8.11, 7.2.1, 7.2.5 |
-| 1.5 | ISO Controls Mapping | `docs/ISO-27001-27701-CONTROLS.md` | Todos |
+| 1.1 | Programa SDLC/SSDLC | `docs/compliance/SDLC-SSDLC-PROGRAM.md` | A.5.1, A.5.8, A.8.25 |
+| 1.2 | Risk Register | `docs/security/risk-register.md` | A.5.7, 7.2.5 |
+| 1.3 | Threat Model (STRIDE) | `docs/security/threat-model.md` | A.5.7, A.8.27 |
+| 1.4 | Data Classification Matrix | `docs/security/data-classification.md` | A.8.11, 7.2.1, 7.2.5 |
+| 1.5 | ISO Controls Mapping | `docs/compliance/ISO-27001-27701-CONTROLS.md` | Todos |
 
 ## 2. Arquitetura e Design
 
 | # | Documento | Path | Controles |
 | --- | --- | --- | --- |
-| 2.1 | Architecture Overview | `docs/architecture.md` | A.8.27 |
-| 2.2 | Platform Overview | `docs/platform-overview.md` | A.8.27 |
-| 2.3 | ADRs (5 decisões documentadas) | `docs/SDLC-SSDLC-PROGRAM.md` §2.2 | A.8.27 |
+| 2.1 | Architecture Overview | `docs/guides/architecture.md` | A.8.27 |
+| 2.2 | Platform Overview | `docs/guides/platform-overview.md` | A.8.27 |
+| 2.3 | ADRs (5 decisões documentadas) | `docs/adr/decisions.md` | A.8.27 |
 
 ## 3. Desenvolvimento Seguro
 
 | # | Documento | Path | Controles |
 | --- | --- | --- | --- |
-| 3.1 | Developer Guide | `docs/developer-guide.md` | A.6.3, A.8.28 |
+| 3.1 | Developer Guide | `docs/guides/developer-guide.md` | A.6.3, A.8.28 |
 | 3.2 | Pre-commit Configuration | `.pre-commit-config.yaml` | A.8.4, A.8.12, A.8.28 |
 | 3.3 | CI/CD Pipeline (Staging) | `cloudbuild-staging.yaml` | A.8.7, A.8.8, A.8.25, A.8.29 |
 | 3.4 | CI/CD Pipeline (Prod) | `cloudbuild-prod.yaml` | A.8.7, A.8.8, A.8.25, A.8.31 |
@@ -77,11 +77,11 @@ Este índice lista todos os artefatos de evidência disponíveis para auditoria 
 
 | # | Documento | Path | Controles |
 | --- | --- | --- | --- |
-| 7.1 | SLO/SLI Definitions | `docs/slo-monitoring.md` | A.8.16 |
-| 7.2 | Incident Response Playbook | `docs/incident-response.md` | A.5.24, A.5.25, A.5.26 |
-| 7.3 | Post-mortem Template | `docs/post-mortem-template.md` | A.5.27 |
-| 7.4 | Runbooks | `docs/runbooks.md` | A.5.26, A.5.29 |
-| 7.5 | Admin Guide | `docs/admin-guide.md` | A.8.2 |
+| 7.1 | SLO/SLI Definitions | `docs/operations/slo-monitoring.md` | A.8.16 |
+| 7.2 | Incident Response Playbook | `docs/security/incident-response.md` | A.5.24, A.5.25, A.5.26 |
+| 7.3 | Post-mortem Template | `docs/operations/post-mortem-template.md` | A.5.27 |
+| 7.4 | Runbooks | `docs/operations/runbooks.md` | A.5.26, A.5.29 |
+| 7.5 | Admin Guide | `docs/guides/admin-guide.md` | A.8.2 |
 
 ## 8. Privacidade e LGPD
 

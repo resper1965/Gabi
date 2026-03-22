@@ -58,8 +58,7 @@ graph TB
 ```mermaid
 graph LR
     subgraph "Modules"
-        GHOST["nGhost<br/>Ghost Writer"]
-        LAW["Law & Comply<br/>Legal AI Agent"]
+        LAW["Law & Comply<br/>Legal AI + Writer"]
         FLASH["Flash<br/>Natural Language → SQL"]
         CHAT["Chat<br/>Session Management"]
     end
@@ -78,12 +77,9 @@ graph LR
         LIMITS["FinOps<br/>Rate Limiting"]
     end
 
-    GHOST --> RAG
-    GHOST --> AI
     LAW --> RAG
     LAW --> AI
     FLASH --> AI
-    GHOST --> LIMITS
     LAW --> LIMITS
     FLASH --> LIMITS
     ORG --> LIMITS
@@ -137,7 +133,7 @@ erDiagram
     ORG_MODULES {
         uuid id PK
         uuid org_id FK
-        string module "ghost | law | ntalk"
+        string module "law"
         boolean enabled
     }
 

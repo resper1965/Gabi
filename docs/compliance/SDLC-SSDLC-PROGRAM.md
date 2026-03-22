@@ -22,7 +22,7 @@ A Gabi é uma plataforma AI enterprise com 2 módulos verticais (Legal + Flash),
 
 ```text
 gabi.legal  → Confidencialidade de documentos jurídicos, sigilo profissional
-gabi.style  → Propriedade intelectual de textos, style profiles (ex-GhostWriter)
+gabi.style  → Propriedade intelectual de textos, style profiles (Writer)
 gabi.flash  → Prevent SQL injection (ALLOWED_TABLE_PAIRS), credential vault
 ```
 

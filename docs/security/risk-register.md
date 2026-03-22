@@ -40,7 +40,7 @@
 | # | Risco | P | I | Score | Status | Mitigação |
 |---|-------|---|---|-------|--------|-----------|
 | R-201 | Prompt injection (AI) | 2 | 3 | 6 | ⚠️ Monitor | Anti-hallucination guardrail, system prompt isolation |
-| R-202 | SQL injection (nTalkSQL) | 1 | 4 | 4 | ✅ Aceito | ALLOWED_TABLE_PAIRS, SELECT-only, parameterized |
+| R-202 | SQL injection (Flash) | 1 | 4 | 4 | ✅ Aceito | ALLOWED_TABLE_PAIRS, SELECT-only, parameterized |
 | R-203 | Dependency vulnerability (supply chain) | 3 | 3 | 9 | 🔴 Mitigar | pip-audit + SCA in CI ✅ |
 | R-204 | Secret rotation falha | 2 | 3 | 6 | ⚠️ Monitor | Quarterly reminder (Cloud Scheduler) |
 | R-205 | Container image comprometida | 1 | 4 | 4 | ✅ Aceito | Trivy scan in CI ✅ |

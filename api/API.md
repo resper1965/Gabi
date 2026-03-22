@@ -55,26 +55,11 @@
 
 ---
 
-## nGhost — Ghost Writer (`/api/ghost`)
+## Law & Comply + Writer (`/api/law`)
 
-> Module: `ghost`. Write texts with AI using style profiles and RAG.
+> Module: `law`. Legal AI agent + style writer with RAG.
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| `POST` | `/upload` | ✅ ghost | Upload reference document (PDF/DOCX) |
-| `GET` | `/documents` | ✅ ghost | List uploaded documents |
-| `DELETE` | `/documents/{doc_id}` | ✅ ghost | Delete document + chunks |
-| `GET` | `/profiles` | ✅ ghost | List style profiles |
-| `POST` | `/profiles` | ✅ ghost | Create style profile |
-| `POST` | `/profiles/{id}/extract-style` | ✅ ghost | Extract writing style from profile docs |
-| `POST` | `/generate` | ✅ ghost | Generate text (sync) |
-| `POST` | `/generate-stream` | ✅ ghost | Generate text (streaming SSE) |
-
----
-
-## Law & Comply (`/api/law`)
-
-> Module: `law`. Legal AI agent with RAG and insurance analytics.
+### Legal AI
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
@@ -84,19 +69,18 @@
 | `GET` | `/documents` | ✅ law | List uploaded legal docs |
 | `GET` | `/alerts` | ✅ law | Compliance deadline alerts |
 
----
-
-## nTalkSQL (`/api/ntalk`)
-
-> Module: `ntalk`. Natural language to SQL with schema sync.
+### Writer (Style Service)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `POST` | `/connections` | ✅ ntalk | Register database connection |
-| `POST` | `/connections/{id}/schema-sync` | ✅ ntalk | Sync database schema |
-| `POST` | `/ask` | ✅ ntalk | Natural language → SQL query |
-| `POST` | `/dictionary` | ✅ ntalk | Add business dictionary terms |
-| `POST` | `/golden-queries` | ✅ ntalk | Add approved golden queries |
+| `POST` | `/upload` | ✅ law | Upload reference document (PDF/DOCX) |
+| `GET` | `/documents` | ✅ law | List uploaded documents |
+| `DELETE` | `/documents/{doc_id}` | ✅ law | Delete document + chunks |
+| `GET` | `/profiles` | ✅ law | List style profiles |
+| `POST` | `/profiles` | ✅ law | Create style profile |
+| `POST` | `/profiles/{id}/extract-style` | ✅ law | Extract writing style from profile docs |
+| `POST` | `/generate` | ✅ law | Generate text (sync) |
+| `POST` | `/generate-stream` | ✅ law | Generate text (streaming SSE) |
 
 ---
 

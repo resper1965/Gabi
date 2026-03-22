@@ -56,7 +56,7 @@ graph TD
 ### Gerenciar Módulos por Usuário
 
 1. Selecione o usuário
-2. Marque/desmarque módulos: `ghost`, `law`, `ntalk`
+2. Marque/desmarque módulos: `law`
 3. Salve
 
 > **Acesso híbrido**: O módulo deve estar habilitado tanto na **organização** (`org_modules`) quanto no **usuário** (`allowed_modules`).
@@ -94,7 +94,7 @@ Lista todas as organizações com:
   "org_name": "Escritório Silva & Associados",
   "owner_email": "silva@escritorio.com.br",
   "plan": "starter",
-  "modules": ["ghost", "law"],
+  "modules": ["law"],
   "sector": "advocacia",
   "cnpj": "12.345.678/0001-90"
 }
@@ -139,7 +139,7 @@ graph LR
 Visualizações:
 - **Gráfico de barras empilhadas**: Operações diárias por módulo (últimos 30 dias)
 - **Top 5 usuários**: Mais ativos no mês
-- **Breakdown por módulo**: ghost vs law vs ntalk
+- **Breakdown por módulo**: law (legal + writer)
 
 ---
 

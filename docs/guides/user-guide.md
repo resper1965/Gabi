@@ -25,7 +25,7 @@
 
 ## Módulos
 
-### nGhost — Ghost Writer
+### Writer — Produção Textual com Style Signature
 
 Escreva textos profissionais com IA usando seu próprio estilo de escrita.
 
@@ -75,7 +75,7 @@ Assistente de IA para análise jurídica, compliance e gestão de sinistros.
 
 ---
 
-### nTalkSQL — Natural Language → SQL
+### Flash — Natural Language → SQL
 
 Consulte seus bancos de dados usando linguagem natural.
 

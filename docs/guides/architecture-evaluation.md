@@ -66,12 +66,12 @@
 | --- | --- | --- | --- | --- | --- |
 | `law/` | ✅ | 7 | 1.403 | Alta — RAG + STRIDE + style | 8/10 |
 | `admin/` | ✅ | 5 | 667 | Média — LGPD + observability | 7/10 |
-| `ntalk/` | ✅ | 1 | 499 | Média — file monolítico | 6/10 |
+
 | `org/` | ✅ | 2 | 486 | Média — multi-tenant | 8/10 |
 | `platform/` | ✅ | 2 | 425 | Baixa — config + status | 7/10 |
 | `chat/` | ✅ | 1 | 141 | Baixa — delegação ao core | 7/10 |
 
-**Observação crítica**: `ntalk/router.py` com 499 LOC em arquivo único — deveria ser modularizado (service + models separados).
+**Observação**: Módulo `law/` unifica funcionalidades jurídicas (compliance, RAG, writer) com boa modularização interna.
 
 ### 2.4 Services Layer (`api/app/services/` — 2.166 LOC)
 
@@ -86,7 +86,7 @@
 
 ### 2.5 Modelos (`api/app/models/` — 796 LOC)
 
-11 model files com Pydantic + SQLAlchemy. Cobrem: user, org, law, legal, ntalk, regulatory, analytics, audit, insightcare.
+10 model files com Pydantic + SQLAlchemy. Cobrem: user, org, law, legal, regulatory, analytics, audit, insightcare.
 
 **Score: 7/10** — Modelos bem tipados, mas alguns poderiam ser consolidados (law vs legal).
 
@@ -178,7 +178,7 @@
 | # | Gap | Impacto | Recomendação |
 | --- | --- | --- | --- |
 | 1 | Rate limiting in-memory (perde estado em redeploy) | DoS | Migrar para Redis ou Cloud Memorystore |
-| 2 | `ntalk/router.py` monolítico (499L em 1 arquivo) | Manutenibilidade | Separar em service + models |
+| 2 | ~~`ntalk/router.py` monolítico~~ (resolvido — módulo removido) | ~~Manutenibilidade~~ | ✅ Consolidado no módulo `law/` |
 | 3 | Telemetria sem traces distribuídos | Debugging prod | Implementar OpenTelemetry |
 | 4 | Coverage gate não bloqueante no CI | Qualidade | Adicionar `--cov-fail-under=80` |
 
@@ -236,6 +236,6 @@ A plataforma Gabi demonstra **maturidade enterprise** para uma startup de AI em 
 **Principais riscos:**
 - Rate limiting não persiste entre deploys (DoS em burst)
 - Telemetria sem distributed tracing dificulta debug em produção
-- Monolitos pontuais (`ntalk`, `seed_regulatory`) aumentam risco de regressão
+- Monolitos pontuais (`seed_regulatory`) aumentam risco de regressão
 
 **Veredicto:** Plataforma pronta para **produção enterprise regulada**, com roadmap claro de melhorias técnicas que não bloqueiam operação.

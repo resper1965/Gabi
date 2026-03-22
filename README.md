@@ -19,41 +19,19 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 
 ## Módulos
 
-### 🖊️ gabi.writer (nGhost)
-**Ghost Writer com Style Signature**
-
-| Aspecto | Detalhe |
-|---------|---------|
-| **Função** | Absorve o estilo de escrita do usuário e produz textos com fidelidade estilística |
-| **Modelo IA** | Gemini 2.0 Flash (criatividade + baixa latência) |
-| **RAG** | Busca em documentos do usuário (`ghost_doc_chunks`) para manter consistência |
-| **Diferencial** | Style Signature — perfil de estilo extraído automaticamente de textos anteriores |
-| **Tabelas** | `ghost_knowledge_docs`, `ghost_doc_chunks`, `ghost_style_profiles` |
-
 ### ⚖️ gabi.legal (Law & Comply)
-**Auditoria Jurídica Multi-Agente**
+**Auditoria Jurídica Multi-Agente + Writer**
 
 | Aspecto | Detalhe |
 |---------|---------|
-| **Função** | Análise jurídica com 4 agentes especializados operando em paralelo |
-| **Modelo IA** | Gemini 1.5 Pro (contexto longo + precisão) |
+| **Função** | Análise jurídica com 4 agentes especializados + produção textual com Style Signature |
+| **Modelo IA** | Gemini 1.5 Pro (análise jurídica) + Gemini 2.0 Flash (writer) |
 | **Agentes** | Auditora, Pesquisadora, Redatora, Sentinela |
-| **RAG** | Chunks de documentos jurídicos + insights regulatórios (BCB, CVM, Planalto) |
+| **Writer** | Absorve estilo de escrita do usuário e produz textos com fidelidade estilística |
+| **RAG** | Chunks jurídicos + insights regulatórios + documentos do usuário para writer |
 | **Multi-Agent** | Debate paralelo → síntese unificada com citações |
 | **Ingestão** | Leis federais (Planalto), normativos BCB/CMN, CVM — parser estrutural |
-| **Tabelas** | `law_documents`, `law_chunks`, `legal_documents`, `legal_versions`, `legal_provisions`, `regulatory_documents`, `regulatory_versions`, `regulatory_provisions`, `regulatory_analyses` |
-
-### 📊 gabi.data (nTalkSQL)
-**CFO de Dados — SQL em Linguagem Natural**
-
-| Aspecto | Detalhe |
-|---------|---------|
-| **Função** | Conversa com bancos de dados financeiros — transforma perguntas em SQL |
-| **Modelo IA** | Gemini 2.0 Flash (geração SQL) |
-| **Conexões** | PostgreSQL (asyncpg) + SQL Server (pymssql) |
-| **Segurança** | Dicionário de negócios customizável, Golden Queries validadas, audit log |
-| **Limites** | Timeout configurável (30s), max rows (1000), query read-only |
-| **Tabelas** | `ntalk_connections`, `ntalk_business_dictionary`, `ntalk_golden_queries`, `ntalk_audit_logs` |
+| **Tabelas** | `law_documents`, `law_chunks`, `legal_documents`, `legal_versions`, `legal_provisions`, `regulatory_*`, `ghost_knowledge_docs`, `ghost_doc_chunks`, `ghost_style_profiles` |
 
 ### 🏢 Onboarding & Platform Admin
 **Multi-Tenancy, FinOps & Provisionamento**
@@ -97,11 +75,11 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 │  │  Request Logging → CORS                         │ │
 │  └─────────────────────────────────────────────────┘ │
 │                                                      │
-│  ┌──────────┬──────────┬──────────┐                  │
-│  │ gabi.    │ gabi.    │ gabi.    │                  │
-│  │ writer   │ legal    │ data     │                  │
-│  │ /ghost   │ /law     │ /ntalk   │                  │
-│  └────┬─────┴────┬─────┴────┬─────┘                  │
+│  ┌──────────────────────┐                            │
+│  │     gabi.legal       │                            │
+│  │  Law & Comply + Writer                            │
+│  │  /law (unified)      │                            │
+│  └──────────┬───────────┘                            │
 │       │          │          │                        │
 │  ┌────▼──────────▼──────────▼──────────────────┐     │
 │  │              CORE ENGINE                     │     │
@@ -177,7 +155,7 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 ## Core Engine — Componentes
 
 ### 🧠 AI Service (`core/ai.py`)
-- **Roteamento inteligente** por módulo: Ghost→Flash (criatividade), Law→Pro (precisão), nTalk→Flash (SQL)
+- **Roteamento inteligente** por módulo: Writer→Flash (criatividade), Law→Pro (precisão)
 - **Global Anti-Hallucination Guardrail** — injetado em TODOS os prompts:
   - Nunca fabrica dados factuais
   - Diferencia FATOS de ANÁLISES
@@ -194,8 +172,8 @@ Gabi é uma plataforma SaaS B2B de IA generativa construída como **monorepo ful
 - **Top-K Expansivo** — recupera 40 chunks e filtra para 8 via **Gemini Flash Re-Ranker**
 - **Context-Aware Re-Ranking** — prompt de re-ranking adaptado por módulo:
   - `law` → cronologia legal (norma mais recente sobrepõe)
-  - `ghost` → relevância narrativa e factual
-- **Profile isolation** — módulo ghost filtra por `profile_id` para isolamento de personas
+  - `law/writer` → relevância narrativa e factual
+- **Profile isolation** — writer filtra por `profile_id` para isolamento de personas
 - **Economia** — salva ~200ms + custo de embedding em 40-60% das interações
 - **SQL injection prevention** — allowlist de tabelas (`ALLOWED_TABLE_PAIRS`)
 - **Ownership filter** — documentos do usuário + documentos regulatórios compartilhados
@@ -327,7 +305,7 @@ Gabi/
 │   └── pyproject.toml
 ├── web/                          # Frontend Next.js
 │   └── src/
-│       ├── app/                  # Pages (ghost, law, ntalk, admin)
+│       ├── app/                  # Pages (law, admin, chat)
 │       └── components/           # Shared UI (auth, chat, sidebar)
 ├── scripts/                      # DB indexes, seeds
 ├── docs/                         # ADRs, compliance, runbooks

@@ -74,9 +74,9 @@ Gabi/
 │   │   ├── models/
 │   │   │   ├── user.py           # User model
 │   │   │   ├── org.py            # Org, Plan, Member, Usage, Session
-│   │   │   └── ghost.py          # Ghost documents & profiles
+│   │   │   └── law.py            # Law + Writer models & profiles
 │   │   └── modules/
-│   │       ├── ghost/router.py   # nGhost Ghost Writer
+│   │       ├── law/              # Law & Comply + Writer (unified)
 │   │       ├── law/router.py     # Law & Comply
 │   │       ├── flash/router.py   # Flash (NL→SQL)
 │   │       ├── chat/router.py    # Chat sessions
