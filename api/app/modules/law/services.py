@@ -1,7 +1,7 @@
 import json
 from typing import Any
 from fastapi import HTTPException
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import StreamingResponse
 from google.api_core.exceptions import GoogleAPIError
@@ -13,7 +13,7 @@ from app.core.memory import summarize, should_summarize
 from app.core.multi_agent import debate, AgentConfig
 from app.core.analytics import log_event
 from app.core.auth import CurrentUser
-from app.models.insightcare import ClaimsData
+from app.models.insightcare import ClaimsData, InsuranceDocument, InsuranceChunk
 
 from .schemas import AgentRequest
 from .agents import (
@@ -63,24 +63,30 @@ async def fetch_rag_context(
         if not intent["needs_rag"]:
             return [], False
         query_embedding = embed(intent["refined_query"])
-        params = {"emb": str(query_embedding), "tid": req.tenant_id}
-        client_filter = ""
-        if req.client_id:
-            client_filter = "AND (d.client_id = :cid OR d.client_id IS NULL)"
-            params["cid"] = req.client_id
 
-        rag_results = await db.execute(
-            text(f"""
-                SELECT c.content, c.section_ref, d.title, d.doc_type
-                FROM ic_chunks c
-                JOIN ic_documents d ON c.document_id = d.id
-                WHERE (d.tenant_id = :tid OR d.is_shared = true) AND d.is_active = true
-                  AND c.embedding IS NOT NULL {client_filter}
-                ORDER BY c.embedding <=> :emb::vector
-                LIMIT 8
-            """),
-            params,
+        query = (
+            select(
+                InsuranceChunk.content,
+                InsuranceChunk.section_ref,
+                InsuranceDocument.title,
+                InsuranceDocument.doc_type,
+            )
+            .join(InsuranceDocument, InsuranceChunk.document_id == InsuranceDocument.id)
+            .where(
+                (InsuranceDocument.tenant_id == req.tenant_id) | (InsuranceDocument.is_shared == True),
+                InsuranceDocument.is_active == True,
+                InsuranceChunk.embedding.isnot(None),
+            )
         )
+        if req.client_id:
+            query = query.where(
+                (InsuranceDocument.client_id == req.client_id) | (InsuranceDocument.client_id.is_(None))
+            )
+        query = query.order_by(
+            InsuranceChunk.embedding.cosine_distance(query_embedding)
+        ).limit(8)
+
+        rag_results = await db.execute(query)
         return [dict(row._mapping) for row in rag_results], True
     else:
         return await retrieve_if_needed(
