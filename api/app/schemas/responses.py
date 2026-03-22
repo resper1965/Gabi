@@ -49,7 +49,7 @@ class LoginResponse(BaseModel):
     is_new: bool = False
 
 
-# ── Ghost (gabi.writer) ──
+# ── Writer (gabi.writer — part of Law module) ──
 
 class StyleProfile(BaseModel):
     """Ghost style profile summary."""
@@ -100,10 +100,10 @@ class RegulatoryAlertItem(BaseModel):
     created_at: datetime | None = None
 
 
-# ── nTalk (gabi.data) ──
+# ── Flash (gabi.data — deprecated) ──
 
-class NTalkResponse(BaseModel):
-    """nTalkSQL query response."""
+class FlashQueryResponse(BaseModel):
+    """Flash (formerly nTalkSQL) query response."""
     interpretation: str
     sql: str
     explanation: str

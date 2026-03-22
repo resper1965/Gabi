@@ -20,7 +20,7 @@ class FakeSuperadmin:
     picture: str | None = None
     role: str = "superadmin"
     status: str = "approved"
-    allowed_modules: list = field(default_factory=lambda: ["ghost", "law", "ntalk"])
+    allowed_modules: list = field(default_factory=lambda: ["law"])
     org_id: str | None = None
     org_role: str | None = None
     org_modules: list = field(default_factory=list)

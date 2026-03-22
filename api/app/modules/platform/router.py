@@ -32,7 +32,7 @@ class ProvisionOrgRequest(BaseModel):
     org_name: str
     owner_email: str
     plan: str = "trial"  # trial, starter, pro, enterprise
-    modules: list[str] = ["ghost", "law"]
+    modules: list[str] = ["law"]
     sector: str | None = None
     cnpj: str | None = None
 
@@ -165,7 +165,7 @@ async def provision_org(
     await db.flush()
 
     # Enable modules
-    valid_modules = {"ghost", "law"}
+    valid_modules = {"law"}
     for mod in req.modules:
         if mod in valid_modules:
             db.add(OrgModule(org_id=org.id, module=mod))

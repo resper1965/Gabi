@@ -39,7 +39,7 @@ class TestProvisionOrg:
         from app.modules.platform.router import ProvisionOrgRequest
         req = ProvisionOrgRequest(org_name="Enterprise Inc", owner_email="owner@ent.com")
         assert req.plan == "trial"
-        assert req.modules == ["ghost", "law", "ntalk"]
+        assert req.modules == ["law"]
         assert req.sector is None
 
     def test_provision_org_request_custom(self):

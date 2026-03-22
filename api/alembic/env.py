@@ -24,7 +24,6 @@ from app.models.base import Base  # noqa
 from app.models.user import User  # noqa
 from app.models.ghost import StyleProfile, KnowledgeDocument, DocumentChunk  # noqa
 from app.models.law import LegalDocument, LegalChunk, RegulatoryAlert  # noqa
-from app.models.ntalk import TenantConnection, BusinessDictionary, GoldenQuery, AuditLog  # noqa
 from app.models.insightcare import InsuranceClient, Policy, ClaimsData, InsuranceDocument, InsuranceChunk  # noqa
 
 target_metadata = Base.metadata

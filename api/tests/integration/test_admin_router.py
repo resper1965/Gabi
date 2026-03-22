@@ -19,8 +19,8 @@ class TestUserManagement:
     async def test_approve_user_sets_modules(self, mock_db, mock_user):
         """Approving a user sets their allowed_modules and status."""
         from app.modules.admin.router import UserApproval
-        body = UserApproval(allowed_modules=["law", "ghost"])
-        assert body.allowed_modules == ["law", "ghost"]
+        body = UserApproval(allowed_modules=["law"])
+        assert body.allowed_modules == ["law"]
 
     @pytest.mark.asyncio
     async def test_block_user_sets_blocked(self, mock_db, mock_user):
@@ -36,9 +36,7 @@ class TestUserManagement:
     async def test_update_modules_validates_names(self):
         """Module names must be in the allowed list."""
         from app.modules.admin.router import ALL_MODULES
-        assert "ghost" in ALL_MODULES
         assert "law" in ALL_MODULES
-        assert "ntalk" in ALL_MODULES
 
 
 class TestSystemStats:

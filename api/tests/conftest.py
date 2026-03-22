@@ -27,7 +27,7 @@ def mock_user():
         uid = "test-uid-123"
         email = "test@ness.com.br"
         role = "superadmin"
-        allowed_modules = ["ghost", "law", "ntalk", ]
+        allowed_modules = ["law"]
     return MockUser()
 
 

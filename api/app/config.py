@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # Production: set to your domain(s), e.g. "https://gabi.ness.com.br"
     cors_origins: list[str] = ["http://localhost:3000"]
 
-    # Legacy nTalkSQL (kept for existing tenant data)
+    # Query limits
     max_query_rows: int = 1000
     query_timeout_seconds: int = 30
 

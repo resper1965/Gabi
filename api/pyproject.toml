@@ -1,7 +1,7 @@
 [project]
 name = "gabi-api"
 version = "0.1.0"
-description = "Gabi Hub — Unified AI Backend (nGhost + Law & Comply + nTalkSQL)"
+description = "Gabi Hub — Unified AI Backend (Law & Comply + Writer)"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",

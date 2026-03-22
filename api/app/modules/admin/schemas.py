@@ -5,7 +5,7 @@ Pydantic models for admin module.
 
 from pydantic import BaseModel
 
-ALL_MODULES = ["ghost", "law"]
+ALL_MODULES = ["law"]
 
 class RoleUpdate(BaseModel):
     role: str  # user, admin, superadmin

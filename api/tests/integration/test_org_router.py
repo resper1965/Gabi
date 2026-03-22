@@ -17,7 +17,7 @@ class TestCreateOrg:
         from app.modules.org.router import CreateOrgRequest
         req = CreateOrgRequest(name="Test Org")
         assert req.name == "Test Org"
-        assert req.modules == ["ghost", "law", "ntalk"]
+        assert req.modules == ["law"]
         assert req.cnpj is None
 
     def test_create_org_request_custom_modules(self):
