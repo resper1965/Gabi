@@ -1,0 +1,59 @@
+# cloudbuild-ingest-job.yaml
+# Builds and deploys the Gabi Ingestion Job to Cloud Run Jobs.
+# Triggered manually or by Cloud Scheduler.
+#
+# Setup Cloud Scheduler (run once):
+#   gcloud scheduler jobs create http gabi-ingest-daily \
+#     --location=southamerica-east1 \
+#     --schedule="0 6 * * *" \
+#     --uri="https://southamerica-east1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/PROJECT_ID/jobs/gabi-ingest:run" \
+#     --http-method=POST \
+#     --oauth-service-account-email=PROJECT_NUMBER-compute@developer.gserviceaccount.com \
+#     --time-zone="America/Sao_Paulo"
+
+steps:
+  # Build the image (reuses API Dockerfile)
+  - id: build
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-ingest:${SHORT_SHA}'
+      - '-f'
+      - 'api/Dockerfile'
+      - 'api/'
+
+  # Push to Artifact Registry
+  - id: push
+    name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-ingest:${SHORT_SHA}'
+    waitFor: ['build']
+
+  # Deploy as Cloud Run Job (not a service — no HTTP listener)
+  - id: deploy-job
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'jobs'
+      - 'update'
+      - 'gabi-ingest'
+      - '--region=${_REGION}'
+      - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/gabi-ingest:${SHORT_SHA}'
+      - '--command=./entrypoint-job.sh'
+      - '--task-timeout=3600'
+      - '--max-retries=1'
+      - '--memory=2Gi'
+      - '--cpu=1'
+      - '--set-env-vars=DATABASE_URL=${_DATABASE_URL},GCP_PROJECT=${PROJECT_ID}'
+    waitFor: ['push']
+
+substitutions:
+  _REGION: southamerica-east1
+  _REPO: gabi
+  _DATABASE_URL: ''  # Set via Cloud Build trigger
+
+options:
+  logging: CLOUD_LOGGING_ONLY

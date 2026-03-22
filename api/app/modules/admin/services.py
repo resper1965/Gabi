@@ -148,6 +148,9 @@ async def run_regulatory_ingestion(trigger: str = "manual") -> dict:
         ("ANS", "scripts.ingest_ans", "run_ans_ingestion"),
         ("ANPD", "scripts.ingest_anpd", "run_anpd_ingestion"),
         ("ANEEL", "scripts.ingest_aneel", "run_aneel_ingestion"),
+        ("CADE", "scripts.ingest_cade", "run_cade_ingestion"),
+        ("DATAJUD", "scripts.ingest_datajud", "run_all_tribunais"),
+        ("PLANALTO", "scripts.ingest_planalto_laws", "run_ingestion"),
     ]
 
     for source, module_path, func_name in scrapers:
@@ -155,10 +158,30 @@ async def run_regulatory_ingestion(trigger: str = "manual") -> dict:
             import importlib
             mod = importlib.import_module(module_path)
             fn = getattr(mod, func_name)
-            await fn()
+            if source == "DATAJUD":
+                await fn(days=90)
+            else:
+                await fn()
             results["steps"].append({"source": source, "status": "ok"})
         except Exception as e:
             results["steps"].append({"source": source, "status": "error", "detail": str(e)})
+
+    # BKJ Legal Knowledge Base (separate ingestion path)
+    try:
+        from scripts.bkj_cli import run_cli
+        await run_cli("core")
+        await run_cli("financial")
+        results["steps"].append({"source": "BKJ", "status": "ok"})
+    except Exception as e:
+        results["steps"].append({"source": "BKJ", "status": "error", "detail": str(e)})
+
+    # Invalidate RAG cache so fresh data is served immediately
+    try:
+        from app.core.cache import cache_invalidate_prefix
+        await cache_invalidate_prefix("rag")
+        results["cache_invalidated"] = True
+    except Exception:
+        results["cache_invalidated"] = False
 
     results["finished_at"] = datetime.now(timezone.utc).isoformat()
     return results
