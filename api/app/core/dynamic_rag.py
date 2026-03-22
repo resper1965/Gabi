@@ -299,7 +299,7 @@ async def retrieve_if_needed(
     # ── Phase 4: Three-source search ─────────────────────────────────────────
     # Build ownership filter: user's own docs + shared regulatory docs
     if profile_id:
-        # Ghost module is isolated by profile
+        # Writer/style feature (alias "ghost") is isolated by profile
         ownership_filter = "d.profile_id = :pid AND d.doc_type = 'content'"
     elif user_id:
         ownership_filter = "(d.user_id = :uid OR d.is_shared = true)"

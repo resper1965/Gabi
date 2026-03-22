@@ -76,10 +76,15 @@ settings = get_settings()
 
 _initialized = False
 
+# Internal model aliases — NOT product modules.
+# "ghost" = Gemini Flash for creative writing (style/writer features)
+# "flash" = Gemini Flash for cheap tasks (RAG, classify, summarize)
+# "law"   = Gemini Pro for legal precision + long context
+# The only user-facing module is "law". Ghost and flash are routing aliases.
 ModuleName = Literal["ghost", "law", "flash"]
 
 MODEL_MAP: dict[ModuleName, str] = {
-    "ghost": settings.model_ghost,  # Flash: creativity
+    "ghost": settings.model_ghost,  # Flash: creative writing (writer feature)
     "law": settings.model_law,      # Pro: precision + long context
     "flash": settings.model_flash,  # Flash: RAG, classify, summarize
 }

@@ -1,6 +1,6 @@
 """
 Style Profile Service — Manages writing style profiles and knowledge documents.
-Formerly the ghost module, now integrated into the law module.
+Writer feature (formerly the "ghost" module), now integrated into the law module.
 
 Endpoints:
   - Style profile CRUD

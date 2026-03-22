@@ -98,7 +98,7 @@ export default function AdminUsersTab({ isSuperadmin, refreshKey }: AdminUsersTa
             { label: "Pendentes", value: stats.pending_users, icon: Clock, color: "#fbbf24" },
             { label: "Documentos", value: stats.documents.total, icon: FileText, color: "var(--color-mod-law)" },
             { label: "DB Size", value: `${stats.database_size_mb} MB`, icon: Database, color: "var(--color-gabi-accent)" },
-            { label: "Ghost Docs", value: stats.documents.ghost, icon: FileText, color: "var(--color-gabi-primary)" },
+            { label: "Writer Docs", value: stats.documents.ghost, icon: FileText, color: "var(--color-gabi-primary)" },
           ].map((c) => (
             <div key={c.label} className="rounded-2xl bg-[#1E293B] border border-[#334155] p-4">
               <div className="flex items-center gap-2 mb-2">

@@ -8,7 +8,7 @@ class AgentRequest(BaseModel):
     query: str
     document_text: str | None = None
     chat_history: list[dict] | None = None
-    style_profile_id: str | None = None  # For writer agent — references ghost style profile
+    style_profile_id: str | None = None  # For writer agent — references style profile (legacy name: ghost)
     # Insurance-specific fields
     tenant_id: str | None = None
     client_id: str | None = None

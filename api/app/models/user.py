@@ -33,7 +33,7 @@ class ChatSession(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(String(128), nullable=False, index=True)
-    module = Column(String(50), nullable=False, index=True)  # ghost, law
+    module = Column(String(50), nullable=False, index=True)  # "law" (active); "ghost" = legacy alias for writer
     title = Column(String(255), nullable=True)
     summary = Column(Text, nullable=True)  # Memory summary for token efficiency
     message_count = Column(Integer, default=0)

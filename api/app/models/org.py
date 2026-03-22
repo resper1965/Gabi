@@ -112,7 +112,7 @@ class OrgModule(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=False, index=True)
-    module = Column(String(50), nullable=False)  # ghost, law
+    module = Column(String(50), nullable=False)  # "law" (active); "ghost" = legacy alias for writer
     enabled = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())
 
@@ -184,7 +184,7 @@ class TokenUsage(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(String(128), nullable=False, index=True)
     org_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"), nullable=True, index=True)
-    module = Column(String(30), nullable=False, index=True)   # ghost, law
+    module = Column(String(30), nullable=False, index=True)   # "law" (active); "ghost" = legacy alias for writer
     model = Column(String(100), nullable=False)                # gemini-2.5-pro-preview-05-06
     prompt_tokens = Column(Integer, nullable=False, default=0)
     completion_tokens = Column(Integer, nullable=False, default=0)

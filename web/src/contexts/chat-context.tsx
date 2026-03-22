@@ -2,8 +2,8 @@
 
 /**
  * ChatContext — persists message state across module navigation.
- * Stored in memory (session-scoped). Each module key ("law", "ghost")
- * holds its own independent message array.
+ * Stored in memory (session-scoped). Each module key (e.g. "law")
+ * holds its own independent message array. "ghost" is a legacy alias for writer.
  */
 
 import { createContext, useCallback, useContext, useState } from "react"

@@ -84,7 +84,7 @@ export function BottomTabs() {
 
   const isSuperadmin = profile?.role === "superadmin"
   const allowedModules = profile?.allowed_modules || []
-  const hasGabi = isSuperadmin || allowedModules.includes("law") || allowedModules.includes("ghost") || allowedModules.includes("gabi")
+  const hasGabi = isSuperadmin || allowedModules.includes("law") || allowedModules.includes("gabi")
 
   const tabs = [
     { key: "home", label: "Painel", icon: LayoutDashboard, href: "/" },

@@ -14,7 +14,7 @@ from app.models.base import Base
 
 
 # ═══════════════════════════════════════════════════════════════════
-# User Documents (ex-ghost module)
+# User Documents (writer feature, formerly "ghost" module)
 # Tables: law_documents, law_chunks, law_alerts, law_gap_analyses,
 #          ghost_style_profiles, ghost_knowledge_docs, ghost_doc_chunks
 # ═══════════════════════════════════════════════════════════════════
