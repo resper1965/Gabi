@@ -161,7 +161,7 @@ async def classify_query(question: str) -> dict:
     """Use Gemini Flash to classify which agents should handle this query."""
     try:
         raw = await generate(
-            module="ntalk",  # Flash — cheapest and fastest
+            module="flash",  # Flash — cheapest and fastest
             prompt=ORCHESTRATOR_PROMPT.format(question=question),
         )
         result = safe_parse_json(raw)
@@ -183,4 +183,4 @@ def is_insurance_query(selected_agents: list[str]) -> bool:
 
 def get_model_module(agent_name: str) -> str:
     """Get the AI module (model tier) for a given agent."""
-    return "law" if agent_name in LEGAL_PRO_AGENTS else "ntalk"
+    return "law" if agent_name in LEGAL_PRO_AGENTS else "flash"

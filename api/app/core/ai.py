@@ -77,12 +77,12 @@ settings = get_settings()
 
 _initialized = False
 
-ModuleName = Literal["ghost", "law", "ntalk"]
+ModuleName = Literal["ghost", "law", "flash"]
 
 MODEL_MAP: dict[ModuleName, str] = {
     "ghost": settings.model_ghost,  # Flash: creativity
     "law": settings.model_law,      # Pro: precision + long context
-    "ntalk": settings.model_ntalk,  # Flash: SQL generation
+    "flash": settings.model_flash,  # Flash: RAG, classify, summarize
 }
 
 # ── Global Anti-Hallucination Guardrail ──
@@ -117,7 +117,7 @@ def _build_system_instruction(system_instruction: str | None = None) -> str:
 def get_model(module: ModuleName, system_instruction: str | None = None) -> GenerativeModel:
     """Get the right Gemini model for a specific module."""
     _init_vertex()
-    model_name = MODEL_MAP.get(module, settings.model_ntalk)
+    model_name = MODEL_MAP.get(module, settings.model_flash)
     full_instruction = _build_system_instruction(system_instruction)
     return GenerativeModel(model_name, system_instruction=full_instruction)
 

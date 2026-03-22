@@ -11,7 +11,7 @@ class AnalyticsEvent(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(String(128), nullable=False, index=True)
-    module = Column(String(50), nullable=False, index=True)     # ghost, law, ntalk, insightcare
+    module = Column(String(50), nullable=False, index=True)     # ghost, law
     event_type = Column(String(50), nullable=False, index=True)  # query, upload, extract_style, etc.
     tokens_used = Column(Integer, nullable=True)
     metadata_ = Column("metadata", Text, nullable=True)  # JSON: extra details

@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     # Model routing per module
     model_ghost: str = "gemini-2.0-flash-001"   # Creativity + low latency
     model_law: str = "gemini-2.5-pro-preview-05-06"  # Best reasoning for legal
-    model_ntalk: str = "gemini-2.0-flash-001"   # SQL generation
+    model_flash: str = "gemini-2.0-flash-001"   # Fast/cheap tasks (RAG, classify, summarize)
     
     # LLM Settings
     chat_history_limit: int = 6
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     # Production: set to your domain(s), e.g. "https://gabi.ness.com.br"
     cors_origins: list[str] = ["http://localhost:3000"]
 
-    # nTalkSQL specific
+    # Legacy nTalkSQL (kept for existing tenant data)
     max_query_rows: int = 1000
     query_timeout_seconds: int = 30
 

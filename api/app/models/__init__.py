@@ -1,7 +1,8 @@
 # Gabi Hub — Models package
-# NOTE: Regulatory classes exist in BOTH regulatory.py and law.py.
-# regulatory.py → RssItem, RegulatoryDocument (table: regulatory_documents)
-# law.py        → RegulatoryDocument (table: legal_documents)
+# Model locations:
+# regulatory.py → RegulatoryDocument, RegulatoryVersion, RegulatoryAnalysis (RSS monitor)
+# law.py        → LegalDocument, LegalChunk, RegulatoryAlert (user docs)
+#                 LegislativeDocument, LegislativeVersion, etc. (Planalto corpus)
 # Import specific classes from the module you need — don't rely on this __init__.
 from app.models.regulatory import RssItem
 from app.models.audit import IngestRun, IngestRunItem

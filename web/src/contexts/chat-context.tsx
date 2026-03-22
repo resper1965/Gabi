@@ -2,7 +2,7 @@
 
 /**
  * ChatContext — persists message state across module navigation.
- * Stored in memory (session-scoped). Each module key ("law", "ghost", "ntalk")
+ * Stored in memory (session-scoped). Each module key ("law", "ghost")
  * holds its own independent message array.
  */
 

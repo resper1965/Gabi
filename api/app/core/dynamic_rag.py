@@ -82,7 +82,7 @@ async def should_retrieve(
         prompt = INTENT_PROMPT.format(history=history_text or "(nenhum)", question=question)
 
         try:
-            raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
+            raw = await generate(module="flash", prompt=prompt)  # Flash (cheapest)
             result = safe_parse_json(raw)
             scope = result.get("scope", "all")
             if scope not in VALID_SCOPES:
@@ -464,7 +464,7 @@ async def retrieve_if_needed(
             rerank_prompt += f"[{idx}] {ck.get('title', '')} — {snippet}...\n"
 
         try:
-            raw_rerank = await generate(module="ntalk", prompt=rerank_prompt)
+            raw_rerank = await generate(module="flash", prompt=rerank_prompt)
             rr_res = safe_parse_json(raw_rerank)
             best_indices = rr_res.get("indices", list(range(limit)))
 

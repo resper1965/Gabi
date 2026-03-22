@@ -27,7 +27,7 @@ class CreateOrgRequest(BaseModel):
     name: str
     cnpj: str | None = None
     sector: str | None = None  # advocacia, asset_mgmt, compliance, banco
-    modules: list[str] = ["ghost", "law", "ntalk"]
+    modules: list[str] = ["ghost", "law"]
 
 class UpdateOrgRequest(BaseModel):
     name: str | None = None
@@ -85,7 +85,7 @@ async def create_org(
     db.add(member)
 
     # Enable selected modules
-    valid_modules = {"ghost", "law", "ntalk"}
+    valid_modules = {"ghost", "law"}
     for mod in req.modules:
         if mod in valid_modules:
             db.add(OrgModule(org_id=org.id, module=mod))

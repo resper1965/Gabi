@@ -19,7 +19,7 @@ async def summarize(messages: list[dict]) -> str:
     )
 
     return await generate(
-        module="ntalk",  # Use Flash (cheapest) for summarization
+        module="flash",  # Use Flash (cheapest) for summarization
         prompt=conversation,
         system_instruction=(
             "Resuma esta conversa em 2-3 frases objetivas: "

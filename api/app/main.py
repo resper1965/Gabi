@@ -1,6 +1,6 @@
 """
 Gabi Hub — Unified FastAPI Application
-Serves 3 modules: nGhost, Law & Comply (+ Insurance), nTalkSQL
+Serves the active Gabi legal/compliance experience.
 """
 
 import logging
@@ -56,7 +56,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Gabi Hub API",
-    description="Unified AI Backend — nGhost + Law & Comply (Legal + Insurance) + nTalkSQL",
+    description="Unified AI Backend — Law & Comply (Legal + Insurance) + style services",
     version=__version__,
     lifespan=lifespan,
     docs_url="/docs" if settings.gcp_project_id == "" or settings.enable_docs else None,  # Enable locally or via GABI_ENABLE_DOCS=true
@@ -101,10 +101,8 @@ app.include_router(health_router, tags=["Health"])
 
 # ── Module Routers ──
 from app.modules.law.router import router as law_router
-from app.modules.ntalk.router import router as ntalk_router
 
 app.include_router(law_router, prefix="/api/law", tags=["Law & Comply"])
-app.include_router(ntalk_router, prefix="/api/ntalk", tags=["nTalkSQL"])
 
 
 # ── Admin Router ──

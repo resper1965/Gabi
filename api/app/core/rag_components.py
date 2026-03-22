@@ -28,7 +28,7 @@ Regras:
 async def classify_intent(
     question: str,
     chat_history: list[dict] | None = None,
-    module: str = "ntalk",
+    module: str = "flash",
 ) -> dict:
     """
     Classify whether a user question needs RAG retrieval.

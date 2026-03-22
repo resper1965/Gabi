@@ -68,7 +68,7 @@ async def classify_document(text: str, fallback_type: str = "law") -> dict:
         prompt = CLASSIFY_PROMPT.format(text=snippet)
 
         try:
-            raw = await generate(module="ntalk", prompt=prompt)  # Flash (cheapest)
+            raw = await generate(module="flash", prompt=prompt)  # Flash (cheapest)
             result = safe_parse_json(raw)
 
             # Validate tipo

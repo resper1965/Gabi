@@ -76,7 +76,7 @@ async def generate_presentation(
     prompt = SLIDE_PROMPT.format(content=snippet)
 
     try:
-        raw = await generate(module="ntalk", prompt=prompt)
+        raw = await generate(module="flash", prompt=prompt)
         structure = safe_parse_json(raw)
     except Exception as e:
         logger.error("Slide structure generation failed: %s", e)
