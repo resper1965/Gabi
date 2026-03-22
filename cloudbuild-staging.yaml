@@ -254,12 +254,41 @@ steps:
           -t ${_STAGING_API_URL}/health \
           -J /zap/wrk/zap-report.json \
           -I || true
-        cp /zap/wrk/zap-report.json /workspace/zap-report.json 2>/dev/null || true
         echo "━━━ ZAP scan complete ━━━"
     volumes:
       - name: "zap-wrk"
         path: "/zap/wrk"
     waitFor: ["deploy-api-staging"]
+
+  # ── SSDLC: DAST Report ──
+  - id: "dast-zap-report"
+    name: "gcr.io/cloud-builders/gsutil"
+    entrypoint: bash
+    args:
+      - "-c"
+      - |
+        if [ -f /zap/wrk/zap-report.json ]; then
+          echo "━━━ ZAP DAST Report Summary ━━━"
+          cat /zap/wrk/zap-report.json | python3 -c "
+        import sys, json
+        try:
+          data = json.load(sys.stdin)
+          for site in data.get('site', []):
+            for alert in site.get('alerts', []):
+              risk = alert.get('riskdesc', 'Unknown')
+              name = alert.get('name', 'Unknown')
+              count = alert.get('count', 0)
+              print(f'  [{risk}] {name} ({count} instances)')
+        except: print('  (could not parse report)')
+        " || true
+          cp /zap/wrk/zap-report.json /workspace/zap-report.json 2>/dev/null || true
+        else
+          echo "No ZAP report generated"
+        fi
+    volumes:
+      - name: "zap-wrk"
+        path: "/zap/wrk"
+    waitFor: ["dast-zap"]
 
 substitutions:
   _REGION: southamerica-east1
