@@ -1,7 +1,6 @@
 """User & Chat models — Shared across all modules."""
 
 import uuid
-from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID, ARRAY

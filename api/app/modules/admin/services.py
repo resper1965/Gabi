@@ -5,7 +5,6 @@ Business logic for admin operations.
 
 import os
 import sys
-import asyncio
 from datetime import datetime, timezone
 from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -97,7 +96,7 @@ async def simulate_rag_retrieval(query: str, module: str, db: AsyncSession) -> d
     intent = await should_retrieve(query, chat_history=[])
     chunks = []
     did_retrieve = False
-    
+
     if intent.get("needs_rag"):
         chunks, did_retrieve = await retrieve_if_needed(
             question=query,
@@ -107,7 +106,7 @@ async def simulate_rag_retrieval(query: str, module: str, db: AsyncSession) -> d
             user_id=None,
             limit=5
         )
-        
+
     return {
         "intent": intent,
         "did_retrieve": did_retrieve,
@@ -123,7 +122,7 @@ async def list_regulatory_bases(db: AsyncSession) -> dict:
     law_docs = [dict(row._mapping) for row in law_res]
 
     reg_res = await db.execute(
-        select(RegulatoryDocument.authority, RegulatoryDocument.tipo_ato, RegulatoryDocument.numero, 
+        select(RegulatoryDocument.authority, RegulatoryDocument.tipo_ato, RegulatoryDocument.numero,
                RegulatoryAnalysis.risco_nivel, RegulatoryAnalysis.resumo_executivo)
         .join(RegulatoryVersion, RegulatoryDocument.id == RegulatoryVersion.document_id)
         .join(RegulatoryAnalysis, RegulatoryVersion.id == RegulatoryAnalysis.version_id)

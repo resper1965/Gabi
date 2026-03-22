@@ -3,7 +3,7 @@ Gabi Hub — Pydantic Response Models
 Standardized API response schemas for all modules.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 
 

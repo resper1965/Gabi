@@ -1,0 +1,16 @@
+[lint]
+select = ["E", "F", "W"]
+ignore = [
+    "E501",  # line-length handled by formatter
+    "E712",  # == True is intentional for SQLAlchemy column filters
+]
+
+[lint.per-file-ignores]
+# main.py: imports after app = FastAPI() are intentional (lazy loading)
+"app/main.py" = ["E402"]
+# db_ingest: imports after load_dotenv() are intentional
+"app/services/db_ingest.py" = ["E402"]
+# __init__.py: re-exports are intentional
+"app/models/__init__.py" = ["F401"]
+# Alembic: generated files have their own conventions
+"alembic/*" = ["F401", "E402"]

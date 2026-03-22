@@ -5,7 +5,7 @@ Absorbed from the former gabi.care module.
 
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

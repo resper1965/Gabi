@@ -14,7 +14,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.core.auth import CurrentUser, get_current_user, require_role
+from app.core.auth import CurrentUser, require_role
 from app.models.user import User, ChatSession, ChatMessage
 
 logger = logging.getLogger("gabi.lgpd")

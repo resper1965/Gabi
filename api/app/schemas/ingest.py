@@ -1,7 +1,7 @@
 import enum
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, HttpUrl, Field
+from pydantic import BaseModel
 
 class RegulatoryAuthority(str, enum.Enum):
     BACEN = "BACEN"

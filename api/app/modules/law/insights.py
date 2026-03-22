@@ -6,7 +6,7 @@ Serves AI-generated analyses + stats for the Radar Regulatório 2.0.
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, func, case, text
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -87,11 +87,11 @@ async def get_insight_stats(
     Returns: total docs, risk distribution, per-authority counts,
     new docs in last 7d, last update timestamp, and weekly timeline.
     """
-    from app.models.regulatory import RegulatoryAnalysis, RegulatoryVersion, RegulatoryDocument
+    from app.models.regulatory import RegulatoryAnalysis, RegulatoryDocument
 
     now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
-    thirty_days_ago = now - timedelta(days=30)
+    now - timedelta(days=30)
 
     # Total documents
     total_docs_q = select(func.count(RegulatoryDocument.id))

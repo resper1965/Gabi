@@ -58,5 +58,5 @@ Realize a análise completa conforme seu prompt de sistema e retorne APENAS o JS
         prompt=prompt,
         system_instruction=ANALYZER_SYSTEM_PROMPT
     )
-    
+
     return analysis

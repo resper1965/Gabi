@@ -7,7 +7,6 @@ Falls back to in-memory LRU if Redis is unavailable.
 import json
 import logging
 import time
-from functools import lru_cache
 from typing import Any
 
 from app.config import get_settings

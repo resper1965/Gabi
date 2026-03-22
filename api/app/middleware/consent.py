@@ -5,7 +5,6 @@ Records consent timestamp and terms version in user profile.
 """
 
 import logging
-from datetime import datetime, timezone
 
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware

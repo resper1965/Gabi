@@ -7,10 +7,9 @@ Run as a scheduled Cloud Run Job or via admin endpoint.
 import logging
 from datetime import datetime, timezone, timedelta
 
-from sqlalchemy import delete, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
 
 logger = logging.getLogger("gabi.retention")
 
@@ -33,11 +32,11 @@ RETENTION_RULES = {
 async def run_retention(db: AsyncSession, dry_run: bool = True) -> dict:
     """
     Execute data retention cleanup.
-    
+
     Args:
         db: Async database session
         dry_run: If True, only report what would be deleted
-        
+
     Returns:
         Dict with per-table deletion counts
     """

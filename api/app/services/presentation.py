@@ -6,7 +6,6 @@ into professional-looking slides.
 """
 
 import io
-import json
 import logging
 from typing import Optional
 
@@ -168,7 +167,6 @@ def _add_title_slide(prs: Presentation, title: str, subtitle: str):
     p2.alignment = PP_ALIGN.LEFT
 
     # Accent line
-    from pptx.shapes.autoshape import Shape
     left_line = Inches(1)
     top_line = Inches(4.0)
     width_line = Inches(3)

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import get_db
-from app.core.auth import CurrentUser, get_current_user, require_module
+from app.core.auth import CurrentUser, require_module
 from app.core.rate_limit import check_rate_limit
 from app.models.law import LegalDocument, LegalChunk, RegulatoryAlert
 

@@ -1,5 +1,4 @@
 import httpx
-import asyncio
 import os
 import requests
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
@@ -12,7 +11,7 @@ HEADERS = {
 class BCBClient:
     def __init__(self):
         self.timeout = httpx.Timeout(int(os.getenv("TIMEOUT", 30)))
-        
+
     @retry(
         wait=wait_exponential(multiplier=1, min=2, max=10),
         stop=stop_after_attempt(3),

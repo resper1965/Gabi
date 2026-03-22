@@ -1,5 +1,5 @@
 """
-Integration tests — nTalkSQL Router
+Integration tests — FlashSQL Router
 Tests: connection registration, schema sync, ask_gabi flow, golden queries, audit log.
 """
 
@@ -12,7 +12,7 @@ class TestConnectionManagement:
 
     def test_connection_request_model(self):
         """ConnectionRequest validates required fields."""
-        from app.modules.ntalk.router import ConnectionRequest
+        from app.modules.flash.router import ConnectionRequest
         req = ConnectionRequest(
             tenant_id="tenant-1",
             name="Production DB",
@@ -40,7 +40,7 @@ class TestSchemaSync:
     @pytest.mark.asyncio
     async def test_sync_reads_information_schema(self, mock_db, mock_user):
         """Schema sync reads MS SQL INFORMATION_SCHEMA and populates dictionary."""
-        with patch("app.modules.ntalk.router._execute_mssql") as mock_mssql:
+        with patch("app.modules.flash.router._execute_mssql") as mock_mssql:
             mock_mssql.return_value = {
                 "columns": ["TABLE_NAME", "COLUMN_NAME", "DATA_TYPE"],
                 "rows": [
@@ -52,11 +52,11 @@ class TestSchemaSync:
 
 
 class TestAskGabi:
-    """Test the full nTalkSQL flow: question → SQL → execute → interpret."""
+    """Test the full FlashSQL flow: question → SQL → execute → interpret."""
 
     def test_chat_request_model(self):
         """ChatRequest validates required fields."""
-        from app.modules.ntalk.router import ChatRequest
+        from app.modules.flash.router import ChatRequest
         req = ChatRequest(tenant_id="t1", question="Qual é o VGV total?")
         assert req.tenant_id == "t1"
         assert req.question == "Qual é o VGV total?"
@@ -83,7 +83,7 @@ class TestAskGabi:
 
     def test_cfo_system_prompt_restricts_to_select(self):
         """System prompt must restrict to SELECT queries."""
-        from app.modules.ntalk.router import CFO_SYSTEM_PROMPT
+        from app.modules.flash.router import CFO_SYSTEM_PROMPT
         assert "SELECT" in CFO_SYSTEM_PROMPT
         assert "TOP" in CFO_SYSTEM_PROMPT
 

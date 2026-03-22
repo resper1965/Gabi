@@ -6,7 +6,6 @@ Called from app startup to fail fast with clear error messages.
 
 import importlib
 import logging
-import sys
 
 logger = logging.getLogger("gabi.startup")
 

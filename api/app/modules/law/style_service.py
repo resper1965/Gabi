@@ -20,7 +20,7 @@ from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.core.auth import CurrentUser, get_current_user, require_module
+from app.core.auth import CurrentUser, require_module
 from app.core.rate_limit import check_rate_limit
 from app.core.ai import generate
 from app.models.law import StyleProfile, KnowledgeDocument, StyleDocChunk

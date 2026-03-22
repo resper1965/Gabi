@@ -21,7 +21,7 @@ def parse_planalto_html(raw_html: str) -> str:
     # Remove struck-through elements (revoked text)
     for strike in soup.find_all(['strike', 'del', 's']):
         strike.decompose()
-        
+
     # Sometimes Planalto uses <span style="text-decoration: line-through">
     for span in soup.find_all('span'):
         style = span.get('style', '').lower()
@@ -30,14 +30,14 @@ def parse_planalto_html(raw_html: str) -> str:
 
     # Extract clean text
     text = soup.get_text(separator="\n")
-    
+
     # Clean up whitespace and empty lines
     lines = [line.strip() for line in text.split("\n") if line.strip()]
     text = "\n".join(lines)
-    
+
     # Clean up repeated spaces
     text = re.sub(r' {2,}', ' ', text)
-    
+
     return text
 
 def chunk_planalto_law(clean_text: str) -> List[ProvisionSchema]:
@@ -49,22 +49,22 @@ def chunk_planalto_law(clean_text: str) -> List[ProvisionSchema]:
     # The lookahead (?=...) keeps the "Art" part in the next chunk
     pattern = r'\n(?=(?:O\s+)?(?:Art\.|Artigo)\s*\d+)'
     chunks = re.split(pattern, "\n" + clean_text, flags=re.IGNORECASE)
-    
+
     provisions = []
-    
+
     for chunk in chunks:
         stripped = chunk.strip()
         if not stripped:
             continue
-            
+
         # Try to extract the literal "Art. 1º" as the structure_path
         m = re.search(r'((?:Art\.|Artigo)\s*\d+(?:[ºo])?)', stripped, flags=re.IGNORECASE)
         structure_path = m.group(1).strip() if m else None
-        
+
         # We don't want to save thousands of small meaningless chunks.
         # If a chunk is just header metadata without an Article, we might group it
         # but for now, we just save it as is with structure_path=None
-        
+
         provisions.append(ProvisionSchema(
             structure_path=structure_path,
             texto_chunk=stripped

@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import get_settings
 from app.database import get_db
 from app.models.user import User
-from app.models.org import OrgMember, OrgModule
+from app.models.org import OrgMember
 
 settings = get_settings()
 logger = logging.getLogger("gabi.auth")
@@ -279,7 +279,7 @@ def require_role(*allowed_roles: str):
 
 def require_module(module_name: str):
     """Dependency factory: require access to a specific module.
-    
+
     Hybrid check:
     - Superadmins bypass all checks
     - Users with org: module must be enabled in org_modules AND in user's allowed_modules

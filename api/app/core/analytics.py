@@ -20,7 +20,7 @@ async def log_event(
     metadata: dict | None = None,
 ) -> None:
     """Log a usage event to the analytics table.
-    
+
     Non-blocking: swallows exceptions to avoid disrupting main flow.
     """
     try:

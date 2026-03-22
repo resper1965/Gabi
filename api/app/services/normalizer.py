@@ -30,7 +30,7 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
         import fitz
     except ImportError:
         raise RuntimeError("PyMuPDF (fitz) is not installed. Run 'pip install PyMuPDF'")
-    
+
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     text_blocks = []
     for page in doc:

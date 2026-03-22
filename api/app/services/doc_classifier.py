@@ -58,11 +58,13 @@ async def classify_document(text: str, fallback_type: str = "law") -> dict:
     with trace_span("document.classify", {"fallback_type": fallback_type}) as span:
         # Use first 4000 chars for classification (enough for most docs)
         snippet = text[:4000] if text else ""
-        if span: span.set_attribute("snippet_length", len(snippet))
+        if span:
+            span.set_attribute("snippet_length", len(snippet))
 
         if len(snippet.strip()) < 50:
             logger.warning("Document too short for classification (%d chars)", len(snippet))
-            if span: span.set_attribute("reason", "too_short")
+            if span:
+                span.set_attribute("reason", "too_short")
             return _fallback(fallback_type)
 
         prompt = CLASSIFY_PROMPT.format(text=snippet)
@@ -94,7 +96,8 @@ async def classify_document(text: str, fallback_type: str = "law") -> dict:
             }
         except Exception as e:
             logger.warning("Document classification failed: %s", e)
-            if span: span.set_attribute("error", str(e))
+            if span:
+                span.set_attribute("error", str(e))
             return _fallback(fallback_type)
 
 

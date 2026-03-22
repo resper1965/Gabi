@@ -19,7 +19,6 @@ Retrieval strategy (law module):
 """
 
 import hashlib
-import json
 import logging
 import time
 import uuid as _uuid_mod
@@ -87,7 +86,7 @@ async def should_retrieve(
             scope = result.get("scope", "all")
             if scope not in VALID_SCOPES:
                 scope = "all"
-            
+
             needs_rag = bool(result.get("needs_rag", True))
             if span:
                 span.set_attribute("needs_rag", needs_rag)
@@ -252,7 +251,8 @@ async def retrieve_if_needed(
         # Validate table names against allowlist (prevent SQL injection)
         if module not in ALLOWED_TABLE_PAIRS:
             logger.warning("RAG blocked: unknown module '%s' [%s]", module, trace_id)
-            if ret_span: ret_span.set_attribute("error", "blocked_module")
+            if ret_span:
+                ret_span.set_attribute("error", "blocked_module")
             return [], False
         chunks_table, docs_table, doc_type_col = ALLOWED_TABLE_PAIRS[module]
 

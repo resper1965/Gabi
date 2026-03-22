@@ -9,7 +9,6 @@ The CVM does NOT offer a public API for normative text.
 This client combines multiple sources to achieve comprehensive coverage.
 """
 
-import asyncio
 import hashlib
 import logging
 import httpx
@@ -18,7 +17,6 @@ from typing import List, Optional
 
 from app.services.bcb_client import BCBClient
 from app.services.lexml_client import LexMLClient, LexMLDocument
-from app.services.normalizer import extract_pdf_text, html_to_text
 
 logger = logging.getLogger("gabi.cvm")
 

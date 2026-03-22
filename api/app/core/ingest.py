@@ -51,7 +51,7 @@ def extract_text_from_docx(data: bytes) -> str:
 
 def extract_text(data: bytes, filename: str) -> str:
     """Auto-detect file type and extract text.
-    
+
     Supported: .pdf, .docx, .txt, .md, .csv
     Unsupported with explicit error: .xlsx (requires structured handling)
     Unknown types: decoded as text with warning logged.
@@ -77,10 +77,10 @@ def extract_text(data: bytes, filename: str) -> str:
                 "Quality of indexed content may be degraded.", filename
             )
             text = data.decode("utf-8", errors="replace")
-            
+
         if span:
             span.set_attribute("char_count", len(text))
-            
+
         return text
 
 

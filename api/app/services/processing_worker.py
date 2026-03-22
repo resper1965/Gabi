@@ -12,7 +12,7 @@ logger = logging.getLogger("gabi.processing_worker")
 async def process_regulatory_version_bg(version_id: int, texto_integral: str, provisions: List[ProvisionSchema]):
     """Background task to run AI analysis and chunk embeddings without blocking ingestion."""
     logger.info("Starting background AI processing for version_id=%s", version_id)
-    
+
     async with async_session() as session:
         # 1. AI Analysis
         try:
@@ -46,7 +46,7 @@ async def process_regulatory_version_bg(version_id: int, texto_integral: str, pr
                     embedding=emb,
                 )
                 session.add(db_prov)
-            
+
         try:
             await session.commit()
             logger.info("Successfully completed and committed AI processing for version %s", version_id)

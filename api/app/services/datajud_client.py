@@ -15,7 +15,7 @@ and update the DATAJUD_API_KEY environment variable.
 import json
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional
 

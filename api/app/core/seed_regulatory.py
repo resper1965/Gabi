@@ -6,7 +6,6 @@ Each pack corresponds to a regulatory body (ANS, CVM, SUSEP, BACEN, LGPD).
 
 import asyncio
 import json
-import os
 import uuid
 import logging
 from pathlib import Path
@@ -15,7 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.embeddings import embed_batch
-from app.core.ingest import chunk_text, extract_text
+from app.core.ingest import chunk_text
 
 logger = logging.getLogger(__name__)
 

@@ -1,11 +1,10 @@
 """Organization, Plan & FinOps models — Multi-tenant Onboarding System."""
 
 import uuid
-from datetime import datetime
 
 from sqlalchemy import (
     Boolean, Column, DateTime, Float, ForeignKey, Integer,
-    String, Text, UniqueConstraint, func,
+    String, UniqueConstraint, func,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship

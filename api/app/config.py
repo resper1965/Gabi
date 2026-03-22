@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     model_ghost: str = "gemini-2.0-flash-001"   # Creativity + low latency
     model_law: str = "gemini-2.5-pro-preview-05-06"  # Best reasoning for legal
     model_flash: str = "gemini-2.0-flash-001"   # Fast/cheap tasks (RAG, classify, summarize)
-    
+
     # LLM Settings
     chat_history_limit: int = 6
 

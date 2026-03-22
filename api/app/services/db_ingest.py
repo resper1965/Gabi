@@ -1,7 +1,5 @@
-import asyncio
 import logging
 from typing import List, Optional
-from datetime import datetime, timezone
 
 logger = logging.getLogger("gabi.db_ingest")
 
@@ -11,31 +9,28 @@ from sqlalchemy import select
 from app.models.regulatory import (
     RegulatoryDocument,
     RegulatoryVersion,
-    RegulatoryProvision,
-    RegulatoryAnalysis,
     RssItem
 )
-from app.models.audit import IngestRun, IngestRunItem, IngestStatus, IngestSource
-from app.schemas.ingest import RegulatoryDocumentSchema, RssItemSchema, ProvisionSchema
-from app.services.analyzer import analyze_normative
+from app.models.audit import IngestRun, IngestRunItem, IngestStatus
+from app.schemas.ingest import RegulatoryDocumentSchema, RssItemSchema
 
 class DBIngester:
     def __init__(self, session: AsyncSession):
         self.session = session
-        
+
     async def ingest_rss_items(self, run: IngestRun, items: List[RssItemSchema]) -> IngestRun:
         for item_data in items:
             # Check existing
             stmt = select(RssItem).where((RssItem.guid == item_data.guid) | (RssItem.link == item_data.link))
             existing = (await self.session.execute(stmt)).scalars().first()
-            
+
             if not existing:
                 new_item = RssItem(**item_data.model_dump())
                 self.session.add(new_item)
                 run.itens_novos += 1
             else:
                 run.itens_atualizados += 1 # Or just skipped for RSS
-                
+
         await self.session.commit()
         return run
 
@@ -72,20 +67,20 @@ class DBIngester:
                 )
                 self.session.add(version)
                 await self.session.flush()
-                
+
                 doc.current_version_id = version.id
-                
+
                 # Mark for background AI / Embeddings processing
                 version_id_to_dispatch = version.id
-                
+
                 run.itens_novos += 1
                 self._log_item(run.id, IngestStatus.NEW, doc_schema.id_fonte, doc_schema.version_hash)
-                
+
             else:
                 # Document exists. Check current version hash
                 curr_ver_stmt = select(RegulatoryVersion).where(RegulatoryVersion.id == doc.current_version_id)
                 curr_version = (await self.session.execute(curr_ver_stmt)).scalars().first()
-                
+
                 if not curr_version or curr_version.version_hash != doc_schema.version_hash:
                     # UPDATED
                     new_version = RegulatoryVersion(
@@ -96,23 +91,23 @@ class DBIngester:
                     self.session.add(new_version)
                     await self.session.flush()
                     doc.current_version_id = new_version.id
-                    
+
                     # Mark for background AI / Embeddings processing
                     version_id_to_dispatch = new_version.id
-                    
+
                     run.itens_atualizados += 1
                     self._log_item(run.id, IngestStatus.UPDATED, doc_schema.id_fonte, doc_schema.version_hash)
                 else:
                     # SKIPPED
                     self._log_item(run.id, IngestStatus.SKIPPED, doc_schema.id_fonte, doc_schema.version_hash)
-            
+
             await self.session.commit()
 
             # Now that the transaction is committed, dispatch background AI tasks
             if version_id_to_dispatch:
                 from app.services.processing_worker import dispatch_regulatory_processing
                 dispatch_regulatory_processing(version_id_to_dispatch, doc_schema.texto_integral, doc_schema.provisions)
-            
+
         except Exception as e:
             await self.session.rollback()
             run.erros += 1

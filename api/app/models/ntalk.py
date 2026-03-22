@@ -1,10 +1,9 @@
 """nTalkSQL models — Business dictionary, golden queries, connections, audit."""
 
 import uuid
-from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.models.base import Base

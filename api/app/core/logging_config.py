@@ -33,7 +33,7 @@ class StructuredFormatter(logging.Formatter):
         req_id = request_id_ctx.get("")
         if req_id:
             log_entry["trace_id"] = req_id
-        
+
         uid = user_id_ctx.get("")
         if uid:
             log_entry["user_id"] = uid

@@ -14,7 +14,6 @@ from app.core.multi_agent import debate, AgentConfig
 from app.core.analytics import log_event
 from app.core.auth import CurrentUser
 from app.models.insightcare import ClaimsData
-from app.models.law import LegalDocument, LegalChunk
 
 from .schemas import AgentRequest
 from .agents import (

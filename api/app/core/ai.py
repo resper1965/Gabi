@@ -5,7 +5,6 @@ Protected by circuit breaker against Vertex AI outages.
 Includes FinOps token usage tracking.
 """
 
-import asyncio
 import json
 import logging
 import time
